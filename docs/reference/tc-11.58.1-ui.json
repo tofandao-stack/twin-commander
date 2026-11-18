@@ -1,0 +1,938 @@
+{
+  "reference": {
+    "product": "Total Commander",
+    "version": "11.58.1",
+    "architecture": "x64",
+    "language": "built-in English",
+    "executableSha256": "570f455917d991d32329005e259653fb4817716f137297ed82389ec920352f99",
+    "buttonbarSha256": "8159c946398eec59d8065342c06b957ae38165e664850fb57f5d9971cffb7c21"
+  },
+  "menus": [
+    {
+      "name": "Files",
+      "caption": "&Files",
+      "command": 0,
+      "items": [
+        {
+          "name": "FilesChangeattributes",
+          "caption": "&Change Attributes...",
+          "command": 502
+        },
+        {
+          "name": "FilesPack",
+          "caption": "&Pack...\tAlt+F5",
+          "command": 508
+        },
+        {
+          "name": "FilesUnpackspecificfiles",
+          "caption": "&Unpack Specific Files...\tAlt+F9",
+          "command": 509
+        },
+        {
+          "name": "Testarchives1",
+          "caption": "Test Arch&ive(s)\tAlt+Shift+F9",
+          "command": 518
+        },
+        {
+          "name": "Comparebycontent1",
+          "caption": "Compare B&y Content...",
+          "command": 2022
+        },
+        {
+          "name": "FilesAssociatewith",
+          "caption": "&Associate With...",
+          "command": 507
+        },
+        {
+          "name": "Changeinternalassociations1",
+          "caption": "Interna&l Associations (Total Commander Only)...",
+          "command": 519
+        },
+        {
+          "name": "FilesVersioninfo",
+          "caption": "Properties&...\tAlt+Enter",
+          "command": 510
+        },
+        {
+          "name": "MenuItemID503",
+          "caption": "Calculate &Occupied Space...\tCtrl+L",
+          "command": 503
+        },
+        {
+          "name": "Renametool1",
+          "caption": "Multi-&Rename Tool...\tCtrl+M",
+          "command": 2400
+        },
+        {
+          "name": "Editcomment1",
+          "caption": "Edit Comme&nt...\tCtrl+Z",
+          "command": 2700
+        },
+        {
+          "name": "Print1",
+          "caption": "Prin&t",
+          "command": 0,
+          "items": [
+            {
+              "name": "Filelist2",
+              "caption": "File &list...",
+              "command": 2027
+            },
+            {
+              "name": "Filelist1",
+              "caption": "File list with &subdirs...",
+              "command": 2028
+            },
+            {
+              "name": "Filecontents1",
+              "caption": "File con&tents\tCtrl+F9",
+              "command": 504
+            }
+          ]
+        },
+        {
+          "name": "N2",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "Splitfile1",
+          "caption": "&Split File...",
+          "command": 560
+        },
+        {
+          "name": "Combinefiles1",
+          "caption": "Co&mbine Files...",
+          "command": 561
+        },
+        {
+          "name": "Encodefile1",
+          "caption": "&Encode File  (MIME,UUE,XXE)...",
+          "command": 562
+        },
+        {
+          "name": "DecodeFile1",
+          "caption": "&Decode File  (MIME,UUE,XXE,BinHex)...",
+          "command": 563
+        },
+        {
+          "name": "CreateCRCchecksums1",
+          "caption": "Create C&hecksum File(s) (CRC32, MD5, SHA1)...",
+          "command": 564
+        },
+        {
+          "name": "VerifyCRCchecksums1",
+          "caption": "&Verify Checksums (from checksum files)",
+          "command": 565
+        },
+        {
+          "name": "N4",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "FilesQuit",
+          "caption": "&Quit\tAlt+F4",
+          "command": 24340
+        }
+      ]
+    },
+    {
+      "name": "Mark",
+      "caption": "&Mark",
+      "command": 0,
+      "items": [
+        {
+          "name": "MarkSelectgroup",
+          "caption": "Select &Group...\tNum +",
+          "command": 521
+        },
+        {
+          "name": "MarkUnselectgroup",
+          "caption": "&Unselect Group...\tNum -",
+          "command": 522
+        },
+        {
+          "name": "MarkSelectall",
+          "caption": "Select &All\tCtrl Num +",
+          "command": 523
+        },
+        {
+          "name": "MarkUnselectall",
+          "caption": "U&nselect All\tCtrl Num -",
+          "command": 524
+        },
+        {
+          "name": "MarkInvertSelection",
+          "caption": "&Invert Selection\tNum *",
+          "command": 525
+        },
+        {
+          "name": "Selectallwithsameextension1",
+          "caption": "Select All With Same E&xtension\tAlt Num +",
+          "command": 527
+        },
+        {
+          "name": "N3",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "Saveselection1",
+          "caption": "&Save Selection",
+          "command": 530
+        },
+        {
+          "name": "MarkRestoreSelection",
+          "caption": "&Restore Selection\tNum /",
+          "command": 529
+        },
+        {
+          "name": "Saveselectiontofile1",
+          "caption": "Sa&ve Selection To File",
+          "command": 2031
+        },
+        {
+          "name": "Loadselectionfromfile1",
+          "caption": "&Load Selection From File",
+          "command": 2032
+        },
+        {
+          "name": "N5",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "Copy1",
+          "caption": "Cop&y Selected Names To Clipboard",
+          "command": 2017
+        },
+        {
+          "name": "Copytoclipboardwithfullpath1",
+          "caption": "Copy Names With &Path To Clipboard",
+          "command": 2018
+        },
+        {
+          "name": "Copytoclipboardwithalldetails1",
+          "caption": "Copy To Clipboard With All &Details",
+          "command": 2036
+        },
+        {
+          "name": "Copytoclipboardwithpathdetails1",
+          "caption": "Copy To Clip&board With Path+Details",
+          "command": 2037
+        },
+        {
+          "name": "MenuItem1",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "MarkComparedirectories",
+          "caption": "&Compare Directories\tShift+F2",
+          "command": 533
+        },
+        {
+          "name": "MarkMarknewerhidesamefiles",
+          "caption": "&Mark Newer, Hide Same Files",
+          "command": 534
+        }
+      ]
+    },
+    {
+      "name": "Commands",
+      "caption": "&Commands",
+      "command": 0,
+      "items": [
+        {
+          "name": "CommandsCDtree",
+          "caption": "CD &Tree...\tAlt+F10",
+          "command": 500
+        },
+        {
+          "name": "CommandsSearch",
+          "caption": "&Search...\tAlt+F7",
+          "command": 501
+        },
+        {
+          "name": "MenuItem8",
+          "caption": "Search in separate &Process...\tAlt+Shift+F7",
+          "command": 545
+        },
+        {
+          "name": "CommandsVolumelabel",
+          "caption": "&Volume Label...",
+          "command": 505
+        },
+        {
+          "name": "CommandsSystemInformation",
+          "caption": "System &Information...",
+          "command": 506
+        },
+        {
+          "name": "Synchronizedirs1",
+          "caption": "S&ynchronize Dirs...",
+          "command": 2020
+        },
+        {
+          "name": "DirectoryHotlist",
+          "caption": "Directory &Hotlist\tCtrl+D",
+          "command": 526
+        },
+        {
+          "name": "Goback1",
+          "caption": "Go &Back\tAlt+Left Arrow",
+          "command": 570
+        },
+        {
+          "name": "MenuItem2",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "CommandsRunDOS",
+          "caption": "Open comman&d prompt window",
+          "command": 511
+        },
+        {
+          "name": "MenuItem3",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "Branchview1",
+          "caption": "Br&anch View (With Subdirs)\tCtrl+B",
+          "command": 2026
+        },
+        {
+          "name": "Opendesktop1",
+          "caption": "&Open Desktop Folder",
+          "command": 2121
+        },
+        {
+          "name": "Backgroundtransfermanager1",
+          "caption": "Background Transfer &Manager...",
+          "command": 559
+        },
+        {
+          "name": "MenuItem4",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "CommandsSourceTarget",
+          "caption": "Source&<->Target\tCtrl+U",
+          "command": 531
+        },
+        {
+          "name": "CommandsTargetSource",
+          "caption": "Target&=Source",
+          "command": 532
+        }
+      ]
+    },
+    {
+      "name": "Net1",
+      "caption": "&Net",
+      "command": 0,
+      "items": [
+        {
+          "name": "CommandsNetworkconnections",
+          "caption": "&Network Connections...",
+          "command": 512
+        },
+        {
+          "name": "MenuItemID513",
+          "caption": "&Disconnect Network Drives...",
+          "command": 513
+        },
+        {
+          "name": "MenuItemID514",
+          "caption": "Share &Current Directory...",
+          "command": 514
+        },
+        {
+          "name": "CommandsUnsharedirectory",
+          "caption": "&Unshare Directory...",
+          "command": 515
+        },
+        {
+          "name": "Showadminshares1",
+          "caption": "Show &Admin Shares",
+          "command": 2204
+        },
+        {
+          "name": "N1",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "Connect1",
+          "caption": "&FTP Connect...\tCtrl+F",
+          "command": 550
+        },
+        {
+          "name": "NewConnection1",
+          "caption": "FT&P New Connection...\tCtrl+N",
+          "command": 551
+        },
+        {
+          "name": "Disconnect1",
+          "caption": "FTP Disconn&ect\tCtrl+Shift+F",
+          "command": 552
+        },
+        {
+          "name": "Showhiddenfiles1",
+          "caption": "FTP Sho&w Hidden Files",
+          "command": 553
+        },
+        {
+          "name": "FTPDownloadfromlist1",
+          "caption": "FTP Download From &List...",
+          "command": 558
+        },
+        {
+          "name": "PORTconnectiontootherPC1",
+          "caption": "P&ORT Connection To Other PC...",
+          "command": 2300
+        }
+      ]
+    },
+    {
+      "name": "Show",
+      "caption": "Sho&w",
+      "command": 0,
+      "items": [
+        {
+          "name": "ShowBrief",
+          "caption": "&Brief\tCtrl+F1",
+          "command": 301
+        },
+        {
+          "name": "ShowFull",
+          "caption": "&Full\tCtrl+F2",
+          "command": 302
+        },
+        {
+          "name": "ShowCommentsMnu",
+          "caption": "Co&mments\tCtrl+Shift+F2",
+          "command": 300
+        },
+        {
+          "name": "Customcolumns1",
+          "caption": "Custom Columns Mo&de\tShift+F1",
+          "command": 270
+        },
+        {
+          "name": "MenuItem10",
+          "caption": "Custom View Modes",
+          "command": 333
+        },
+        {
+          "name": "ShowTree",
+          "caption": "&Tree\tCtrl+F8",
+          "command": 303
+        },
+        {
+          "name": "SeparateTree1",
+          "caption": "Separate Tree\tCtrl+Shift+F8",
+          "command": 0,
+          "items": [
+            {
+              "name": "None1",
+              "caption": "&0 (None)",
+              "command": 3200
+            },
+            {
+              "name": "One1",
+              "caption": "&1 (One For Both Panels)",
+              "command": 3201
+            },
+            {
+              "name": "Two1",
+              "caption": "&2 (Two, One For Each Panel)",
+              "command": 3202
+            }
+          ]
+        },
+        {
+          "name": "Thumbnailview1",
+          "caption": "Thumbnai&l View\tCtrl+Shift+F1",
+          "command": 269
+        },
+        {
+          "name": "QuickView1",
+          "caption": "&Quick View Panel\tCtrl+Q",
+          "command": 304
+        },
+        {
+          "name": "Verticalarrangement1",
+          "caption": "&Vertical Arrangement",
+          "command": 305
+        },
+        {
+          "name": "NewFolderTabtCtrlT1",
+          "caption": "Ne&w Folder Tab\tCtrl+T",
+          "command": 3001
+        },
+        {
+          "name": "a1",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "ShowAllFiles",
+          "caption": "&All Files\tCtrl+F10",
+          "command": 312
+        },
+        {
+          "name": "ShowPrograms",
+          "caption": "&Programs\tCtrl+F11",
+          "command": 311
+        },
+        {
+          "name": "Show1",
+          "caption": "*.*",
+          "command": 313
+        },
+        {
+          "name": "ShowCustom",
+          "caption": "&Custom...\tCtrl+F12",
+          "command": 314
+        },
+        {
+          "name": "ShowOnlySelected",
+          "caption": "&Only Selected Files",
+          "command": 2023
+        },
+        {
+          "name": "MenuItem5",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "ShowName",
+          "caption": "&Name\tCtrl+F3",
+          "command": 321
+        },
+        {
+          "name": "ShowExtension",
+          "caption": "E&xtension\tCtrl+F4",
+          "command": 322
+        },
+        {
+          "name": "ShowTime",
+          "caption": "T&ime\tCtrl+F5",
+          "command": 324
+        },
+        {
+          "name": "ShowSize",
+          "caption": "&Size\tCtrl+F6",
+          "command": 323
+        },
+        {
+          "name": "ShowUnsorted",
+          "caption": "&Unsorted\tCtrl+F7",
+          "command": 325
+        },
+        {
+          "name": "MenuItem6",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "ShowReversedorder",
+          "caption": "&Reversed Order",
+          "command": 330
+        },
+        {
+          "name": "N6",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "ShowRereadsource",
+          "caption": "R&eread Source\tCtrl+R",
+          "command": 540
+        }
+      ]
+    },
+    {
+      "name": "Configuration",
+      "caption": "C&onfiguration",
+      "command": 0,
+      "items": [
+        {
+          "name": "ConfigurationConfiguration",
+          "caption": "&Options...",
+          "command": 490
+        },
+        {
+          "name": "ConfigurationButtonbar",
+          "caption": "&Button Bar...",
+          "command": 498
+        },
+        {
+          "name": "ConfigurationButtonbar2",
+          "caption": "Button Bar &2 (Vertical)...",
+          "command": 583
+        },
+        {
+          "name": "ConfigurationIniChange",
+          "caption": "&Change Settings Files Directly",
+          "command": 581
+        },
+        {
+          "name": "DarkNormalMenu",
+          "caption": "&Dark<->Normal",
+          "command": 2950
+        },
+        {
+          "name": "ConfigurationSaveposition",
+          "caption": "&Save Position",
+          "command": 493
+        },
+        {
+          "name": "ConfigurationSaveSettings",
+          "caption": "Sa&ve Settings",
+          "command": 580
+        }
+      ]
+    },
+    {
+      "name": "Start1",
+      "caption": "&Start",
+      "command": 0
+    },
+    {
+      "name": "Help",
+      "caption": "&Help",
+      "command": 0,
+      "items": [
+        {
+          "name": "HelpIndex",
+          "caption": "&Index\tF1",
+          "command": 610
+        },
+        {
+          "name": "HelpKeyboard",
+          "caption": "&Keyboard",
+          "command": 620
+        },
+        {
+          "name": "HelpRegistrationInfo",
+          "caption": "&Registration Info",
+          "command": 630
+        },
+        {
+          "name": "VisittheWebsite1",
+          "caption": "&Visit Totalcmd's Website",
+          "command": 640
+        },
+        {
+          "name": "CheckForUpdates1",
+          "caption": "&Check for updates now",
+          "command": 650
+        },
+        {
+          "name": "MenuItem7",
+          "caption": "-",
+          "command": 0
+        },
+        {
+          "name": "HelpAbout",
+          "caption": "&About Total Commander...",
+          "command": 690
+        }
+      ],
+      "rightAligned": true
+    }
+  ],
+  "toolbar": [
+    {
+      "slot": 1,
+      "command": "cm_Rereadsource",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll",
+      "nativeId": 540
+    },
+    {
+      "slot": 2,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 3,
+      "command": "cm_srcshort",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,3",
+      "nativeId": 301
+    },
+    {
+      "slot": 4,
+      "command": "cm_srclong",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,4",
+      "nativeId": 302
+    },
+    {
+      "slot": 5,
+      "command": "cm_SrcThumbs",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,26",
+      "nativeId": 269
+    },
+    {
+      "slot": 6,
+      "command": "cm_SwitchSeparateTree",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,51",
+      "nativeId": 3203
+    },
+    {
+      "slot": 7,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 8,
+      "command": "cm_DirBranch",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,50",
+      "nativeId": 2026
+    },
+    {
+      "slot": 9,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 10,
+      "command": "cm_ExchangeSelection",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,11",
+      "nativeId": 525
+    },
+    {
+      "slot": 11,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 12,
+      "command": "cm_GotoPreviousDir",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,18",
+      "nativeId": 570
+    },
+    {
+      "slot": 13,
+      "command": "cm_GotoNextDir",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,19",
+      "nativeId": 571
+    },
+    {
+      "slot": 14,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 15,
+      "command": "cm_PackFiles",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,30",
+      "nativeId": 508
+    },
+    {
+      "slot": 16,
+      "command": "cm_UnpackFiles",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,31",
+      "nativeId": 509
+    },
+    {
+      "slot": 17,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 18,
+      "command": "cm_FtpConnect",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,16",
+      "nativeId": 550
+    },
+    {
+      "slot": 19,
+      "command": "cm_FtpNew",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,17",
+      "nativeId": 551
+    },
+    {
+      "slot": 20,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 21,
+      "command": "cm_SearchFor",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,47",
+      "nativeId": 501
+    },
+    {
+      "slot": 22,
+      "command": "cm_MultiRenameFiles",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,46",
+      "nativeId": 2400
+    },
+    {
+      "slot": 23,
+      "command": "cm_FileSync",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,48",
+      "nativeId": 2020
+    },
+    {
+      "slot": 24,
+      "command": "cm_CopyFullNamesToClip",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,45",
+      "nativeId": 2018
+    },
+    {
+      "slot": 25,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 26,
+      "command": "notepad.exe",
+      "separator": false,
+      "referenceIcon": "notepad.exe",
+      "nativeId": 0
+    }
+  ],
+  "verticalToolbar": [
+    {
+      "slot": 1,
+      "command": "-2",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 2,
+      "command": "-2",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 3,
+      "command": "cm_List",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,27",
+      "nativeId": 903
+    },
+    {
+      "slot": 4,
+      "command": "cm_Edit",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,28",
+      "nativeId": 904
+    },
+    {
+      "slot": 5,
+      "command": "cm_Copy",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,62",
+      "nativeId": 905
+    },
+    {
+      "slot": 6,
+      "command": "cm_RenMov",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,63",
+      "nativeId": 906
+    },
+    {
+      "slot": 7,
+      "command": "",
+      "separator": true,
+      "referenceIcon": "",
+      "nativeId": 0
+    },
+    {
+      "slot": 8,
+      "command": "cm_PackFiles",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,30",
+      "nativeId": 508
+    },
+    {
+      "slot": 9,
+      "command": "cm_MkDir",
+      "separator": false,
+      "referenceIcon": "wcmicons.dll,29",
+      "nativeId": 907
+    }
+  ],
+  "layoutDefaults": {
+    "ButtonBar": 1,
+    "ButtonBarVertical": 1,
+    "CmdLine": 1,
+    "CurDir": 1,
+    "DirectoryTabs": 1,
+    "DriveBar1": 0,
+    "DriveBar2": 0,
+    "DriveCombo": 1,
+    "HistoryHotlistButtons": 1,
+    "InterfaceFlat": 1,
+    "KeyButtons": 1,
+    "StatusBar": 1,
+    "TabHeader": 1,
+    "alwaysShowTabs": 0
+  },
+  "functionKeys": [
+    "F3 View",
+    "F4 Edit",
+    "F5 Copy",
+    "F6 Move",
+    "F7 NewFolder",
+    "F8 Delete",
+    "Alt+F4 Exit"
+  ],
+  "columns": [
+    "Name",
+    "Ext",
+    "Size",
+    "Date",
+    "Attr"
+  ],
+  "sourceForm": {
+    "width": 622,
+    "height": 421,
+    "font": "MS Sans Serif",
+    "fontHeight": -11
+  }
+}

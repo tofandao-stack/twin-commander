@@ -1,0 +1,67 @@
+{
+  "product": "Total Commander for Windows",
+  "version": "11.58.1",
+  "collectionState": "static resources audited; installed Windows runtime comparison pending",
+  "installerSha256": "e1b86b14d473af6168b7328ea62268cce4b0da8b3a5582baaaf8653927d91f86",
+  "architecture": "x64",
+  "language": "built-in English",
+  "windowsVersion": null,
+  "displayScale": null,
+  "viewport": null,
+  "fonts": null,
+  "configurationSnapshot": {
+    "source": "bundled help inisettings3.htm; no installed user configuration",
+    "defaults": {
+      "ButtonBar": 1,
+      "ButtonBarVertical": 1,
+      "CmdLine": 1,
+      "CurDir": 1,
+      "DirectoryTabs": 1,
+      "DriveBar1": 0,
+      "DriveBar2": 0,
+      "DriveCombo": 1,
+      "HistoryHotlistButtons": 1,
+      "InterfaceFlat": 1,
+      "KeyButtons": 1,
+      "StatusBar": 1,
+      "TabHeader": 1,
+      "alwaysShowTabs": 0
+    }
+  },
+  "screenshots": [],
+  "observedWorkflows": [],
+  "collectedDate": "2026-11-18",
+  "sources": [
+    "https://totalcommander.ch/115801/tcmd115801x64.exe",
+    "https://www.ghisler.com/download.htm"
+  ],
+  "declaredForm": {
+    "font": "MS Sans Serif",
+    "fontHeight": -11,
+    "clientWidth": 622,
+    "clientHeight": 421,
+    "note": "Design values from form resources; not observed runtime dimensions."
+  },
+  "artifacts": {
+    "TOTALCMD64.EXE": {
+      "sha256": "570f455917d991d32329005e259653fb4817716f137297ed82389ec920352f99",
+      "kind": "official reference input, ignored build artifact"
+    },
+    "DEFAULT.BAR": {
+      "sha256": "8159c946398eec59d8065342c06b957ae38165e664850fb57f5d9971cffb7c21",
+      "kind": "official reference input, ignored build artifact"
+    },
+    "VERTICAL.BAR": {
+      "sha256": "2269161181abceb488f93ed7a52e81900d3217d0da4cd3fe7cd405b7658d814a",
+      "kind": "official reference input, ignored build artifact"
+    },
+    "TOTALCMD.CHM": {
+      "sha256": "ac88512d1e474f49993c90f2f21f1f296e696fce1fabb0623e566ef2a0d82087",
+      "kind": "official reference input, ignored build artifact"
+    },
+    "TOTALCMD.INC": {
+      "sha256": "cf25d733d8605283e62b68118ca0ec1e0b0a5de70c2144e7a1385bcd6ee4e713",
+      "kind": "functional command-name/ID reference; comments not bundled"
+    }
+  }
+}

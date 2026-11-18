@@ -1,0 +1,312 @@
+[
+  {
+    "caption": "Test Arch&ive(s)\tAlt+Shift+F9",
+    "context": "commands",
+    "id": "tc_518"
+  },
+  {
+    "caption": "File &list...",
+    "context": "commands",
+    "id": "tc_2027"
+  },
+  {
+    "caption": "File list with &subdirs...",
+    "context": "commands",
+    "id": "tc_2028"
+  },
+  {
+    "caption": "File con&tents\tCtrl+F9",
+    "context": "commands",
+    "id": "tc_504"
+  },
+  {
+    "caption": "Create C&hecksum File(s) (CRC32, MD5, SHA1)...",
+    "context": "commands",
+    "id": "tc_564"
+  },
+  {
+    "caption": "&Verify Checksums (from checksum files)",
+    "context": "commands",
+    "id": "tc_565"
+  },
+  {
+    "caption": "Sa&ve Selection To File",
+    "context": "commands",
+    "id": "tc_2031"
+  },
+  {
+    "caption": "&Load Selection From File",
+    "context": "commands",
+    "id": "tc_2032"
+  },
+  {
+    "caption": "&Mark Newer, Hide Same Files",
+    "context": "commands",
+    "id": "tc_534"
+  },
+  {
+    "caption": "CD &Tree...\tAlt+F10",
+    "context": "commands",
+    "id": "tc_500"
+  },
+  {
+    "caption": "Search in separate &Process...\tAlt+Shift+F7",
+    "context": "commands",
+    "id": "tc_545"
+  },
+  {
+    "caption": "System &Information...",
+    "context": "commands",
+    "id": "tc_506"
+  },
+  {
+    "caption": "Open comman&d prompt window",
+    "context": "commands",
+    "id": "tc_511"
+  },
+  {
+    "caption": "&Open Desktop Folder",
+    "context": "commands",
+    "id": "tc_2121"
+  },
+  {
+    "caption": "Custom View Modes",
+    "context": "commands",
+    "id": "tc_333"
+  },
+  {
+    "caption": "&Programs\tCtrl+F11",
+    "context": "commands",
+    "id": "tc_311"
+  },
+  {
+    "caption": "*.*",
+    "context": "commands",
+    "id": "tc_313"
+  },
+  {
+    "caption": "&Custom...\tCtrl+F12",
+    "context": "commands",
+    "id": "tc_314"
+  },
+  {
+    "caption": "&Only Selected Files",
+    "context": "commands",
+    "id": "tc_2023"
+  },
+  {
+    "caption": "&Unsorted\tCtrl+F7",
+    "context": "commands",
+    "id": "tc_325"
+  },
+  {
+    "caption": "&Change Settings Files Directly",
+    "context": "commands",
+    "id": "tc_581"
+  },
+  {
+    "caption": "Sa&ve now",
+    "context": "configuration",
+    "id": "HistorySaveNowBtn"
+  },
+  {
+    "caption": "&Delete now",
+    "context": "configuration",
+    "id": "HistoryDeleteNowBtn"
+  },
+  {
+    "caption": "Dire&ctory history",
+    "context": "configuration",
+    "id": "ConfHistoryButton"
+  },
+  {
+    "caption": "&Delete...",
+    "context": "configuration",
+    "id": "id_deletemenu"
+  },
+  {
+    "caption": "&Add...",
+    "context": "configuration",
+    "id": "id_addmenu"
+  },
+  {
+    "caption": "Change &Title...",
+    "context": "configuration",
+    "id": "id_changetitle"
+  },
+  {
+    "caption": "De&fault",
+    "context": "configuration",
+    "id": "id_TabDefaults"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_ForeChooseColor"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_BackChooseColor"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_MarkChooseColor"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_CursorChooseColor"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_CursorFontChooseColor"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_BackChooseColor2"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_OtherChooseColor"
+  },
+  {
+    "caption": "Change font",
+    "context": "configuration",
+    "id": "ChangeFont1"
+  },
+  {
+    "caption": "Change font",
+    "context": "configuration",
+    "id": "ChangeFont2"
+  },
+  {
+    "caption": "Change font",
+    "context": "configuration",
+    "id": "ChangeFont3"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_barfilesearch"
+  },
+  {
+    "caption": "&Delete",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_delete"
+  },
+  {
+    "caption": "&Add",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_add"
+  },
+  {
+    "caption": "Change &>>",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_addcmd"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_iconfile"
+  },
+  {
+    "caption": "...",
+    "context": "cm_ButtonConfig",
+    "id": "BitBtn1"
+  },
+  {
+    "caption": "->.ico",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_saveicon"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_barfilesearch"
+  },
+  {
+    "caption": "&Delete",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_delete"
+  },
+  {
+    "caption": "&Add",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_add"
+  },
+  {
+    "caption": "Change &>>",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_addcmd"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_iconfile"
+  },
+  {
+    "caption": "...",
+    "context": "cm_ButtonConfig2",
+    "id": "BitBtn1"
+  },
+  {
+    "caption": "->.ico",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_saveicon"
+  },
+  {
+    "caption": "[N#-#] &Range",
+    "context": "rename",
+    "id": "AddRangeN"
+  },
+  {
+    "caption": "[YMD]  &Date",
+    "context": "rename",
+    "id": "AddDate"
+  },
+  {
+    "caption": "[hms]  &Time",
+    "context": "rename",
+    "id": "AddTime"
+  },
+  {
+    "caption": "&+",
+    "context": "rename",
+    "id": "AddOther"
+  },
+  {
+    "caption": "&#",
+    "context": "rename",
+    "id": "AddRangeOther"
+  },
+  {
+    "caption": "[E#-#] R&ange",
+    "context": "rename",
+    "id": "AddRangeE"
+  },
+  {
+    "caption": "...",
+    "context": "rename",
+    "id": "MoreButton"
+  },
+  {
+    "caption": "&View F3",
+    "context": "search",
+    "id": "&View F3"
+  },
+  {
+    "caption": "&Edit F4",
+    "context": "search",
+    "id": "&Edit F4"
+  },
+  {
+    "caption": "Feed to &listbox",
+    "context": "search",
+    "id": "Feed to &listbox"
+  }
+]

@@ -1,0 +1,1 @@
+Public libarchive 3.7.2 headers from Ubuntu package libarchive-dev 3.7.2-2ubuntu0.9. Copyright and license notices are retained in the headers and COPYRIGHT. Used only as a fallback when the system development headers are absent; implementation is supplied by the system libarchive shared library. Install libarchive-dev for the standard development setup.

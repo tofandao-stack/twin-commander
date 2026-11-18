@@ -1,0 +1,957 @@
+[
+  {
+    "caption": "Test Arch&ive(s)\tAlt+Shift+F9",
+    "context": "commands",
+    "id": "tc_518",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Associate With...",
+    "context": "commands",
+    "id": "tc_507",
+    "status": "native-adaptation",
+    "note": "Desktop MIME associations through xdg-mime."
+  },
+  {
+    "caption": "Interna&l Associations (Total Commander Only)...",
+    "context": "commands",
+    "id": "tc_519",
+    "status": "native-adaptation",
+    "note": "Native executable associations."
+  },
+  {
+    "caption": "Edit Comme&nt...\tCtrl+Z",
+    "context": "commands",
+    "id": "tc_2700",
+    "status": "native-adaptation",
+    "note": "Linux extended attributes."
+  },
+  {
+    "caption": "File &list...",
+    "context": "commands",
+    "id": "tc_2027",
+    "status": "implemented"
+  },
+  {
+    "caption": "File list with &subdirs...",
+    "context": "commands",
+    "id": "tc_2028",
+    "status": "implemented"
+  },
+  {
+    "caption": "File con&tents\tCtrl+F9",
+    "context": "commands",
+    "id": "tc_504",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Split File...",
+    "context": "commands",
+    "id": "tc_560",
+    "status": "implemented"
+  },
+  {
+    "caption": "Co&mbine Files...",
+    "context": "commands",
+    "id": "tc_561",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Encode File  (MIME,UUE,XXE)...",
+    "context": "commands",
+    "id": "tc_562",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Decode File  (MIME,UUE,XXE,BinHex)...",
+    "context": "commands",
+    "id": "tc_563",
+    "status": "implemented"
+  },
+  {
+    "caption": "Create C&hecksum File(s) (CRC32, MD5, SHA1)...",
+    "context": "commands",
+    "id": "tc_564",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Verify Checksums (from checksum files)",
+    "context": "commands",
+    "id": "tc_565",
+    "status": "implemented"
+  },
+  {
+    "caption": "Sa&ve Selection To File",
+    "context": "commands",
+    "id": "tc_2031",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Load Selection From File",
+    "context": "commands",
+    "id": "tc_2032",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Mark Newer, Hide Same Files",
+    "context": "commands",
+    "id": "tc_534",
+    "status": "implemented"
+  },
+  {
+    "caption": "CD &Tree...\tAlt+F10",
+    "context": "commands",
+    "id": "tc_500",
+    "status": "implemented"
+  },
+  {
+    "caption": "Search in separate &Process...\tAlt+Shift+F7",
+    "context": "commands",
+    "id": "tc_545",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Volume Label...",
+    "context": "commands",
+    "id": "tc_505",
+    "status": "native-adaptation",
+    "note": "Installed Linux filesystem utility and optional polkit authorization."
+  },
+  {
+    "caption": "System &Information...",
+    "context": "commands",
+    "id": "tc_506",
+    "status": "implemented"
+  },
+  {
+    "caption": "Open comman&d prompt window",
+    "context": "commands",
+    "id": "tc_511",
+    "status": "implemented"
+  },
+  {
+    "caption": "Br&anch View (With Subdirs)\tCtrl+B",
+    "context": "commands",
+    "id": "tc_2026",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Open Desktop Folder",
+    "context": "commands",
+    "id": "tc_2121",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Network Connections...",
+    "context": "commands",
+    "id": "tc_512",
+    "status": "native-adaptation",
+    "note": "Desktop network URI handler or native filesystem provider."
+  },
+  {
+    "caption": "&Disconnect Network Drives...",
+    "context": "commands",
+    "id": "tc_513",
+    "status": "native-adaptation",
+    "note": "Session-owned gio unmount."
+  },
+  {
+    "caption": "Share &Current Directory...",
+    "context": "commands",
+    "id": "tc_514",
+    "status": "native-adaptation",
+    "note": "Read-only HTTP share."
+  },
+  {
+    "caption": "&Unshare Directory...",
+    "context": "commands",
+    "id": "tc_515",
+    "status": "conditional",
+    "note": "Requires an active connection/share or a valid/completed rename plan."
+  },
+  {
+    "caption": "Show &Admin Shares",
+    "context": "commands",
+    "id": "tc_2204",
+    "status": "native-adaptation",
+    "note": "Administrative SMB location through desktop handler."
+  },
+  {
+    "caption": "&FTP Connect...\tCtrl+F",
+    "context": "commands",
+    "id": "tc_550",
+    "status": "implemented"
+  },
+  {
+    "caption": "FT&P New Connection...\tCtrl+N",
+    "context": "commands",
+    "id": "tc_551",
+    "status": "implemented"
+  },
+  {
+    "caption": "FTP Disconn&ect\tCtrl+Shift+F",
+    "context": "commands",
+    "id": "tc_552",
+    "status": "conditional",
+    "note": "Requires an active connection/share or a valid/completed rename plan."
+  },
+  {
+    "caption": "FTP Sho&w Hidden Files",
+    "context": "commands",
+    "id": "tc_553",
+    "status": "conditional",
+    "note": "Requires an active connection/share or a valid/completed rename plan."
+  },
+  {
+    "caption": "FTP Download From &List...",
+    "context": "commands",
+    "id": "tc_558",
+    "status": "implemented"
+  },
+  {
+    "caption": "P&ORT Connection To Other PC...",
+    "context": "commands",
+    "id": "tc_2300",
+    "status": "native-adaptation",
+    "note": "Native HTTP peer transfer; not the TC PORT protocol."
+  },
+  {
+    "caption": "Co&mments\tCtrl+Shift+F2",
+    "context": "commands",
+    "id": "tc_300",
+    "status": "implemented"
+  },
+  {
+    "caption": "Custom Columns Mo&de\tShift+F1",
+    "context": "commands",
+    "id": "tc_270",
+    "status": "implemented"
+  },
+  {
+    "caption": "Custom View Modes",
+    "context": "commands",
+    "id": "tc_333",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Tree\tCtrl+F8",
+    "context": "commands",
+    "id": "tc_303",
+    "status": "implemented"
+  },
+  {
+    "caption": "&0 (None)",
+    "context": "commands",
+    "id": "tc_3200",
+    "status": "implemented"
+  },
+  {
+    "caption": "&1 (One For Both Panels)",
+    "context": "commands",
+    "id": "tc_3201",
+    "status": "implemented"
+  },
+  {
+    "caption": "&2 (Two, One For Each Panel)",
+    "context": "commands",
+    "id": "tc_3202",
+    "status": "implemented"
+  },
+  {
+    "caption": "Thumbnai&l View\tCtrl+Shift+F1",
+    "context": "commands",
+    "id": "tc_269",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Quick View Panel\tCtrl+Q",
+    "context": "commands",
+    "id": "tc_304",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Programs\tCtrl+F11",
+    "context": "commands",
+    "id": "tc_311",
+    "status": "implemented"
+  },
+  {
+    "caption": "*.*",
+    "context": "commands",
+    "id": "tc_313",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Custom...\tCtrl+F12",
+    "context": "commands",
+    "id": "tc_314",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Only Selected Files",
+    "context": "commands",
+    "id": "tc_2023",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Unsorted\tCtrl+F7",
+    "context": "commands",
+    "id": "tc_325",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Change Settings Files Directly",
+    "context": "commands",
+    "id": "tc_581",
+    "status": "implemented"
+  },
+  {
+    "caption": "Change &Start Menu...",
+    "context": "commands",
+    "id": "tc_700",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Registration Info",
+    "context": "commands",
+    "id": "tc_630",
+    "status": "native-adaptation",
+    "note": "Independent application registration information."
+  },
+  {
+    "caption": "&Check for updates now",
+    "context": "commands",
+    "id": "tc_650",
+    "status": "native-adaptation",
+    "note": "Explicit user-configured JSON update feed."
+  },
+  {
+    "caption": "cm_SwitchSeparateTree",
+    "context": "commands",
+    "id": "bar_cm_SwitchSeparateTree",
+    "status": "implemented"
+  },
+  {
+    "caption": "...",
+    "context": "configuration",
+    "id": "HOT_OKBTN",
+    "status": "implemented"
+  },
+  {
+    "caption": "...",
+    "context": "configuration",
+    "id": "hot_command_button",
+    "status": "implemented"
+  },
+  {
+    "caption": "...",
+    "context": "configuration",
+    "id": "HOT_list_button",
+    "status": "implemented"
+  },
+  {
+    "caption": "...",
+    "context": "configuration",
+    "id": "HOT_CANCELBTN",
+    "status": "implemented"
+  },
+  {
+    "caption": "Con&figure",
+    "context": "configuration",
+    "id": "SND_Configure",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "z7_find",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_zip_find1",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_zip_find2",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Configure packer extension WCXs",
+    "context": "configuration",
+    "id": "ConfigurePlugins",
+    "status": "native-adaptation",
+    "note": "Native executable extension manager; not the Windows TC DLL ABI."
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_zip_find3",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_zip_find4",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_zip_find5",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_zip_find6",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "Button1",
+    "status": "implemented"
+  },
+  {
+    "caption": "Sa&ve now",
+    "context": "configuration",
+    "id": "HistorySaveNowBtn",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Delete now",
+    "context": "configuration",
+    "id": "HistoryDeleteNowBtn",
+    "status": "implemented"
+  },
+  {
+    "caption": "S&ave now",
+    "context": "configuration",
+    "id": "FrequentlyUsedSaveNowBtn",
+    "status": "implemented"
+  },
+  {
+    "caption": "D&elete now",
+    "context": "configuration",
+    "id": "FrequentlyUsedDeleteNowBtn",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Add selected names",
+    "context": "configuration",
+    "id": "AddSelButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "Add selected names with &full path",
+    "context": "configuration",
+    "id": "AddSelWithPathButton",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "Button9",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "FileLogButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "De&fault",
+    "context": "configuration",
+    "id": "Button5",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "Button4",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Add...",
+    "context": "configuration",
+    "id": "Button6",
+    "status": "implemented"
+  },
+  {
+    "caption": "Fields &by type",
+    "context": "configuration",
+    "id": "Button12",
+    "status": "implemented"
+  },
+  {
+    "caption": "Sta&rt!",
+    "context": "configuration",
+    "id": "CompactDatabase",
+    "status": "implemented"
+  },
+  {
+    "caption": "Configure",
+    "context": "configuration",
+    "id": "ButtonWCX",
+    "status": "native-adaptation",
+    "note": "Native executable extension manager; not the Windows TC DLL ABI."
+  },
+  {
+    "caption": "Configure",
+    "context": "configuration",
+    "id": "ButtonWFX",
+    "status": "native-adaptation",
+    "note": "Native executable extension manager; not the Windows TC DLL ABI."
+  },
+  {
+    "caption": "Configure",
+    "context": "configuration",
+    "id": "ButtonWLX",
+    "status": "native-adaptation",
+    "note": "Native executable extension manager; not the Windows TC DLL ABI."
+  },
+  {
+    "caption": "Configure",
+    "context": "configuration",
+    "id": "ButtonWDX",
+    "status": "native-adaptation",
+    "note": "Native executable extension manager; not the Windows TC DLL ABI."
+  },
+  {
+    "caption": "Download",
+    "context": "configuration",
+    "id": "ButtonDownload",
+    "status": "reference-resource",
+    "note": "Opens the reference publisher resource page; no automatic import or execution."
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "FtpLogFileButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Associations...",
+    "context": "configuration",
+    "id": "IdConfAssociateViewer",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_conf_find1",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Configure internal viewer...",
+    "context": "configuration",
+    "id": "Button2",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_conf_find2",
+    "status": "implemented"
+  },
+  {
+    "caption": "Dire&ctory history",
+    "context": "configuration",
+    "id": "ConfHistoryButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&>>",
+    "context": "configuration",
+    "id": "id_main_search",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Edit",
+    "context": "configuration",
+    "id": "id_main_edit",
+    "status": "implemented"
+  },
+  {
+    "caption": "Download",
+    "context": "configuration",
+    "id": "Button7",
+    "status": "reference-resource",
+    "note": "Opens the reference publisher resource page; no automatic import or execution."
+  },
+  {
+    "caption": "&Add...",
+    "context": "configuration",
+    "id": "AddRulesButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Delete...",
+    "context": "configuration",
+    "id": "DeleteRulesButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&More sub-rules",
+    "context": "configuration",
+    "id": "MoreRulesButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Fewer sub-rules",
+    "context": "configuration",
+    "id": "LessRulesButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Delete...",
+    "context": "configuration",
+    "id": "id_deletemenu",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Add...",
+    "context": "configuration",
+    "id": "id_addmenu",
+    "status": "implemented"
+  },
+  {
+    "caption": "Change &Title...",
+    "context": "configuration",
+    "id": "id_changetitle",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_TabColorBgBtn",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_TabColorBg2Btn",
+    "status": "implemented"
+  },
+  {
+    "caption": "+",
+    "context": "configuration",
+    "id": "AdditionalSortButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "+",
+    "context": "configuration",
+    "id": "AutoRunAdd",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_TabColorBtn",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "IconChooseButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Edit",
+    "context": "configuration",
+    "id": "CustomEdit",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Delete",
+    "context": "configuration",
+    "id": "CustomColumnsDelete",
+    "status": "implemented"
+  },
+  {
+    "caption": "&New",
+    "context": "configuration",
+    "id": "CustomColumnsAdd",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Copy",
+    "context": "configuration",
+    "id": "CustomColumnsCopy",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_icondetailsbtn",
+    "status": "implemented"
+  },
+  {
+    "caption": "De&fault",
+    "context": "configuration",
+    "id": "id_TabDefaults",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_ForeChooseColor",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_BackChooseColor",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_MarkChooseColor",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_CursorChooseColor",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_CursorFontChooseColor",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_BackChooseColor2",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Define colors by file type...",
+    "context": "configuration",
+    "id": "Button3",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "configuration",
+    "id": "id_OtherChooseColor",
+    "status": "implemented"
+  },
+  {
+    "caption": "Change font",
+    "context": "configuration",
+    "id": "ChangeFont1",
+    "status": "implemented"
+  },
+  {
+    "caption": "Change font",
+    "context": "configuration",
+    "id": "ChangeFont2",
+    "status": "implemented"
+  },
+  {
+    "caption": "Change font",
+    "context": "configuration",
+    "id": "ChangeFont3",
+    "status": "implemented"
+  },
+  {
+    "caption": "Set default icon library",
+    "context": "configuration",
+    "id": "Button8",
+    "status": "implemented"
+  },
+  {
+    "caption": "+",
+    "context": "configuration",
+    "id": "Idconf_AddCustomHints",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_barfilesearch",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Delete",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_delete",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Add",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_add",
+    "status": "implemented"
+  },
+  {
+    "caption": "Change &>>",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_addcmd",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_iconfile",
+    "status": "implemented"
+  },
+  {
+    "caption": "...",
+    "context": "cm_ButtonConfig",
+    "id": "BitBtn1",
+    "status": "implemented"
+  },
+  {
+    "caption": "->.ico",
+    "context": "cm_ButtonConfig",
+    "id": "id_btn_saveicon",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_barfilesearch",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Delete",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_delete",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Add",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_add",
+    "status": "implemented"
+  },
+  {
+    "caption": "Change &>>",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_addcmd",
+    "status": "implemented"
+  },
+  {
+    "caption": ">>",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_iconfile",
+    "status": "implemented"
+  },
+  {
+    "caption": "...",
+    "context": "cm_ButtonConfig2",
+    "id": "BitBtn1",
+    "status": "implemented"
+  },
+  {
+    "caption": "->.ico",
+    "context": "cm_ButtonConfig2",
+    "id": "id_btn_saveicon",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Start!",
+    "context": "rename",
+    "id": "applyRename",
+    "status": "conditional",
+    "note": "Requires an active connection/share or a valid/completed rename plan."
+  },
+  {
+    "caption": "[N#-#] &Range",
+    "context": "rename",
+    "id": "AddRangeN",
+    "status": "implemented"
+  },
+  {
+    "caption": "[YMD]  &Date",
+    "context": "rename",
+    "id": "AddDate",
+    "status": "implemented"
+  },
+  {
+    "caption": "[hms]  &Time",
+    "context": "rename",
+    "id": "AddTime",
+    "status": "implemented"
+  },
+  {
+    "caption": "[=?]  Plug&in",
+    "context": "rename",
+    "id": "PluginButton",
+    "status": "implemented"
+  },
+  {
+    "caption": "&+",
+    "context": "rename",
+    "id": "AddOther",
+    "status": "implemented"
+  },
+  {
+    "caption": "&#",
+    "context": "rename",
+    "id": "AddRangeOther",
+    "status": "implemented"
+  },
+  {
+    "caption": "[E#-#] R&ange",
+    "context": "rename",
+    "id": "AddRangeE",
+    "status": "implemented"
+  },
+  {
+    "caption": "...",
+    "context": "rename",
+    "id": "MoreButton",
+    "status": "implemented"
+  },
+  {
+    "caption": ">",
+    "context": "rename",
+    "id": ">",
+    "status": "conditional",
+    "note": "Requires an active connection/share or a valid/completed rename plan."
+  },
+  {
+    "caption": "&Undo",
+    "context": "rename",
+    "id": "&Undo",
+    "status": "conditional",
+    "note": "Requires an active connection/share or a valid/completed rename plan."
+  },
+  {
+    "caption": "",
+    "context": "search",
+    "id": "ScrollLeftButton",
+    "status": "qt-managed",
+    "note": "Enabled by Qt only when tab overflow permits scrolling."
+  },
+  {
+    "caption": "&View F3",
+    "context": "search",
+    "id": "&View F3",
+    "status": "implemented"
+  },
+  {
+    "caption": "&Edit F4",
+    "context": "search",
+    "id": "&Edit F4",
+    "status": "implemented"
+  },
+  {
+    "caption": "Feed to &listbox",
+    "context": "search",
+    "id": "Feed to &listbox",
+    "status": "implemented"
+  }
+]

@@ -1,0 +1,777 @@
+[
+    {
+        "caption": "Test Arch&ive(s)\tAlt+Shift+F9",
+        "context": "commands",
+        "id": "tc_518"
+    },
+    {
+        "caption": "&Associate With...",
+        "context": "commands",
+        "id": "tc_507"
+    },
+    {
+        "caption": "Interna&l Associations (Total Commander Only)...",
+        "context": "commands",
+        "id": "tc_519"
+    },
+    {
+        "caption": "Edit Comme&nt...\tCtrl+Z",
+        "context": "commands",
+        "id": "tc_2700"
+    },
+    {
+        "caption": "File &list...",
+        "context": "commands",
+        "id": "tc_2027"
+    },
+    {
+        "caption": "File list with &subdirs...",
+        "context": "commands",
+        "id": "tc_2028"
+    },
+    {
+        "caption": "File con&tents\tCtrl+F9",
+        "context": "commands",
+        "id": "tc_504"
+    },
+    {
+        "caption": "&Split File...",
+        "context": "commands",
+        "id": "tc_560"
+    },
+    {
+        "caption": "Co&mbine Files...",
+        "context": "commands",
+        "id": "tc_561"
+    },
+    {
+        "caption": "&Encode File  (MIME,UUE,XXE)...",
+        "context": "commands",
+        "id": "tc_562"
+    },
+    {
+        "caption": "&Decode File  (MIME,UUE,XXE,BinHex)...",
+        "context": "commands",
+        "id": "tc_563"
+    },
+    {
+        "caption": "Create C&hecksum File(s) (CRC32, MD5, SHA1)...",
+        "context": "commands",
+        "id": "tc_564"
+    },
+    {
+        "caption": "&Verify Checksums (from checksum files)",
+        "context": "commands",
+        "id": "tc_565"
+    },
+    {
+        "caption": "Sa&ve Selection To File",
+        "context": "commands",
+        "id": "tc_2031"
+    },
+    {
+        "caption": "&Load Selection From File",
+        "context": "commands",
+        "id": "tc_2032"
+    },
+    {
+        "caption": "&Mark Newer, Hide Same Files",
+        "context": "commands",
+        "id": "tc_534"
+    },
+    {
+        "caption": "CD &Tree...\tAlt+F10",
+        "context": "commands",
+        "id": "tc_500"
+    },
+    {
+        "caption": "Search in separate &Process...\tAlt+Shift+F7",
+        "context": "commands",
+        "id": "tc_545"
+    },
+    {
+        "caption": "&Volume Label...",
+        "context": "commands",
+        "id": "tc_505"
+    },
+    {
+        "caption": "System &Information...",
+        "context": "commands",
+        "id": "tc_506"
+    },
+    {
+        "caption": "Open comman&d prompt window",
+        "context": "commands",
+        "id": "tc_511"
+    },
+    {
+        "caption": "Br&anch View (With Subdirs)\tCtrl+B",
+        "context": "commands",
+        "id": "tc_2026"
+    },
+    {
+        "caption": "&Open Desktop Folder",
+        "context": "commands",
+        "id": "tc_2121"
+    },
+    {
+        "caption": "&Network Connections...",
+        "context": "commands",
+        "id": "tc_512"
+    },
+    {
+        "caption": "&Disconnect Network Drives...",
+        "context": "commands",
+        "id": "tc_513"
+    },
+    {
+        "caption": "Share &Current Directory...",
+        "context": "commands",
+        "id": "tc_514"
+    },
+    {
+        "caption": "&Unshare Directory...",
+        "context": "commands",
+        "id": "tc_515"
+    },
+    {
+        "caption": "Show &Admin Shares",
+        "context": "commands",
+        "id": "tc_2204"
+    },
+    {
+        "caption": "&FTP Connect...\tCtrl+F",
+        "context": "commands",
+        "id": "tc_550"
+    },
+    {
+        "caption": "FT&P New Connection...\tCtrl+N",
+        "context": "commands",
+        "id": "tc_551"
+    },
+    {
+        "caption": "FTP Disconn&ect\tCtrl+Shift+F",
+        "context": "commands",
+        "id": "tc_552"
+    },
+    {
+        "caption": "FTP Sho&w Hidden Files",
+        "context": "commands",
+        "id": "tc_553"
+    },
+    {
+        "caption": "FTP Download From &List...",
+        "context": "commands",
+        "id": "tc_558"
+    },
+    {
+        "caption": "P&ORT Connection To Other PC...",
+        "context": "commands",
+        "id": "tc_2300"
+    },
+    {
+        "caption": "Co&mments\tCtrl+Shift+F2",
+        "context": "commands",
+        "id": "tc_300"
+    },
+    {
+        "caption": "Custom Columns Mo&de\tShift+F1",
+        "context": "commands",
+        "id": "tc_270"
+    },
+    {
+        "caption": "Custom View Modes",
+        "context": "commands",
+        "id": "tc_333"
+    },
+    {
+        "caption": "&Tree\tCtrl+F8",
+        "context": "commands",
+        "id": "tc_303"
+    },
+    {
+        "caption": "&0 (None)",
+        "context": "commands",
+        "id": "tc_3200"
+    },
+    {
+        "caption": "&1 (One For Both Panels)",
+        "context": "commands",
+        "id": "tc_3201"
+    },
+    {
+        "caption": "&2 (Two, One For Each Panel)",
+        "context": "commands",
+        "id": "tc_3202"
+    },
+    {
+        "caption": "Thumbnai&l View\tCtrl+Shift+F1",
+        "context": "commands",
+        "id": "tc_269"
+    },
+    {
+        "caption": "&Quick View Panel\tCtrl+Q",
+        "context": "commands",
+        "id": "tc_304"
+    },
+    {
+        "caption": "&Programs\tCtrl+F11",
+        "context": "commands",
+        "id": "tc_311"
+    },
+    {
+        "caption": "*.*",
+        "context": "commands",
+        "id": "tc_313"
+    },
+    {
+        "caption": "&Custom...\tCtrl+F12",
+        "context": "commands",
+        "id": "tc_314"
+    },
+    {
+        "caption": "&Only Selected Files",
+        "context": "commands",
+        "id": "tc_2023"
+    },
+    {
+        "caption": "&Unsorted\tCtrl+F7",
+        "context": "commands",
+        "id": "tc_325"
+    },
+    {
+        "caption": "&Change Settings Files Directly",
+        "context": "commands",
+        "id": "tc_581"
+    },
+    {
+        "caption": "Change &Start Menu...",
+        "context": "commands",
+        "id": "tc_700"
+    },
+    {
+        "caption": "&Registration Info",
+        "context": "commands",
+        "id": "tc_630"
+    },
+    {
+        "caption": "&Check for updates now",
+        "context": "commands",
+        "id": "tc_650"
+    },
+    {
+        "caption": "cm_SwitchSeparateTree",
+        "context": "commands",
+        "id": "bar_cm_SwitchSeparateTree"
+    },
+    {
+        "caption": "...",
+        "context": "configuration",
+        "id": "HOT_OKBTN"
+    },
+    {
+        "caption": "...",
+        "context": "configuration",
+        "id": "hot_command_button"
+    },
+    {
+        "caption": "...",
+        "context": "configuration",
+        "id": "HOT_list_button"
+    },
+    {
+        "caption": "...",
+        "context": "configuration",
+        "id": "HOT_CANCELBTN"
+    },
+    {
+        "caption": "Con&figure",
+        "context": "configuration",
+        "id": "SND_Configure"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "z7_find"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_zip_find1"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_zip_find2"
+    },
+    {
+        "caption": "&Configure packer extension WCXs",
+        "context": "configuration",
+        "id": "ConfigurePlugins"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_zip_find3"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_zip_find4"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_zip_find5"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_zip_find6"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "Button1"
+    },
+    {
+        "caption": "Sa&ve now",
+        "context": "configuration",
+        "id": "HistorySaveNowBtn"
+    },
+    {
+        "caption": "&Delete now",
+        "context": "configuration",
+        "id": "HistoryDeleteNowBtn"
+    },
+    {
+        "caption": "S&ave now",
+        "context": "configuration",
+        "id": "FrequentlyUsedSaveNowBtn"
+    },
+    {
+        "caption": "D&elete now",
+        "context": "configuration",
+        "id": "FrequentlyUsedDeleteNowBtn"
+    },
+    {
+        "caption": "&Add selected names",
+        "context": "configuration",
+        "id": "AddSelButton"
+    },
+    {
+        "caption": "Add selected names with &full path",
+        "context": "configuration",
+        "id": "AddSelWithPathButton"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "Button9"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "FileLogButton"
+    },
+    {
+        "caption": "De&fault",
+        "context": "configuration",
+        "id": "Button5"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "Button4"
+    },
+    {
+        "caption": "&Add...",
+        "context": "configuration",
+        "id": "Button6"
+    },
+    {
+        "caption": "Fields &by type",
+        "context": "configuration",
+        "id": "Button12"
+    },
+    {
+        "caption": "Sta&rt!",
+        "context": "configuration",
+        "id": "CompactDatabase"
+    },
+    {
+        "caption": "Configure",
+        "context": "configuration",
+        "id": "ButtonWCX"
+    },
+    {
+        "caption": "Configure",
+        "context": "configuration",
+        "id": "ButtonWFX"
+    },
+    {
+        "caption": "Configure",
+        "context": "configuration",
+        "id": "ButtonWLX"
+    },
+    {
+        "caption": "Configure",
+        "context": "configuration",
+        "id": "ButtonWDX"
+    },
+    {
+        "caption": "Download",
+        "context": "configuration",
+        "id": "ButtonDownload"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "FtpLogFileButton"
+    },
+    {
+        "caption": "&Associations...",
+        "context": "configuration",
+        "id": "IdConfAssociateViewer"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_conf_find1"
+    },
+    {
+        "caption": "&Configure internal viewer...",
+        "context": "configuration",
+        "id": "Button2"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_conf_find2"
+    },
+    {
+        "caption": "Dire&ctory history",
+        "context": "configuration",
+        "id": "ConfHistoryButton"
+    },
+    {
+        "caption": "&>>",
+        "context": "configuration",
+        "id": "id_main_search"
+    },
+    {
+        "caption": "&Edit",
+        "context": "configuration",
+        "id": "id_main_edit"
+    },
+    {
+        "caption": "Download",
+        "context": "configuration",
+        "id": "Button7"
+    },
+    {
+        "caption": "&Add...",
+        "context": "configuration",
+        "id": "AddRulesButton"
+    },
+    {
+        "caption": "&Delete...",
+        "context": "configuration",
+        "id": "DeleteRulesButton"
+    },
+    {
+        "caption": "&More sub-rules",
+        "context": "configuration",
+        "id": "MoreRulesButton"
+    },
+    {
+        "caption": "&Fewer sub-rules",
+        "context": "configuration",
+        "id": "LessRulesButton"
+    },
+    {
+        "caption": "&Delete...",
+        "context": "configuration",
+        "id": "id_deletemenu"
+    },
+    {
+        "caption": "&Add...",
+        "context": "configuration",
+        "id": "id_addmenu"
+    },
+    {
+        "caption": "Change &Title...",
+        "context": "configuration",
+        "id": "id_changetitle"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_TabColorBgBtn"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_TabColorBg2Btn"
+    },
+    {
+        "caption": "+",
+        "context": "configuration",
+        "id": "AdditionalSortButton"
+    },
+    {
+        "caption": "+",
+        "context": "configuration",
+        "id": "AutoRunAdd"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_TabColorBtn"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "IconChooseButton"
+    },
+    {
+        "caption": "&Edit",
+        "context": "configuration",
+        "id": "CustomEdit"
+    },
+    {
+        "caption": "&Delete",
+        "context": "configuration",
+        "id": "CustomColumnsDelete"
+    },
+    {
+        "caption": "&New",
+        "context": "configuration",
+        "id": "CustomColumnsAdd"
+    },
+    {
+        "caption": "&Copy",
+        "context": "configuration",
+        "id": "CustomColumnsCopy"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_icondetailsbtn"
+    },
+    {
+        "caption": "De&fault",
+        "context": "configuration",
+        "id": "id_TabDefaults"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_ForeChooseColor"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_BackChooseColor"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_MarkChooseColor"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_CursorChooseColor"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_CursorFontChooseColor"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_BackChooseColor2"
+    },
+    {
+        "caption": "&Define colors by file type...",
+        "context": "configuration",
+        "id": "Button3"
+    },
+    {
+        "caption": ">>",
+        "context": "configuration",
+        "id": "id_OtherChooseColor"
+    },
+    {
+        "caption": "Change font",
+        "context": "configuration",
+        "id": "ChangeFont1"
+    },
+    {
+        "caption": "Change font",
+        "context": "configuration",
+        "id": "ChangeFont2"
+    },
+    {
+        "caption": "Change font",
+        "context": "configuration",
+        "id": "ChangeFont3"
+    },
+    {
+        "caption": "Set default icon library",
+        "context": "configuration",
+        "id": "Button8"
+    },
+    {
+        "caption": "+",
+        "context": "configuration",
+        "id": "Idconf_AddCustomHints"
+    },
+    {
+        "caption": ">>",
+        "context": "cm_ButtonConfig",
+        "id": "id_btn_barfilesearch"
+    },
+    {
+        "caption": "&Delete",
+        "context": "cm_ButtonConfig",
+        "id": "id_btn_delete"
+    },
+    {
+        "caption": "&Add",
+        "context": "cm_ButtonConfig",
+        "id": "id_btn_add"
+    },
+    {
+        "caption": "Change &>>",
+        "context": "cm_ButtonConfig",
+        "id": "id_btn_addcmd"
+    },
+    {
+        "caption": ">>",
+        "context": "cm_ButtonConfig",
+        "id": "id_btn_iconfile"
+    },
+    {
+        "caption": "...",
+        "context": "cm_ButtonConfig",
+        "id": "BitBtn1"
+    },
+    {
+        "caption": "->.ico",
+        "context": "cm_ButtonConfig",
+        "id": "id_btn_saveicon"
+    },
+    {
+        "caption": ">>",
+        "context": "cm_ButtonConfig2",
+        "id": "id_btn_barfilesearch"
+    },
+    {
+        "caption": "&Delete",
+        "context": "cm_ButtonConfig2",
+        "id": "id_btn_delete"
+    },
+    {
+        "caption": "&Add",
+        "context": "cm_ButtonConfig2",
+        "id": "id_btn_add"
+    },
+    {
+        "caption": "Change &>>",
+        "context": "cm_ButtonConfig2",
+        "id": "id_btn_addcmd"
+    },
+    {
+        "caption": ">>",
+        "context": "cm_ButtonConfig2",
+        "id": "id_btn_iconfile"
+    },
+    {
+        "caption": "...",
+        "context": "cm_ButtonConfig2",
+        "id": "BitBtn1"
+    },
+    {
+        "caption": "->.ico",
+        "context": "cm_ButtonConfig2",
+        "id": "id_btn_saveicon"
+    },
+    {
+        "caption": "&Start!",
+        "context": "rename",
+        "id": "applyRename"
+    },
+    {
+        "caption": "[N#-#] &Range",
+        "context": "rename",
+        "id": "AddRangeN"
+    },
+    {
+        "caption": "[YMD]  &Date",
+        "context": "rename",
+        "id": "AddDate"
+    },
+    {
+        "caption": "[hms]  &Time",
+        "context": "rename",
+        "id": "AddTime"
+    },
+    {
+        "caption": "[=?]  Plug&in",
+        "context": "rename",
+        "id": "PluginButton"
+    },
+    {
+        "caption": "&+",
+        "context": "rename",
+        "id": "AddOther"
+    },
+    {
+        "caption": "&#",
+        "context": "rename",
+        "id": "AddRangeOther"
+    },
+    {
+        "caption": "[E#-#] R&ange",
+        "context": "rename",
+        "id": "AddRangeE"
+    },
+    {
+        "caption": "...",
+        "context": "rename",
+        "id": "MoreButton"
+    },
+    {
+        "caption": ">",
+        "context": "rename",
+        "id": ">"
+    },
+    {
+        "caption": "&Undo",
+        "context": "rename",
+        "id": "&Undo"
+    },
+    {
+        "caption": "",
+        "context": "search",
+        "id": "ScrollLeftButton"
+    },
+    {
+        "caption": "&View F3",
+        "context": "search",
+        "id": "&View F3"
+    },
+    {
+        "caption": "&Edit F4",
+        "context": "search",
+        "id": "&Edit F4"
+    },
+    {
+        "caption": "Feed to &listbox",
+        "context": "search",
+        "id": "Feed to &listbox"
+    }
+]

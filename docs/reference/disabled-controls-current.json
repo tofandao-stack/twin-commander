@@ -1,0 +1,2384 @@
+{
+    "buttonBarEditors": [
+        {
+            "caption": "",
+            "editor": "horizontalBarEditor",
+            "id": "id_btn_iconindex",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "horizontalBarEditor",
+            "id": "W_btn_param",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Run mi&nimized",
+            "editor": "horizontalBarEditor",
+            "id": "id_btn_assymbol",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "horizontalBarEditor",
+            "id": "W_btn_startpath",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Run ma&ximized",
+            "editor": "horizontalBarEditor",
+            "id": "id_btn_maximized",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "horizontalBarEditor",
+            "id": "id_btn_barsize",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "F&lat icons",
+            "editor": "horizontalBarEditor",
+            "id": "id_FlatIcons",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "S&mall icons:",
+            "editor": "horizontalBarEditor",
+            "id": "id_SmallIcons",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "XP st&yle",
+            "editor": "horizontalBarEditor",
+            "id": "id_XPstyle",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "horizontalBarEditor",
+            "id": "id_smalliconsize",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "verticalBarEditor",
+            "id": "id_btn_iconindex",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "verticalBarEditor",
+            "id": "W_btn_param",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Run mi&nimized",
+            "editor": "verticalBarEditor",
+            "id": "id_btn_assymbol",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "verticalBarEditor",
+            "id": "W_btn_startpath",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Run ma&ximized",
+            "editor": "verticalBarEditor",
+            "id": "id_btn_maximized",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "verticalBarEditor",
+            "id": "id_btn_barsize",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "F&lat icons",
+            "editor": "verticalBarEditor",
+            "id": "id_FlatIcons",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "S&mall icons:",
+            "editor": "verticalBarEditor",
+            "id": "id_SmallIcons",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "XP st&yle",
+            "editor": "verticalBarEditor",
+            "id": "id_XPstyle",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "editor": "verticalBarEditor",
+            "id": "id_smalliconsize",
+            "type": "QLineEdit",
+            "visible": true
+        }
+    ],
+    "configuration": [
+        {
+            "caption": "F&lat icons",
+            "id": "idFlatDriveBar",
+            "page": "Layout",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Sh&ow two drive button bars (fixed width, above file windows)",
+            "id": "idTwoDriveBars",
+            "page": "Layout",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show clickable &path parts ('breadcrumb bar')",
+            "id": "idShowBreadcrumb",
+            "page": "Layout",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Auto-open when moving mouse over it",
+            "id": "idAutoOpenBreadcrumb",
+            "page": "Layout",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "R&un command line only when focused",
+            "id": "idExecCmdLineFocused",
+            "page": "Layout",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Flat user &interface (button bar configured separately)",
+            "id": "idFlatInterface",
+            "page": "Layout",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Windows &XP theme background (menu+all bars)",
+            "id": "idXPthemeBackground",
+            "page": "Layout",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Show hidden files",
+            "id": "IdConfshowhidden",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show old &8.3 filenames lowercase (like explorer)",
+            "id": "IdConfLower83Names",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show &parent dir [..] also in root of drive",
+            "id": "IdShowUpdir",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Use long names (recommended)",
+            "id": "IdConf_longnames",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show s&quare brackets [ ] around directories",
+            "id": "IdDirBrackets",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Limit width of brief view column to:",
+            "id": "IdBriefViewWidthLimit",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "SortMethodCombo",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "BriefViewWidthLimitEdit",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Show s&ystem files",
+            "id": "IdConfshowSystem",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Append \\",
+            "id": "IdDirBackslash",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Always &by name",
+            "id": "IdConfDirsByName",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "Like &files (also by time)",
+            "id": "IdConfDirsLikeFiles",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "Show &help texts for buttons (tooltips)",
+            "id": "IdConf_tooltips",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show &volume labels/network paths for drives",
+            "id": "IdConf_drivetips",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Sho&w filename in file list as tooltip if truncated",
+            "id": "IdConf_NameTips",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "W&in32-style tips with file comments (if available)",
+            "id": "IdConf_Win32Tips",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Comments from descript.ion/files.bbs",
+            "id": "IdConf_DescriptComments",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Comments from &Explorer (OLE2)",
+            "id": "IdConf_ExplorerComments",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Always load complete directory tree",
+            "id": "IdConfOldStyleTree",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Tree: Press ENTER to open dir in other window",
+            "id": "IdTreeNoAutoChange",
+            "page": "Display",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "idiconsize",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Extra space: &Horizontal:",
+            "id": "idIconExtraX",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Vert&ical:",
+            "id": "idIconExtraY",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&All associated",
+            "id": "IdConfShowAllIcons",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&Only standard icons",
+            "id": "IdConfshowStandardIcons",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&No icons",
+            "id": "IdConfShowNoIcons",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "All associated + &EXE/LNK (slow)",
+            "id": "IdConfAllAndEXE",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "E&XE/LNK not on floppy",
+            "id": "NotOnFloppy",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "EXE/&LNK not on net",
+            "id": "NotOnNet",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Sho&w icons for special folders: Normal file system",
+            "id": "IdShowSpecialFoldersLocal",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show icons for special folders: &Virtual folders (e.g. Network)",
+            "id": "IdShowSpecialFoldersRemote",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show overlay i&cons, e.g. for links",
+            "id": "IdShowOverlayIcons",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show default &folder/file icons from Explorer",
+            "id": "IdShowDefIconsFromExplorer",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show '!' on hidden/s&ystem",
+            "id": "IdHidSysExclamation",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Dimmed hidden files",
+            "id": "IdDimmedHidden",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show icons for commands in the &main menu",
+            "id": "IdIconsForMenu",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "IdMenuIconSize",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Show &3d frame around icon",
+            "id": "Id3dFrame",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show checked items as &pressed buttons instead of checkmarks",
+            "id": "IdPressedButtons",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show d&rive icons from Explorer",
+            "id": "IdDriveIconsFromExplorer",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Ex&tra drive space:",
+            "id": "idDriveExtraX",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Ex&tra drive space:",
+            "id": "idDriveExtraY",
+            "page": "Icons",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Set dots per inch (DPI) to:",
+            "id": "DpiCheck",
+            "page": "Font",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "DpiEdit",
+            "page": "Font",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Automatically adjust dialog boxes to larger fonts",
+            "id": "AutoSizeCheck",
+            "page": "Font",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "D&ark mode:",
+            "id": "id_DarkModeCombo",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "id_ForeColor",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Font color:",
+            "id": "id_BackColor",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Background &2:",
+            "id": "id_MarkColor",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Mark color:",
+            "id": "id_CursorColor",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Cursor color:",
+            "id": "id_CursorFontColor",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Background:",
+            "id": "id_BackColor2",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Use inverted cursor",
+            "id": "id_CursorInverted",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "id_ColorTypesEnabled",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Use inverted &selection",
+            "id": "id_MarkInverted",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Others:",
+            "id": "id_OtherColor",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Others:",
+            "id": "id_OtherName",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Use Windows &theme for cursor",
+            "id": "id_CursorThemed",
+            "page": "Color",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "di&rectly after filename",
+            "id": "id_confExtAfterName",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "ali&gned (with Tab)",
+            "id": "id_confExtAligned",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&Size:",
+            "id": "id_tabSize",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Date/Time:",
+            "id": "id_TabDate",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Attributes:",
+            "id": "id_TabAttr",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Extension:",
+            "id": "id_tabExt",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Co&mments (fixed):",
+            "id": "id_TabComments",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Show &century in date (20xx)",
+            "id": "id_ShowCentury",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Use 12 hour AM/PM format",
+            "id": "id_UseAMPMFormat",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Adjust &Tabs to window width",
+            "id": "id_AdjustWidth",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "id_sizeDisplay",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Si&ze display:",
+            "id": "id_size_footer",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Show director&y count in footer",
+            "id": "id_dircountinfooter",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Date f&ormat:",
+            "id": "id_confDateFormat",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "id_confTimeFormat",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Date:",
+            "id": "id_sepDate",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Time:",
+            "id": "id_sepTime",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Thousands:",
+            "id": "id_sepThousands",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Decimal:",
+            "id": "id_sepDecimal",
+            "page": "Tabstops/Data Formats",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Tabs on multiple lines",
+            "id": "ChkTabsMultiLines",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&All tabs have same width",
+            "id": "ChkTabsSameWidth",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Limit tab title length to:",
+            "id": "ChkTabsLimitOption",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "EdtTabsLimitLength",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Confirm close all tabs",
+            "id": "ChkTabsConfirmClose",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Cl&ose tab on double click",
+            "id": "ChkTabsCloseDoubleClick",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Ctrl+&Up opens new tab in foreground",
+            "id": "ChkTabsOpenForeground",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Open &new tabs near current tab",
+            "id": "ChkTabsOpenNearCurrent",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Show tab header also when there is only one tab",
+            "id": "ChkTabsAlwaysVisible",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show locked tabs &with an asterisk *",
+            "id": "ChkTabsLockedAsterisk",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Activate target &panel when clicking on one of its Tabs",
+            "id": "ChkTabsActivateTarget",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Always show &drive letter in tab title",
+            "id": "ChkTabsDriveInTitle",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Show &icons on tabs",
+            "id": "ChkTabsIcons",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Return to locked tab root directory on tab change",
+            "id": "ChkTabsRevertToRoot",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Save displayed &file types separately for each tab",
+            "id": "ChkTabsSaveFiltersSeparately",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Ctrl+Ta&b opens as list",
+            "id": "ChkTabsOpenList",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Ctrl+Tab switches to last &visited",
+            "id": "ChkTabsLastVisitedFirst",
+            "page": "Folder-Tabs",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "FileSystemCombo",
+            "page": "Custom Columns",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Sort order:",
+            "id": "AdditionalSortEdit",
+            "page": "View Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Tab color and icon:",
+            "id": "id_TabColorBg",
+            "page": "View Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Background:",
+            "id": "id_TabColorBg2",
+            "page": "View Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Background &2:",
+            "id": "AutoRunEdit",
+            "page": "View Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Additional sort orders:",
+            "id": "id_TabColor",
+            "page": "View Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Priority",
+            "id": "PriorityCheckbox",
+            "page": "View Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "ModeChooseCombo",
+            "page": "Auto Switch Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Automatically switch view mode on directory change:",
+            "id": "AutoSwitchModeCheck",
+            "page": "Auto Switch Mode",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Change the language/ Sprache wechseln/ Changer de langue",
+            "id": "W_langlist",
+            "page": "Language",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QListWidget",
+            "visible": true
+        },
+        {
+            "caption": "Use &right mouse button (as in NC) - context menu after 1 second",
+            "id": "IdConfrightbutton",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&Left mouse button (Windows standard)",
+            "id": "IdConfleftbutton",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "By clic&king on icon",
+            "id": "IdClickOnIcon",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Only on touch&screen",
+            "id": "IdOnlyOnTouchscreen",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Rubber band selection",
+            "id": "IdRubberband",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Select &files only",
+            "id": "IdConfFilesOnly",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "Also select d&irectories",
+            "id": "IdConfAlsoDirs",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&Directories",
+            "id": "IdConfsavedirs",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Panels (brief/full, etc.)",
+            "id": "IdConfsavepanels",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Old co&mmand lines",
+            "id": "IdConfCommandLines",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&when selecting with the space bar",
+            "id": "IdConf_Countfiles",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&before copying/deleting",
+            "id": "IdConf_CountfilesCopy",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "'Everything'",
+            "id": "IdConf_EverythingForSize",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "IdConf_GetDirSize",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Ignore 1 ho&ur time delay",
+            "id": "Idconf_1hourdif",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Read from bot&h",
+            "id": "IdConf_comments_bothformats",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "C&opy comments with files",
+            "id": "IdConf_comments_copy",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "DOS ch&arset",
+            "id": "IdConf_comments_doscharset",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "IdPreferredCommentFormat",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Allow only &1 copy of Total Commander at a time",
+            "id": "IdConf_oneinstanceonly",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Mo&ve icon to system tray when minimized",
+            "id": "Id_ConfMoveToTray",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Always &go to the root of a drive when changing drives",
+            "id": "Id_ConfAlwaysToRoot",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Select only the file name when renaming (not the e&xtension)",
+            "id": "Id_ConfselOnlyName",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Op&en files and directories with a single click",
+            "id": "Id_ConfSingleClickStart",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Auto-comple&te paths",
+            "id": "id_ConfAutoComplete",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Auto-append suggested &name",
+            "id": "id_ConfAutoSuggest",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Check for updates",
+            "id": "id_checkforupdates",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Extra lines below cursor:",
+            "id": "id_scrollahead",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "id_extralines",
+            "page": "Operation",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Internal Viewer with file under cursor",
+            "id": "ViewerHotkeyCombo",
+            "page": "Edit/View",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Plugins/FTP: Automatically re-upload changed files",
+            "id": "IdAutoReUpload",
+            "page": "Edit/View",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Source+Target on same disk:",
+            "id": "EdSmallSame",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Source+Target on different disks:",
+            "id": "EdSmallOther",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Source+Target on same disk:",
+            "id": "EdBigSame",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Source+Target on different disks:",
+            "id": "EdBigOther",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Use &compatibility mode for the following drives:",
+            "id": "ChkCompatibility",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "EdCompatLetters",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Use &default method only (reliable, not very fast)",
+            "id": "RdDefaultCopy",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&Also use big file copy mode (not using cache)",
+            "id": "RdBigfileCopy",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&Use copy+paste via Explorer (only in case of copy problems)",
+            "id": "RdCopyPaste",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "The following drive letters are on the same physical &harddisk (example: CDE,FGH ):",
+            "id": "EdPhysDisks",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "USB sticks",
+            "id": "ChkUsbSticks",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Cop&y date/time of directories",
+            "id": "ChkCopyStamp",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Use E&xplorer delete method (faster, cannot handle comments)",
+            "id": "ChkExplorerDelete",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&F8/Del deletes to recycle bin (Shift=directly)",
+            "id": "IdConf_trashcan",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Verify after copying (MD5 checksum)",
+            "id": "ChkVerifyAfterCopy",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Use standard copy &method (recommended)",
+            "id": "id_StandardCopyMethod",
+            "page": "Copy/Delete",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&No refresh for these drives:",
+            "id": "NoRereadEdit",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Do not remember these drives on exit:",
+            "id": "NoReread2Edit",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Refresh when files are &created, deleted and renamed",
+            "id": "WatchDirsDetect",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Also when &size, date, or attributes change",
+            "id": "WatchDirsSizeDateAttr",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Put added files at the END of the file list (default: sorted)",
+            "id": "WatchDirsAtEnd",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Don't &react to updates while in the background",
+            "id": "WatchDirsNoBackground",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Update &footer (total number of files)",
+            "id": "WatchDirsFooter",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Update &header (free disk space)",
+            "id": "WatchDirsHeader",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "No refresh for &these drives:",
+            "id": "WatchDirsExcludeEdit",
+            "page": "Refresh",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Ctrl+Alt+Letters",
+            "id": "IdConfAltForMenu",
+            "page": "Quick Search",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "Al&t+Letters",
+            "id": "IdConfAltForQuickSearch",
+            "page": "Quick Search",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "L&etter only",
+            "id": "IdConfLetterQuickSearch",
+            "page": "Quick Search",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "Letters - &with search dialog",
+            "id": "IdConfLetterDlgQuickSearch",
+            "page": "Quick Search",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "Di&sabled",
+            "id": "IdConfDisabledQuickSearch",
+            "page": "Quick Search",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&Beginning (name must start with first typed character)",
+            "id": "IdConfExactBeginning",
+            "page": "Quick Search",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "En&ding (last character before a typed dot . must match)",
+            "id": "IdConfExactEnding",
+            "page": "Quick Search",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "FTP_Retry",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Delay between retries (seconds)",
+            "id": "FtpTransferModeBox",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "FTP_retry_delay",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Default &transfer mode:",
+            "id": "FtpOpenInBox",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&All uploads/downloads in background",
+            "id": "FtpBackGnd",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Use passive mode by default",
+            "id": "FtpPassiveMode",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Compress during transfer (MODE &Z)",
+            "id": "FtpModeZ",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Not on &LAN",
+            "id": "FtpModeZnotonLAN",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&PORT mode: only use ports from limited range:",
+            "id": "FtpPORTlimitrange",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "FtpPortFrom",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "-",
+            "id": "FtpPortTo",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Auto-&resume transfer if no data received for:",
+            "id": "FtpAutoResumeOption",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "FtpAutoResumeValue",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "PORT mode: e&xternal address (IP/DNS/HTTP):",
+            "id": "FtpPortIPbox",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "FtpPortIPedit",
+            "page": "FTP",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Copy/delete thumbnails with files",
+            "id": "ThumbsCopyDeleteChk",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Show custom fields below thumbnails (e.g. image size):",
+            "id": "ThumbsCustomFieldsChk",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Re&move thumbnails for currently ejected CDs",
+            "id": "RemoveThumbsForCDs",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Use Explorer method (OLE2) for:",
+            "id": "ThumbsFromExplorerChk",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Get from &Lister plugins for:",
+            "id": "ThumbsFromListerPluginsChk",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Plain Text file thumbnails for:",
+            "id": "ThumbsFromTextChk",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromExplorerEdt",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromListerPluginsEdt",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromTextEdt",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Get from &Irfan-/Xnview for:",
+            "id": "ThumbsFromIrfanXnChk",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromIrfanXnEdt",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "I&nternal thumbnails from images:",
+            "id": "ThumbsFromInternalChk",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromInternalEdt",
+            "page": "Thumbnails",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "C&opy/Move/Create shortcut",
+            "id": "LogCpMvShChk",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Delete",
+            "id": "LogDeleteChk",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "C&reate/Delete folders",
+            "id": "LogFoldersChk",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Pack/Unpack/Test archives",
+            "id": "LogArchiveChk",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&File system plugins",
+            "id": "LogFsChk",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Log &successful operations",
+            "id": "LogSuccess",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Log &errors",
+            "id": "LogErrors",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Log s&kipped files (when choosing skip or skip all)",
+            "id": "LogSkipped",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Never (always log to same log file)",
+            "id": "IdLogNever",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "Every day &after midnight",
+            "id": "IdLogEveryDay",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&When the log file becomes larger than",
+            "id": "IdLogWhenLarger",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "IdLogSizeLimit",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Keep a &maximum of",
+            "id": "IdKeepMaximum",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "IdLogFileCount",
+            "page": "Log file",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Directory history &thinning",
+            "id": "id_historythinning2",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "I&cons",
+            "id": "ShowHistoryIconsChk",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Fo&nt:",
+            "id": "HistoryFontCombo",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Save &history on exit",
+            "id": "SaveHistoryOnExitChk",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Maximum items to save:",
+            "id": "HistoryMaxSaveEdit",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Maximum items to sh&ow:",
+            "id": "HistoryMaxShowEdit",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Show last visited di&rectory closest to the middle of the list",
+            "id": "ShowLastVisitedInMiddleChk",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Maximum &items to save:",
+            "id": "FrequentlyUsedMaxSaveEdit",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Maximum items to sho&w:",
+            "id": "FrequentlyUsedMaxShowEdit",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Storage &location for list of most frequently used folders:",
+            "id": "DirUsageLocationCombo",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Show most frequently &used directory closest to the middle of the list",
+            "id": "ShowFreqentlyUsedMaxInMiddleChk",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "ScrollListToCombo",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Ma&x. width in characters (average):",
+            "id": "MaxWidthEdit",
+            "page": "History",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Treat archives like &directories",
+            "id": "zip_likedirs",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Use internal un-ARJ if possible",
+            "id": "arj_useinternal",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Pass long filenames to ARJ (ARJ 2.55 or later required)",
+            "id": "arj_longnames",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Use &internal un-LZH if possible",
+            "id": "lzh_useinternal",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Use internal un-RAR if possible",
+            "id": "rar_useinternal",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Use internal un-ACE if possible",
+            "id": "ace_useinternal",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Create &TAR archives for Linux (unchecked: for SunOS)",
+            "id": "tar_linuxcompatible",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Set archive date to &newest file date",
+            "id": "zip_setdate",
+            "page": "Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Use internal ZIP &packer",
+            "id": "zip_internalpack",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "U&se ZIP-NT 2.01",
+            "id": "zip_zipnt",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Always use &internal unzipping (if possible)",
+            "id": "zip_useinternal",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&7Z",
+            "id": "zip_use7z",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&normal compression (6)",
+            "id": "internalzip_default",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&maximum compression (9)",
+            "id": "internalzip_max",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&fastest compression (1)",
+            "id": "internalzip_min",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&other:",
+            "id": "internalzip_other",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "internalzip_value",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&default (run 'cd %TEMP%' in command line to see directory)",
+            "id": "internalzip_settemp",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "o&ther:",
+            "id": "internalzip_otherdir",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "internalzip_tempdir",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Use &8.3 short filenames",
+            "id": "zip_83name",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Open p&artial ZIP files",
+            "id": "zip_openpartial",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Keep damaged files (bad CRC)",
+            "id": "zip_keepdamaged",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Pack Unicode names:",
+            "id": "internalzip_unicodemethod",
+            "page": "ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Use &internal 7-Zip packer",
+            "id": "z7_internalpack",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Prefer 7-Zip plugin if installed",
+            "id": "z7_preferplugin",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "E&xtra parameters:",
+            "id": "z7_extraparameters",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&normal compression (6)",
+            "id": "z7_default",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&maximum compression (9)",
+            "id": "z7_max",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&fastest compression (1)",
+            "id": "z7_min",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "&other:",
+            "id": "z7_other",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QRadioButton",
+            "visible": true
+        },
+        {
+            "caption": "",
+            "id": "z7_value",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "&Compression method:",
+            "id": "z7_method",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Dictionary size:",
+            "id": "z7_dict",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Word size:",
+            "id": "z7_word",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Solid &block size:",
+            "id": "z7_solidblock",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "Create &solid archive",
+            "id": "z7_solid",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Number of CPU &threads:",
+            "id": "z7_threads",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QComboBox",
+            "visible": true
+        },
+        {
+            "caption": "&Also encrypt names",
+            "id": "z7_encryptnames",
+            "page": "7-ZIP Packer",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Overwriting files",
+            "id": "confirm_overwrite",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Overwriting/Deleting &read-only files",
+            "id": "confirm_readonly",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Overwriting/Deleting &hidden/system files",
+            "id": "confirm_hidsys",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Drag&&Drop (copying files with mouse)",
+            "id": "confirm_mouse",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Deleting &non-empty directories",
+            "id": "confirm_dirs",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "Drag&&Drop to the 'F8 Delete' &button",
+            "id": "confirm_mouse_delete",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": "&Parameters:",
+            "id": "Hot_Params_Edit",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        },
+        {
+            "caption": "Only play for &long operations:",
+            "id": "SND_onlylong",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QCheckBox",
+            "visible": true
+        },
+        {
+            "caption": ">",
+            "id": "SND_Delay",
+            "page": "Misc.",
+            "tooltip": "This reference control is not implemented in Twin Commander yet.",
+            "type": "QLineEdit",
+            "visible": true
+        }
+    ],
+    "disabledActionsAtStartup": [
+        {
+            "caption": "FTP Disconn&ect\tCtrl+Shift+F",
+            "id": "tc_552",
+            "referenceAvailable": true
+        },
+        {
+            "caption": "FTP Sho&w Hidden Files",
+            "id": "tc_553",
+            "referenceAvailable": true
+        },
+        {
+            "caption": "&Unshare Directory...",
+            "id": "tc_515",
+            "referenceAvailable": true
+        },
+        {
+            "caption": "&Help",
+            "id": "",
+            "referenceAvailable": false
+        }
+    ]
+}
