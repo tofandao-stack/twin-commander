@@ -1,3 +1,4 @@
+#include "ui/dialogs/operationprogressdialog.h"
 #include "operations/jobqueue.h"
 #include "operations/iothreadpool.h"
 #include <QDateTime>
@@ -218,6 +219,8 @@ JobQueueDialog::JobQueueDialog(JobQueue *queue, QWidget *parent)
     table_->setSelectionMode(QAbstractItemView::SingleSelection);
     table_->setEditTriggers(QAbstractItemView::NoEditTriggers);
     layout->addWidget(table_);
+    progress_ = new OperationProgressWidget(this);
+    layout->addWidget(progress_);
     auto *buttons = new QHBoxLayout;
     auto add = [&](const QString &label, auto callback) {
         auto *button = new QPushButton(label, this);
@@ -282,4 +285,11 @@ void JobQueueDialog::refresh() {
             table_->setCurrentCell(row, 0);
         ++row;
     }
+    auto job=std::find_if(queue_->jobs().begin(),queue_->jobs().end(),[id](const auto &j){return j.id==id;});
+    if(job==queue_->jobs().end()) job=std::find_if(queue_->jobs().begin(),queue_->jobs().end(),[](const auto &j){return j.state==JobQueue::State::Running || j.state==JobQueue::State::Paused;});
+    if(job!=queue_->jobs().end()) {
+        if (!id) table_->setCurrentCell(int(std::distance(queue_->jobs().begin(), job)), 0);
+        progress_->updateProgress(job->control,job->state);
+    }
+    else progress_->clear();
 }

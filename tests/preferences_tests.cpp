@@ -1,3 +1,5 @@
+#include "ui/dialogs/operationprogressdialog.h"
+#include <QProgressBar>
 #include "ui/icons/commandicons.h"
 #include "ui/panels/filepanellayout.h"
 #include "filesystem/pathencoding.h"
@@ -118,6 +120,41 @@ class PreferencesTests : public QObject {
         QVERIFY(custom.save(dir.filePath("cm_Copy.png")));
         QSettings().setValue("appearance/iconDirectory", dir.path());
         QCOMPARE(commanderIcon("cm_Copy").pixmap(24, 24).toImage().pixelColor(12, 12), QColor(Qt::magenta));
+    }
+    void fileAndOverallBarsRemainIndependentAndHandleCancellation() {
+        auto control=std::make_shared<LocalFiles::Control>();
+        OperationProgressWidget widget;
+        control->startProgress();widget.updateProgress(control,JobQueue::State::Running);
+        auto *file=widget.findChild<QProgressBar *>("currentFileProgress");
+        auto *overall=widget.findChild<QProgressBar *>("overallProgress");
+        QCOMPARE(overall->maximum(),0);QCOMPARE(file->value(),0);
+        control->setTotals(200,2,true,true);control->beginFile("/tmp/first",100);control->advanceFile(50);
+        widget.updateProgress(control,JobQueue::State::Running);
+        QCOMPARE(file->value(),50);QCOMPARE(overall->value(),25);
+        control->advanceFile(50);control->finishFile();control->beginFile("/tmp/second",100);control->advanceFile(10);
+        widget.updateProgress(control,JobQueue::State::Paused);
+        QCOMPARE(file->value(),10);QCOMPARE(overall->value(),55);
+        control->cancelled=true;control->finishProgress();widget.updateProgress(control,JobQueue::State::Cancelled);
+        QCOMPARE(file->value(),10);QCOMPARE(overall->value(),55);
+        widget.updateProgress(control,JobQueue::State::Failed);QCOMPARE(overall->value(),55);
+        control->cancelled=false;control->advanceFile(90);control->finishFile();widget.updateProgress(control,JobQueue::State::Completed);
+        QCOMPARE(file->value(),100);QCOMPARE(overall->value(),100);
+        control->startProgress();control->setTotals(0,1,true,true);control->beginFile("/tmp/empty",0);control->finishFile();
+        widget.updateProgress(control,JobQueue::State::Completed);QCOMPARE(file->value(),100);QCOMPARE(overall->value(),100);
+        control->startProgress();control->setTotals(0,4,true,false);control->beginFile("/tmp/delete-a",1);control->finishFile();
+        widget.updateProgress(control,JobQueue::State::Running);QCOMPARE(file->value(),100);QCOMPARE(overall->value(),25);
+        control->beginFile("/tmp/delete-b",1);widget.updateProgress(control,JobQueue::State::Running);
+        QCOMPARE(file->value(),0);QCOMPARE(overall->value(),25);
+    }
+    void droppedCopyOpensTwoBarsAndCompletes() {
+        QTemporaryDir source,target; put(source.filePath("data"),"copy me");
+        QSettings().setValue("final/confirm_mouse",false);
+        MainWindow window({target.path(),target.path()});window.show();
+        QTRY_VERIFY(!window.activePanel()->path().empty());
+        window.activePanel()->filesDropped({nativePath(source.filePath("data"))},false);
+        QPointer<OperationProgressDialog> dialog=window.findChild<OperationProgressDialog *>("operationProgressDialog");
+        QVERIFY(dialog);QCOMPARE(dialog->findChildren<QProgressBar *>().size(),2);
+        QTRY_VERIFY(QFile::exists(target.filePath("data")));QTRY_VERIFY(dialog.isNull());
     }
     void baselineReductionAndCancel() {
         QTemporaryDir dir;

@@ -53,7 +53,7 @@ Ensure `$HOME/.local/bin` is on `PATH` when using this prefix. The launcher uses
 - F3 viewer (UTF-8 text, hex and images), F4 editor with staged saving and unsaved-change protection.
 - F5 recursive copy with explicit conflict policy, F6 same-device move, Shift+F6 rename, F7 mkdir and Shift+F4 new text file.
 - F8/Delete desktop trash and separately confirmed Shift+Delete permanent deletion.
-- Background operations with progress, cancellation, per-item reports and diagnostic JSON journals.
+- Background operations with separate current-file and overall progress bars, pause/cancellation, per-item reports and diagnostic JSON journals. See [operation progress](docs/operation-progress.md).
 - Recursive glob/content search with reveal-in-panel, SHA-256 checksums and native file properties.
 - Per-panel quick filters, wildcard selection, inverse selection, path clipboard and persistent bookmarks.
 - A background operation queue with pause/resume, cancellation, waiting-job ordering, per-job results and report history.

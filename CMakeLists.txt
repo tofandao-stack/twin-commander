@@ -57,6 +57,7 @@ add_library(commander_ui
     src/network/remoteservices.h
 
     # operations
+    src/operations/operationprogress.cpp
     src/operations/batchrename.cpp
     src/operations/batchrename.h
     src/operations/fileoperations.cpp
@@ -90,6 +91,8 @@ add_library(commander_ui
     src/thumbnails/thumbnailproviders.h
 
     # ui/dialogs
+    src/ui/dialogs/operationprogressdialog.cpp
+    src/ui/dialogs/operationprogressdialog.h
     src/ui/dialogs/filecontentandsearchdialogs.cpp
     src/ui/dialogs/filecontentandsearchdialogs.h
     src/ui/dialogs/fileoperationdialogs.cpp

@@ -5,6 +5,7 @@
 #include <functional>
 
 class QTableWidget;
+class OperationProgressWidget;
 class JobQueue : public QObject {
     Q_OBJECT
   public:
@@ -55,4 +56,5 @@ class JobQueueDialog : public QDialog {
     void refresh();
     JobQueue *queue_;
     QTableWidget *table_;
+    OperationProgressWidget *progress_;
 };

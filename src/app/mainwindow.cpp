@@ -1,3 +1,4 @@
+#include "ui/dialogs/operationprogressdialog.h"
 #include "ui/icons/commandicons.h"
 #include "filesystem/pathencoding.h"
 #include "filesystem/directorysizes.h"
@@ -860,7 +861,7 @@ void MainWindow::startOperation(const LocalFiles::Request &request) {
     const auto label =
         verb + (request.destination.empty() ? QString(" · %1 entries").arg(request.sources.size())
                                             : " → " + displayPath(request.destination));
-    queue_->enqueue(
+    const auto jobId = queue_->enqueue(
         label, [request](const auto &control) { return LocalFiles::execute(request, control); },
         [this, source, request](const LocalFiles::Result &result) {
             if (source && active_ == source && !QApplication::activeModalWidget())
@@ -902,6 +903,9 @@ void MainWindow::startOperation(const LocalFiles::Request &request) {
                 report->show();
             }
         });
+    if (request.operation == LocalFiles::Operation::Copy || request.operation == LocalFiles::Operation::Delete ||
+        request.operation == LocalFiles::Operation::Trash || request.operation == LocalFiles::Operation::Move)
+        (new OperationProgressDialog(queue_, jobId, this))->show();
     statusBar()->showMessage("Operation queued · Ctrl+J opens background operations", 10000);
 }
 void MainWindow::updateBookmarks() {

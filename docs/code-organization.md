@@ -8,7 +8,7 @@ Production code is grouped by responsibility under `src/`. Includes use paths re
 | `archives/` | Libarchive operations and sandboxed external archive backends |
 | `filesystem/` | Native descriptors, file analysis/transforms/exports, comments, filename presentation and directory sizing |
 | `network/` | FTP browser/transfers, transfer options and directory sharing |
-| `operations/` | Local mutations, batch rename, job queue, operation logs and worker pool |
+| `operations/` | Local mutations, batch rename, job queue, thread-safe operation progress, operation logs and worker pool |
 | `platform/` | Native extension records, associations, mounting and external program launching |
 | `search/` | File-search requests and execution |
 | `settings/` | Application, interface and panel preferences |

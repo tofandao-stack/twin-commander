@@ -3,8 +3,10 @@
 #include <QString>
 #include <QByteArray>
 #include <atomic>
+#include <cstdint>
 #include <filesystem>
 #include <memory>
+#include <mutex>
 #include <vector>
 #include <thread>
 #include <chrono>
@@ -20,11 +22,30 @@ struct Request {
     QString journalDirectory;
     unsigned permissions = 0644;
 };
+struct Progress {
+    enum class Phase { Idle, Scanning, Working, Finished };
+    Phase phase = Phase::Idle;
+    std::filesystem::path currentPath;
+    uint64_t totalBytes = 0, doneBytes = 0, totalEntries = 0, doneEntries = 0;
+    uint64_t fileBytes = 0, fileTotal = 0;
+    bool totalsKnown = false, byteBased = false, fileComplete = false;
+};
 struct Control {
     std::atomic_bool cancelled{false};
     std::atomic_bool paused{false};
     std::atomic_uint64_t bytes{0};
     std::atomic_uint64_t completed{0};
+    Progress progressSnapshot() const;
+    void startProgress();
+    void setTotals(uint64_t bytes, uint64_t entries, bool known, bool byteBased);
+    void beginFile(const std::filesystem::path &path, uint64_t size);
+    void advanceFile(uint64_t count);
+    void finishFile();
+    void finishProgress();
+  private:
+    mutable std::mutex progressMutex_;
+    Progress progress_;
+
 };
 struct Cancelled {};
 inline void checkpoint(const std::shared_ptr<Control> &control)

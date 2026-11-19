@@ -29,6 +29,40 @@ class OperationTests : public QObject {
         return execute({kind, sources, destination, conflict, {}}, std::make_shared<Control>());
     }
 private slots:
+    void copyReportsIndependentFileAndOverallProgress() {
+        QTemporaryDir dir;
+        const auto root=nativePath(dir.path()); fs::create_directory(root/"out");
+        put(root/"first",std::string(700000,'x')); put(root/"second","last");
+        auto control=std::make_shared<Control>();
+        const auto result=execute({Operation::Copy,{root/"first",root/"second"},root/"out"},control);
+        QVERIFY(!result.cancelled); QCOMPARE(result.items.size(),size_t(2));
+        for(const auto &item:result.items)QVERIFY2(item.error.isEmpty(),qPrintable(item.error));
+        const auto progress=control->progressSnapshot();
+        QVERIFY(progress.phase==Progress::Phase::Finished); QVERIFY(progress.totalsKnown); QVERIFY(progress.byteBased);
+        QCOMPARE(progress.totalBytes,uint64_t(700004)); QCOMPARE(progress.doneBytes,progress.totalBytes);
+        QCOMPARE(progress.totalEntries,uint64_t(2)); QCOMPARE(progress.doneEntries,uint64_t(2));
+        QCOMPARE(progress.currentPath,root/"second"); QCOMPARE(progress.fileTotal,uint64_t(4));
+        QCOMPARE(progress.fileBytes,uint64_t(4)); QVERIFY(progress.fileComplete);
+        QCOMPARE(control->completed.load(),uint64_t(2));
+    }
+    void recursiveDeleteReportsEntriesWithoutFollowingLinks() {
+        QTemporaryDir dir; const auto root=nativePath(dir.path());
+        fs::create_directories(root/"tree"/"empty"); put(root/"tree"/"a","abc");put(root/"outside","keep");
+        fs::create_symlink(root/"outside",root/"tree"/"link");
+        auto control=std::make_shared<Control>();
+        const auto result=execute({Operation::Delete,{root/"tree"}},control);
+        QVERIFY(result.items.front().error.isEmpty()); QVERIFY(!fs::exists(root/"tree"));QCOMPARE(get(root/"outside"),std::string("keep"));
+        const auto p=control->progressSnapshot(); QVERIFY(p.totalsKnown);QVERIFY(!p.byteBased);
+        QCOMPARE(p.totalEntries,uint64_t(4));QCOMPARE(p.doneEntries,p.totalEntries);QCOMPARE(p.doneBytes,uint64_t(0));
+        QCOMPARE(p.currentPath,root/"tree"); QVERIFY(p.fileComplete);QVERIFY(p.phase==Progress::Phase::Finished);
+    }
+    void cancelledProgressDoesNotPretendToComplete() {
+        QTemporaryDir dir; const auto root=nativePath(dir.path());put(root/"source","abc");fs::create_directory(root/"out");
+        auto control=std::make_shared<Control>(); control->cancelled=true;
+        auto result=execute({Operation::Copy,{root/"source"},root/"out"},control);
+        QVERIFY(result.cancelled); const auto p=control->progressSnapshot();QCOMPARE(p.doneBytes,uint64_t(0));
+        QCOMPARE(p.doneEntries,uint64_t(0));QVERIFY(p.phase==Progress::Phase::Finished);QVERIFY(!fs::exists(root/"out"/"source"));
+    }
     void recursiveCopyPreservesBytesLinksAndPermissions()
     {
         QTemporaryDir directory;

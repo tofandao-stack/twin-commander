@@ -20,6 +20,7 @@
 #include <cstring>
 #include <dirent.h>
 #include <fcntl.h>
+#include <limits>
 #include <stdexcept>
 #include <sys/stat.h>
 #include <sys/syscall.h>
@@ -57,13 +58,44 @@ bool unchanged(const struct stat &a, const struct stat &b) {
            a.st_mtim.tv_nsec == b.st_mtim.tv_nsec && a.st_ctim.tv_sec == b.st_ctim.tv_sec &&
            a.st_ctim.tv_nsec == b.st_ctim.tv_nsec;
 }
+// Advisory totals only: mutation still performs its original descriptor and identity checks.
+void countEntry(int parent, const std::string &name, dev_t device, uint64_t &bytes, uint64_t &entries,
+                const std::shared_ptr<Control> &control, unsigned depth = 0) {
+    cancellation(control);
+    if (depth > 256 || entries >= 1000000) throw Failure("Progress scan limit reached");
+    const auto st = metadata(parent, name);
+    ++entries;
+    if (S_ISREG(st.st_mode)) {
+        if (st.st_size < 0 || uint64_t(st.st_size) > std::numeric_limits<uint64_t>::max() - bytes)
+            throw Failure("Progress byte total exceeds its limit");
+        bytes += uint64_t(st.st_size);
+    }
+    if (!S_ISDIR(st.st_mode)) return;
+    if (st.st_dev != device) throw Failure("Progress scan reached another filesystem");
+    FileDescriptor dir(::openat(parent, name.c_str(), O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC));
+    struct stat opened{}; check(::fstat(dir.value, &opened));
+    if (!same(st, opened)) throw Failure("Directory changed during progress scan");
+    const int duplicate = ::dup(dir.value); check(duplicate);
+    auto *stream = ::fdopendir(duplicate);
+    if (!stream) { ::close(duplicate); throw Failure("Cannot scan directory for progress"); }
+    try {
+        while (true) {
+            errno=0; auto *entry=::readdir(stream);
+            if (!entry) { if(errno) throw Failure(std::strerror(errno)); break; }
+            const std::string child(entry->d_name);
+            if (child!="." && child!="..") countEntry(dir.value,child,device,bytes,entries,control,depth+1);
+        }
+    } catch (...) { ::closedir(stream); throw; }
+    ::closedir(stream);
+}
 void removeEntry(int parent, const std::string &name, dev_t device, const std::shared_ptr<Control> &control,
-                 unsigned depth = 0) {
+                 const fs::path &path = {}, unsigned depth = 0) {
     cancellation(control);
     if (depth > 256)
         throw Failure("Directory nesting exceeds the 256-level operation limit");
     const auto st = metadata(parent, name);
     if (!S_ISDIR(st.st_mode)) {
+        if (!path.empty()) control->beginFile(path, 1);
         if (ApplicationPreferences::flag("ChkExplorerDelete")) {
             const auto display = QFile::decodeName(QByteArray::fromStdString(name));
             if (QFile::encodeName(display).toStdString() != name)
@@ -72,6 +104,7 @@ void removeEntry(int parent, const std::string &name, dev_t device, const std::s
                 throw Failure("Qt compatibility deletion failed");
         } else
             check(::unlinkat(parent, name.c_str(), 0));
+        if (!path.empty()) control->finishFile();
         return;
     }
     if (st.st_dev != device)
@@ -101,7 +134,7 @@ void removeEntry(int parent, const std::string &name, dev_t device, const std::s
             const std::string child(entry->d_name);
             if (child == "." || child == "..")
                 continue;
-            removeEntry(directory.value, child, device, control, depth + 1);
+            removeEntry(directory.value, child, device, control, path.empty() ? fs::path{} : path / child, depth + 1);
         }
     } catch (...) {
         ::closedir(stream);
@@ -110,14 +143,17 @@ void removeEntry(int parent, const std::string &name, dev_t device, const std::s
     ::closedir(stream);
     if (!same(st, metadata(parent, name)))
         throw Failure("Directory name changed during deletion");
+    if (!path.empty()) control->beginFile(path, 1);
     check(::unlinkat(parent, name.c_str(), AT_REMOVEDIR));
+    if (!path.empty()) control->finishFile();
 }
 void copyEntry(int sourceParent, const std::string &source, int targetParent, const std::string &target,
-               dev_t device, const std::shared_ptr<Control> &control, unsigned depth = 0) {
+               dev_t device, const std::shared_ptr<Control> &control, const fs::path &path, unsigned depth = 0) {
     cancellation(control);
     if (depth > 256)
         throw Failure("Directory nesting exceeds the 256-level operation limit");
     const auto before = metadata(sourceParent, source);
+    if (!S_ISDIR(before.st_mode)) control->beginFile(path, S_ISREG(before.st_mode) ? uint64_t(before.st_size) : 0);
     if (S_ISLNK(before.st_mode)) {
         std::vector<char> bytes(4096);
         ssize_t size = 0;
@@ -134,6 +170,7 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
         check(::symlinkat(link.c_str(), targetParent, target.c_str()));
         if (!unchanged(before, metadata(sourceParent, source)))
             throw Failure("Source link changed during copy");
+        control->finishFile();
         return;
     }
     if (!S_ISREG(before.st_mode) && !S_ISDIR(before.st_mode))
@@ -170,7 +207,7 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
                 const std::string child(entry->d_name);
                 if (child == "." || child == "..")
                     continue;
-                copyEntry(input.value, child, output.value, child, device, control, depth + 1);
+                copyEntry(input.value, child, output.value, child, device, control, path / child, depth + 1);
             }
         } catch (...) {
             ::closedir(stream);
@@ -242,6 +279,7 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
                 if (!size)
                     break;
                 control->bytes += size;
+                control->advanceFile(size);
                 continue;
             }
             size = qt ? qtInput.read(buffer.data(), buffer.size())
@@ -261,6 +299,7 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
                 check(written <= 0 ? -1 : 0);
                 offset += written;
                 control->bytes += written;
+                control->advanceFile(written);
             }
             if (big) {
                 const auto offset = ::lseek(input.value, 0, SEEK_CUR);
@@ -312,6 +351,8 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
     check(::fstat(input.value, &after));
     if (!unchanged(before, after) || !unchanged(before, metadata(sourceParent, source)))
         throw Failure("Source changed during copy; destination was not committed");
+    if (S_ISDIR(before.st_mode)) control->beginFile(path, 0);
+    control->finishFile();
 }
 void noReplace(int sourceParent, const std::string &source, int targetParent, const std::string &target) {
     check(static_cast<int>(::syscall(SYS_renameat2, sourceParent, source.c_str(), targetParent,
@@ -447,10 +488,29 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
         (request.operation == Operation::MakeDirectory || request.operation == Operation::MakeFile)
             ? std::vector<fs::path>{request.destination}
             : request.sources;
+    control->startProgress();
+    uint64_t totalBytes=0, totalEntries=0;
+    bool totalsKnown=true;
+    try {
+        if (request.operation == Operation::Copy || request.operation == Operation::Delete) {
+            for (const auto &path : sources) {
+                if (!path.is_absolute() || path.filename().empty() || path.filename()=="." || path.filename()=="..")
+                    throw Failure("Invalid path during progress scan");
+                FileDescriptor parent(::open(path.parent_path().c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC));
+                const auto st=metadata(parent.value,path.filename().native());
+                countEntry(parent.value,path.filename().native(),st.st_dev,totalBytes,totalEntries,control);
+            }
+        } else totalEntries=sources.size();
+    } catch (const Cancelled &) {
+        result.cancelled=true; control->finishProgress(); journal(true); return result;
+    } catch (const std::exception &) { totalsKnown=false; }
+    control->setTotals(totalBytes,totalEntries,totalsKnown,request.operation==Operation::Copy);
     for (const auto &sourcePath : sources) {
         Outcome outcome{sourcePath, {}, {}, false};
         try {
             cancellation(control);
+            if (request.operation != Operation::Copy && request.operation != Operation::Delete)
+                control->beginFile(sourcePath, 1);
             const auto copiedComment =
                 ApplicationPreferences::flag("IdConf_comments_copy") &&
                         (request.operation == Operation::Copy || request.operation == Operation::Move ||
@@ -503,7 +563,7 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
                 outcome.destination = nativePath(trashed);
             } else if (request.operation == Operation::Delete) {
                 const auto st = metadata(sourceParent.value, source);
-                removeEntry(sourceParent.value, source, st.st_dev, control);
+                removeEntry(sourceParent.value, source, st.st_dev, control, sourcePath);
             } else {
                 const auto targetPath = request.operation == Operation::Rename
                                             ? request.destination
@@ -538,7 +598,7 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
                         ".tc-copy-" + QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString();
                     try {
                         copyEntry(sourceParent.value, source, targetParent.value, temporary, before.st_dev,
-                                  control);
+                                  control, sourcePath);
                         cancellation(control);
                         if (exists) {
                             if (!unchanged(existing, metadata(targetParent.value, target)))
@@ -581,6 +641,8 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
         } catch (const std::exception &error) {
             outcome.error += QString::fromLocal8Bit(error.what());
         }
+        if (request.operation != Operation::Copy && request.operation != Operation::Delete && outcome.error.isEmpty() && !outcome.skipped)
+            control->finishFile();
         result.items.push_back(std::move(outcome));
         ++control->completed;
         journal(false);
@@ -588,6 +650,7 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
             break;
     }
     result.cancelled = result.cancelled || control->cancelled.load();
+    control->finishProgress();
     journal(true);
     return result;
 }
