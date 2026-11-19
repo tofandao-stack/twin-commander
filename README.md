@@ -2,6 +2,8 @@
 
 A native Linux two-panel file manager, implemented in C++20 and Qt 6 Widgets according to [PLAN.md](PLAN.md). Version 0.9 is an internal local-manager alpha with file operations, viewer/editor and search. Total Commander parity has not been established.
 
+See [source organization and naming](docs/code-organization.md) for the package layout and class/module responsibilities.
+
 ## Build and run
 
 On Ubuntu 24.04 or Debian 12:

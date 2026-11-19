@@ -1,9 +1,10 @@
-#include "archives.h"
-#include "batchrename.h"
-#include "filetools.h"
-#include "directorymodel.h"
-#include "search.h"
-#include "productivitytools.h"
+#include "filesystem/pathencoding.h"
+#include "archives/archives.h"
+#include "operations/batchrename.h"
+#include "filesystem/fileanalysis.h"
+#include "ui/panels/directorymodel.h"
+#include "search/filesearch.h"
+#include "filesystem/fileexports.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -46,35 +47,35 @@ private slots:
     void selectionFilesPreserveBytesAndRejectEscapes()
     {
         QTemporaryDir directory;const auto root=nativePath(directory.path());const auto raw=fs::path(std::string("raw-")+char(0xff));
-        const std::vector<fs::path> paths{root/"normal",root/raw};const auto decoded=Productivity::selectionPaths(Productivity::selectionData(paths),root);QVERIFY(decoded==paths);
-        auto object=QJsonDocument::fromJson(Productivity::selectionData(paths)).object();object["namesBase64"]=QJsonArray{QString::fromLatin1(QByteArray("../outside").toBase64())};
-        QVERIFY_EXCEPTION_THROWN(Productivity::selectionPaths(QJsonDocument(object).toJson(),root),NativeFs::Error);
-        QVERIFY_EXCEPTION_THROWN(Productivity::selectionPaths("invalid",root),NativeFs::Error);
+        const std::vector<fs::path> paths{root/"normal",root/raw};const auto decoded=FileExports::selectionPaths(FileExports::selectionData(paths),root);QVERIFY(decoded==paths);
+        auto object=QJsonDocument::fromJson(FileExports::selectionData(paths)).object();object["namesBase64"]=QJsonArray{QString::fromLatin1(QByteArray("../outside").toBase64())};
+        QVERIFY_EXCEPTION_THROWN(FileExports::selectionPaths(QJsonDocument(object).toJson(),root),NativeFs::Error);
+        QVERIFY_EXCEPTION_THROWN(FileExports::selectionPaths("invalid",root),NativeFs::Error);
     }
     void exportsNeverReplaceExistingEntries()
     {
-        QTemporaryDir directory;const auto root=nativePath(directory.path());Productivity::exportNew(root/"new","original");
-        QVERIFY_EXCEPTION_THROWN(Productivity::exportNew(root/"new","replacement"),NativeFs::Error);QCOMPARE(get(root/"new"),std::string("original"));
-        fs::create_symlink(root/"new",root/"link");QVERIFY_EXCEPTION_THROWN(Productivity::exportNew(root/"link","replacement"),NativeFs::Error);
-        QVERIFY_EXCEPTION_THROWN(Productivity::readSmall(root/"link"),NativeFs::Error);QCOMPARE(fs::directory_iterator(root)!=fs::directory_iterator(),true);
+        QTemporaryDir directory;const auto root=nativePath(directory.path());FileExports::exportNew(root/"new","original");
+        QVERIFY_EXCEPTION_THROWN(FileExports::exportNew(root/"new","replacement"),NativeFs::Error);QCOMPARE(get(root/"new"),std::string("original"));
+        fs::create_symlink(root/"new",root/"link");QVERIFY_EXCEPTION_THROWN(FileExports::exportNew(root/"link","replacement"),NativeFs::Error);
+        QVERIFY_EXCEPTION_THROWN(FileExports::readSmall(root/"link"),NativeFs::Error);QCOMPARE(fs::directory_iterator(root)!=fs::directory_iterator(),true);
         for(const auto &entry:fs::directory_iterator(root))QVERIFY(!entry.path().filename().native().starts_with(".tc-export-"));
     }
     void checksumManifestsDetectChangesAndRejectTraversal()
     {
         QTemporaryDir directory;const auto root=nativePath(directory.path());put(root/"file","abc");
         for(const auto algorithm:{QCryptographicHash::Md5,QCryptographicHash::Sha1,QCryptographicHash::Sha256}){
-            const auto data=Productivity::checksumManifest({root/"file"},algorithm,control());put(root/"manifest",data.toStdString());
-            QVERIFY(Productivity::verifyManifest(root/"manifest",control()).contains("1 verified; 0 failed"));put(root/"file","changed");QVERIFY(Productivity::verifyManifest(root/"manifest",control()).contains("0 verified; 1 failed"));put(root/"file","abc");
+            const auto data=FileExports::checksumManifest({root/"file"},algorithm,control());put(root/"manifest",data.toStdString());
+            QVERIFY(FileExports::verifyManifest(root/"manifest",control()).contains("1 verified; 0 failed"));put(root/"file","changed");QVERIFY(FileExports::verifyManifest(root/"manifest",control()).contains("0 verified; 1 failed"));put(root/"file","abc");
         }
-        put(root/"manifest",std::string(64,'a')+"  ../outside\n");QVERIFY_EXCEPTION_THROWN(Productivity::verifyManifest(root/"manifest",control()),NativeFs::Error);
-        fs::create_symlink(root/"file",root/"link");QVERIFY_EXCEPTION_THROWN(Productivity::checksumManifest({root/"link"},QCryptographicHash::Sha256,control()),NativeFs::Error);
-        auto cancelled=control();cancelled->cancelled=true;QVERIFY_EXCEPTION_THROWN(Productivity::checksumManifest({root/"file"},QCryptographicHash::Sha256,cancelled),LocalFiles::Cancelled);
+        put(root/"manifest",std::string(64,'a')+"  ../outside\n");QVERIFY_EXCEPTION_THROWN(FileExports::verifyManifest(root/"manifest",control()),NativeFs::Error);
+        fs::create_symlink(root/"file",root/"link");QVERIFY_EXCEPTION_THROWN(FileExports::checksumManifest({root/"link"},QCryptographicHash::Sha256,control()),NativeFs::Error);
+        auto cancelled=control();cancelled->cancelled=true;QVERIFY_EXCEPTION_THROWN(FileExports::checksumManifest({root/"file"},QCryptographicHash::Sha256,cancelled),LocalFiles::Cancelled);
     }
     void recursiveFileListsDoNotTraverseLinks()
     {
         QTemporaryDir directory;const auto root=nativePath(directory.path());fs::create_directory(root/"folder");put(root/"folder/file");fs::create_directory_symlink(root/"folder",root/"alias");
-        const auto list=Productivity::fileList({root/"folder",root/"alias"},true,control());QVERIFY(list.contains("folder/file"));QVERIFY(!list.contains("alias/file"));
-        QVERIFY(!Productivity::fileList({root/"folder"},false,control()).contains("folder/file"));
+        const auto list=FileExports::fileList({root/"folder",root/"alias"},true,control());QVERIFY(list.contains("folder/file"));QVERIFY(!list.contains("alias/file"));
+        QVERIFY(!FileExports::fileList({root/"folder"},false,control()).contains("folder/file"));
     }
     void commanderRenameMasksUseRangesDatesAndUnicode()
     {
@@ -258,47 +259,47 @@ private slots:
     {
         QTemporaryDir directory; const auto root = nativePath(directory.path());
         put(root / "a", "same bytes"); put(root / "b", "same bytes");
-        QVERIFY(FileTools::compareFiles(root / "a", root / "b", control()).equal);
-        put(root / "b", "same Bytes"); const auto compared = FileTools::compareFiles(root / "a", root / "b", control());
+        QVERIFY(FileAnalysis::compareFiles(root / "a", root / "b", control()).equal);
+        put(root / "b", "same Bytes"); const auto compared = FileAnalysis::compareFiles(root / "a", root / "b", control());
         QVERIFY(!compared.equal); QCOMPARE(compared.offset, quint64(5)); QVERIFY(compared.error.isEmpty());
-        put(root / "b", "same"); QCOMPARE(FileTools::compareFiles(root / "a", root / "b", control()).offset, quint64(4));
-        fs::create_symlink(root / "a", root / "link"); QVERIFY(!FileTools::compareFiles(root / "a", root / "link", control()).error.isEmpty());
+        put(root / "b", "same"); QCOMPARE(FileAnalysis::compareFiles(root / "a", root / "b", control()).offset, quint64(4));
+        fs::create_symlink(root / "a", root / "link"); QVERIFY(!FileAnalysis::compareFiles(root / "a", root / "link", control()).error.isEmpty());
     }
     void directoryComparisonAndSelectiveSync()
     {
         QTemporaryDir directory; const auto root = nativePath(directory.path());
         fs::create_directories(root / "left/sub/empty"); fs::create_directory(root / "right");
         put(root / "left/sub/file", "copy"); put(root / "left/changed", "left"); put(root / "right/changed", "right"); put(root / "right/retain", "keep");
-        const auto plan = FileTools::compareDirectories(root / "left", root / "right", true, control());
+        const auto plan = FileAnalysis::compareDirectories(root / "left", root / "right", true, control());
         QVERIFY2(plan.errors.empty(), qPrintable(plan.errors.join('\n')));
         std::vector<size_t> selected;
         for (size_t i = 0; i < plan.rows.size(); ++i) if (plan.rows[i].actionable) selected.push_back(i);
-        const auto result = FileTools::synchronize(plan, selected, control());
+        const auto result = FileAnalysis::synchronize(plan, selected, control());
         QVERIFY2(success(result), qPrintable(result.items.back().error));
         QCOMPARE(get(root / "right/sub/file"), std::string("copy")); QCOMPARE(get(root / "right/changed"), std::string("left"));
         QCOMPARE(get(root / "right/retain"), std::string("keep")); QVERIFY(fs::is_directory(root / "right/sub/empty"));
-        const auto equal = FileTools::compareDirectories(root / "left", root / "right", true, control());
-        for (const auto &row : equal.rows) QVERIFY(row.difference == FileTools::Difference::Equal || row.difference == FileTools::Difference::RightOnly);
+        const auto equal = FileAnalysis::compareDirectories(root / "left", root / "right", true, control());
+        for (const auto &row : equal.rows) QVERIFY(row.difference == FileAnalysis::Difference::Equal || row.difference == FileAnalysis::Difference::RightOnly);
     }
     void syncRefusesStaleAndOverlappingPlans()
     {
         QTemporaryDir directory; const auto root = nativePath(directory.path());
         fs::create_directories(root / "left"); fs::create_directory(root / "right"); put(root / "left/file", "before");
-        auto plan = FileTools::compareDirectories(root / "left", root / "right", true, control());
+        auto plan = FileAnalysis::compareDirectories(root / "left", root / "right", true, control());
         put(root / "left/file", "changed");
-        QVERIFY(!success(FileTools::synchronize(plan, {0}, control()))); QVERIFY(fs::is_empty(root / "right"));
+        QVERIFY(!success(FileAnalysis::synchronize(plan, {0}, control()))); QVERIFY(fs::is_empty(root / "right"));
         fs::create_directory(root / "left/child");
-        plan = FileTools::compareDirectories(root / "left", root / "left/child", true, control());
-        QVERIFY(!success(FileTools::synchronize(plan, {0}, control()))); QVERIFY(fs::is_empty(root / "left/child"));
+        plan = FileAnalysis::compareDirectories(root / "left", root / "left/child", true, control());
+        QVERIFY(!success(FileAnalysis::synchronize(plan, {0}, control()))); QVERIFY(fs::is_empty(root / "left/child"));
     }
     void syncDestinationChangesRefuseAllMutations()
     {
         QTemporaryDir directory; const auto root = nativePath(directory.path()); fs::create_directory(root / "left"); fs::create_directory(root / "right");
         put(root / "left/a-new", "new"); put(root / "left/z-existing", "source"); put(root / "right/z-existing", "original");
-        const auto plan = FileTools::compareDirectories(root / "left", root / "right", true, control());
+        const auto plan = FileAnalysis::compareDirectories(root / "left", root / "right", true, control());
         std::vector<size_t> selected; for (size_t i = 0; i < plan.rows.size(); ++i) if (plan.rows[i].actionable) selected.push_back(i);
         put(root / "right/z-existing", "external edit");
-        QVERIFY(!success(FileTools::synchronize(plan, selected, control())));
+        QVERIFY(!success(FileAnalysis::synchronize(plan, selected, control())));
         QVERIFY(!fs::exists(root / "right/a-new")); QCOMPARE(get(root / "right/z-existing"), std::string("external edit"));
     }
     void folderStatisticsAndDuplicateCandidates()
@@ -306,9 +307,9 @@ private slots:
         QTemporaryDir directory; const auto root = nativePath(directory.path()); fs::create_directory(root / "sub");
         put(root / "a", "duplicate"); put(root / "sub/b", "duplicate"); put(root / "other", "different");
         fs::create_hard_link(root / "a", root / "alias"); fs::create_directory_symlink(root, root / "sub/cycle");
-        const auto stats = FileTools::statistics({root}, control());
+        const auto stats = FileAnalysis::statistics({root}, control());
         QCOMPARE(stats.files, quint64(4)); QCOMPARE(stats.directories, quint64(2)); QCOMPARE(stats.links, quint64(1)); QCOMPARE(stats.bytes, quint64(36));
-        const auto duplicates = FileTools::duplicates(root, control());
+        const auto duplicates = FileAnalysis::duplicates(root, control());
         QVERIFY(duplicates.errors.empty()); QCOMPARE(duplicates.groups.size(), size_t(1)); QCOMPARE(duplicates.groups.front().paths.size(), size_t(2)); QCOMPARE(duplicates.groups.front().size, quint64(9));
         fs::remove(root / "sub/cycle");
     }

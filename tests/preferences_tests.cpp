@@ -1,5 +1,6 @@
-#include "mainwindow.h"
-#include "preferences.h"
+#include "filesystem/pathencoding.h"
+#include "app/mainwindow.h"
+#include "settings/panelpreferences.h"
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
@@ -54,7 +55,7 @@ class PreferencesTests : public QObject {
   private slots:
     void initTestCase() {
         QCoreApplication::setOrganizationName("TwinCommanderPreferencesTests");
-        QCoreApplication::setApplicationName("Preferences");
+        QCoreApplication::setApplicationName("PanelPreferences");
         QSettings::setDefaultFormat(QSettings::IniFormat);
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, settings_.path());
     }
@@ -136,10 +137,10 @@ class PreferencesTests : public QObject {
         s.setValue("format/dateOrder", 1);
         s.setValue("format/dateSeparator", "/");
         s.setValue("format/timeSeparator", ".");
-        QCOMPARE(Preferences::dateText(QDateTime(QDate(2026, 11, 18), QTime(14, 3, 5))),
+        QCOMPARE(PanelPreferences::dateText(QDateTime(QDate(2026, 11, 18), QTime(14, 3, 5))),
                  QString("18/11/26 02.03.05 PM"));
         s.setValue("format/thousands", " ");
-        QCOMPARE(Preferences::sizeText(1234567, 0), QString("1 234 567"));
+        QCOMPARE(PanelPreferences::sizeText(1234567, 0), QString("1 234 567"));
         QTemporaryDir dir;
         put(dir.filePath("file10"));
         put(dir.filePath("file2"));

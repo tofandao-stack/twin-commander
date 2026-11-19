@@ -1,6 +1,7 @@
-#include "fileoperations.h"
-#include "search.h"
-#include "directorymodel.h"
+#include "filesystem/pathencoding.h"
+#include "operations/fileoperations.h"
+#include "search/filesearch.h"
+#include "ui/panels/directorymodel.h"
 #include <QDir>
 #include <QFile>
 #include <QTemporaryDir>

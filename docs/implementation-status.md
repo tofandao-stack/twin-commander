@@ -26,26 +26,28 @@ The Phase 0 reuse gate remains open. No installed TC versus Double Commander com
 
 ## Modules
 
+See [source organization and naming](code-organization.md) for the complete package map, renamed classes and extracted services.
+
 | File | Responsibility |
 | --- | --- |
-| `src/directorymodel.*` | Native entry identity, background enumeration, stale-result rejection, sorting, table presentation |
-| `src/filepanel.*` | Per-tab directory state, selection, path input, history and contextual keyboard handling |
-| `src/commandregistry.h` | Shared actions and shortcut dispatch |
-| `src/productivitytools.*` | Selection files, atomic exports, bounded file lists and checksum manifests |
-| `src/productivity.cpp` | Additional reference command handlers, printing and system integration |
-| `src/customization.cpp` | Persisted bar editing, fonts/colors and view-mode presets |
-| `src/mainwindow.*` | Independent panel tab groups, menus, toolbar, directory command and session settings |
-| `src/fileoperations.*` | Descriptor-based local mutations, staged copy/save, conflict/cancellation handling and journals |
-| `src/search.*` | Bounded local glob/content search service |
-| `src/toolwindows.*` | Text/hex/image viewer, UTF-8 editor and recursive search dialog |
+| `src/ui/panels/directorymodel.*` | Native entry identity, background enumeration, stale-result rejection, sorting, table presentation |
+| `src/ui/panels/filepanel.*` | Per-tab directory state, selection, path input, history and contextual keyboard handling |
+| `src/app/commandregistry.h` | Shared actions and shortcut dispatch |
+| `src/filesystem/fileexports.*` | Selection files, atomic exports, bounded file lists and checksum manifests |
+| `src/app/filecommands.cpp` | Additional reference command handlers, printing and system integration |
+| `src/ui/settings/appearanceandtoolbareditors.cpp` | Persisted bar editing, fonts/colors and view-mode presets |
+| `src/app/mainwindow.*` | Independent panel tab groups, menus, toolbar, directory command and session settings |
+| `src/operations/fileoperations.*` | Descriptor-based local mutations, staged copy/save, conflict/cancellation handling and journals |
+| `src/search/filesearch.*` | Bounded local glob/content search service |
+| `src/ui/dialogs/filecontentandsearchdialogs.*` | Text/hex/image viewer, UTF-8 editor and recursive search dialog |
 | `tests/commander_tests.cpp` | Temporary-filesystem and widget interaction regression scenarios |
 | `tests/operation_tests.cpp` | Real local operation, failure, search and atomic-save regression scenarios |
-| `src/backgroundpool.h` | File-worker pool isolated from Qt's global rendering pool |
-| `src/jobqueue.*` | Serialized background mutations, cooperative controls, reordering, summaries and queue UI |
-| `src/archives.*` | Bounded libarchive reading/packing and descriptor-based staged extraction |
-| `src/batchrename.*` | Preview validation, cycle-aware temporary renames, rollback attempts and phase journals |
-| `src/filetools.*` | Statistics, duplicate candidates, content/directory comparison and non-deleting sync |
-| `src/advancedwindows.*` | Archive browser, rename preview, directory comparison and analysis reports |
+| `src/operations/iothreadpool.h` | File-worker pool isolated from Qt's global rendering pool |
+| `src/operations/jobqueue.*` | Serialized background mutations, cooperative controls, reordering, summaries and queue UI |
+| `src/archives/archives.*` | Bounded libarchive reading/packing and descriptor-based staged extraction |
+| `src/operations/batchrename.*` | Preview validation, cycle-aware temporary renames, rollback attempts and phase journals |
+| `src/filesystem/fileanalysis.*` | Statistics, duplicate candidates, content/directory comparison and non-deleting sync |
+| `src/ui/dialogs/fileoperationdialogs.*` | Archive browser, rename preview, directory comparison and analysis reports |
 | `tests/advanced_tests.cpp` / `tests/queue_tests.cpp` | Archive/fault, rename, comparison/sync, inspection, permission and queue regressions |
 
 The prototype has a local directory model rather than the final provider API. Avoid defining archive/remote contracts until stream, identity and capability requirements have fixtures. Entry operations, bookmarks and persisted tab paths preserve native bytes internally. Entered path text, display paths, desktop launch and desktop trash still have decoding boundaries documented in `README.md`.

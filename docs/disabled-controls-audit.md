@@ -39,7 +39,7 @@ The previous 155-entry inventory counted buttons/actions and omitted most settin
 | Plugins | 0 |
 | Ignore list | 0 |
 
-Every configuration entry below is visible when its page is selected and has the renderer’s “not implemented” tooltip. `src/referenceforms.cpp:62` disables reference inputs by default; `configureAppearance()` and `configureRemainingOptions()` selectively enable supported inputs. IDs are authoritative. Captions on non-button fields are inferred from nearby labels and may be imprecise; unlabeled fields retain their ID.
+Every configuration entry below is visible when its page is selected and has the renderer’s “not implemented” tooltip. `src/ui/settings/referenceformrenderer.cpp:62` disables reference inputs by default; `configureAppearance()` and `configureConfigurationEditors()` selectively enable supported inputs. IDs are authoritative. Captions on non-button fields are inferred from nearby labels and may be imprecise; unlabeled fields retain their ID.
 
 ## Full configuration inventory
 
@@ -442,7 +442,7 @@ Every configuration entry below is visible when its page is selected and has the
 
 ## Button-bar editors
 
-These ten controls are disabled in **both** the horizontal and vertical bar editors (`src/customization.cpp:125`). Other editor buttons are enabled.
+These ten controls are disabled in **both** the horizontal and vertical bar editors (`src/ui/settings/appearanceandtoolbareditors.cpp:125`). Other editor buttons are enabled.
 
 | Control ID | Unavailable setting |
 |---|---|
@@ -463,8 +463,8 @@ External program commands and parameters in button bars are not supported by the
 
 | Location | Disabled function | Evidence |
 |---|---|---|
-| Directory hotlist / bookmarks | Configure… editor | `src/mainwindow.cpp:691` explicitly disables the action. Adding/removing the current directory is implemented. |
-| Find files → Plugins | Search in plugins | `src/toolwindows.cpp:249` disables the checkbox. Native content providers elsewhere do not implement search predicates. |
+| Directory hotlist / bookmarks | Configure… editor | `src/app/mainwindow.cpp:691` explicitly disables the action. Adding/removing the current directory is implemented. |
+| Find files → Plugins | Search in plugins | `src/ui/dialogs/filecontentandsearchdialogs.cpp:249` disables the checkbox. Native content providers elsewhere do not implement search predicates. |
 
 ## Disabled because of current state
 
@@ -472,11 +472,11 @@ These are implemented controls that can be disabled normally; they should not be
 
 | Control | Enabling condition |
 |---|---|
-| FTP Disconnect; FTP Show Hidden Files | Active FTP connection (`src/networkcommands.cpp`) |
-| Unshare Directory | An active native HTTP share (`src/networkcommands.cpp`) |
-| Multi-Rename Start | Valid preview with actual changes, no mutation running (`src/advancedwindows.cpp`) |
+| FTP Disconnect; FTP Show Hidden Files | Active FTP connection (`src/app/networkcommands.cpp`) |
+| Unshare Directory | An active native HTTP share (`src/app/networkcommands.cpp`) |
+| Multi-Rename Start | Valid preview with actual changes, no mutation running (`src/ui/dialogs/fileoperationdialogs.cpp`) |
 | Multi-Rename Next / Undo | Completed rename; Undo also requires a retained inverse plan |
-| Search Start | No search currently running (`src/toolwindows.cpp`) |
+| Search Start | No search currently running (`src/ui/dialogs/filecontentandsearchdialogs.cpp`) |
 | Search View / Edit | A current result; Feed to listbox requires results |
 | Comparison Scan / Compare contents / Apply | Worker idle; Apply additionally requires a valid comparison plan |
 | Archive extract all / selected | Archive listing complete |

@@ -1,6 +1,7 @@
+#include "filesystem/pathencoding.h"
 // Run against the built commander_ui library; see docs/disabled-controls-audit.md.
-#include "mainwindow.h"
-#include "toolwindows.h"
+#include "app/mainwindow.h"
+#include "ui/dialogs/filecontentandsearchdialogs.h"
 #include <QAbstractButton>
 #include <QAbstractSpinBox>
 #include <QAction>

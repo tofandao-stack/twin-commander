@@ -1,10 +1,11 @@
-#include "directorymodel.h"
-#include "filepanel.h"
-#include "mainwindow.h"
-#include "toolwindows.h"
-#include "advancedwindows.h"
-#include "backgroundpool.h"
-#include "classicui.h"
+#include "filesystem/pathencoding.h"
+#include "ui/panels/directorymodel.h"
+#include "ui/panels/filepanel.h"
+#include "app/mainwindow.h"
+#include "ui/dialogs/filecontentandsearchdialogs.h"
+#include "ui/dialogs/fileoperationdialogs.h"
+#include "operations/iothreadpool.h"
+#include "ui/panels/filepanellayout.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -129,7 +130,7 @@ private slots:
         window.findChild<QAction *>("cm_Config")->trigger();auto *configuration=window.findChild<QDialog *>("referenceConfiguration");
         window.findChild<QAction *>("cm_ButtonConfig")->trigger();auto *horizontal=window.findChild<QDialog *>("horizontalBarEditor");
         window.findChild<QAction *>("cm_ButtonConfig2")->trigger();auto *vertical=window.findChild<QDialog *>("verticalBarEditor");
-        JobQueue queue;RenameDialog rename({nativePath(directory.filePath("fixture.txt"))},&queue,{},&window);
+        JobQueue queue;BatchRenameDialog rename({nativePath(directory.filePath("fixture.txt"))},&queue,{},&window);
         SearchDialog search(nativePath(directory.path()),&window);search.show();QTest::mouseClick(search.findChild<QPushButton *>("searchStart"),Qt::LeftButton);auto *results=search.findChild<QTableWidget *>("searchResults");QTRY_COMPARE(results->rowCount(),1);results->selectRow(0);QTest::qWait(150);
         const QMap<QString,QWidget *> contexts{{"configuration",configuration},{"cm_ButtonConfig",horizontal},{"cm_ButtonConfig2",vertical},{"rename",&rename},{"search",&search}};
         QSet<QString> seen;
@@ -680,7 +681,7 @@ private slots:
         QTemporaryDir directory;
         const auto path = directory.filePath("text.txt");
         writeFile(path, "original");
-        QPointer<FileWindow> editor = new FileWindow(nativePath(path), true);
+        QPointer<FileContentDialog> editor = new FileContentDialog(nativePath(path), true);
         editor->show();
         auto *text = editor->findChild<QPlainTextEdit *>();
         QTRY_VERIFY(!text->isReadOnly());
@@ -714,7 +715,7 @@ private slots:
         QTemporaryDir directory;
         const auto path = directory.filePath("windows.txt");
         writeFile(path, "original\r\n");
-        QPointer<FileWindow> editor = new FileWindow(nativePath(path), true);
+        QPointer<FileContentDialog> editor = new FileContentDialog(nativePath(path), true);
         editor->show();
         auto *text = editor->findChild<QPlainTextEdit *>();
         QTRY_VERIFY(!text->isReadOnly());
@@ -738,7 +739,7 @@ private slots:
         const auto created = Archives::create({root / "source.txt"}, root / "source.zip", Archives::Format::Zip, std::make_shared<LocalFiles::Control>());
         QVERIFY(created.items.front().error.isEmpty());
         JobQueue queue;
-        QPointer<ArchiveDialog> dialog = new ArchiveDialog(root / "source.zip", root, &queue);
+        QPointer<ArchiveBrowserDialog> dialog = new ArchiveBrowserDialog(root / "source.zip", root, &queue);
         dialog->show();
         auto *entries = dialog->findChild<QTableWidget *>("archiveEntries");
         auto *extract = dialog->findChild<QPushButton *>("extractAll");
@@ -759,7 +760,7 @@ private slots:
         QTemporaryDir directory;
         writeFile(directory.filePath("a.txt"), "a"); writeFile(directory.filePath("b.txt"), "b");
         const auto root = nativePath(directory.path()); JobQueue queue;
-        QPointer<RenameDialog> dialog = new RenameDialog({root / "a.txt", root / "b.txt"}, &queue, directory.filePath("jobs"));
+        QPointer<BatchRenameDialog> dialog = new BatchRenameDialog({root / "a.txt", root / "b.txt"}, &queue, directory.filePath("jobs"));
         dialog->show();
         auto *pattern = dialog->findChild<QLineEdit *>("renamePattern"); auto *apply = dialog->findChild<QPushButton *>("applyRename");
         pattern->setText("item_[C]"); QTRY_VERIFY(apply->isEnabled());
@@ -774,7 +775,7 @@ private slots:
     void renameDefaultPreservesExtensionlessNames()
     {
         QTemporaryDir directory;writeFile(directory.filePath("README"));JobQueue queue;
-        QPointer<RenameDialog> dialog=new RenameDialog({nativePath(directory.filePath("README"))},&queue,{});dialog->show();
+        QPointer<BatchRenameDialog> dialog=new BatchRenameDialog({nativePath(directory.filePath("README"))},&queue,{});dialog->show();
         auto *table=dialog->findChild<QTableWidget *>("renamePreview");QTRY_COMPARE(table->rowCount(),1);
         QCOMPARE(table->item(0,2)->text(),QString("README"));QVERIFY(!dialog->findChild<QPushButton *>("applyRename")->isEnabled());
         dialog->findChild<QLineEdit *>("renamePattern")->setText("[UNSUPPORTED]");QTest::qWait(250);QVERIFY(!dialog->findChild<QPushButton *>("applyRename")->isEnabled());dialog->close();QTRY_VERIFY(dialog.isNull());
@@ -786,7 +787,7 @@ private slots:
         QVERIFY(QDir(directory.path()).mkdir("left")); QVERIFY(QDir(directory.path()).mkdir("right"));
         writeFile(directory.filePath("left/file.txt"), "new"); writeFile(directory.filePath("right/file.txt"), "old"); writeFile(directory.filePath("right/retain"), "keep");
         const auto root = nativePath(directory.path()); JobQueue queue;
-        QPointer<CompareDialog> dialog = new CompareDialog(root / "left", root / "right", &queue, directory.filePath("jobs"));
+        QPointer<DirectoryComparisonDialog> dialog = new DirectoryComparisonDialog(root / "left", root / "right", &queue, directory.filePath("jobs"));
         dialog->show(); auto *apply = dialog->findChild<QPushButton *>("applySync"); QTRY_VERIFY(apply->isEnabled());
         auto *table = dialog->findChild<QTableWidget *>("directoryComparison"); QCOMPARE(table->rowCount(), 2);
         const auto screenshots = qEnvironmentVariable("TC_SCREENSHOT_DIR");
@@ -826,7 +827,7 @@ private slots:
             while (true) { LocalFiles::checkpoint(control); std::this_thread::sleep_for(std::chrono::milliseconds(1)); }
         });
         queue.enqueue("Waiting fixture", [](const auto &) { return LocalFiles::Result{}; });
-        QPointer<QueueDialog> dialog = new QueueDialog(&queue); dialog->show();
+        QPointer<JobQueueDialog> dialog = new JobQueueDialog(&queue); dialog->show();
         auto *table = dialog->findChild<QTableWidget *>("jobTable"); QTRY_COMPARE(table->rowCount(), 2);
         QTRY_VERIFY(queue.jobs().front().state == JobQueue::State::Running); table->setCurrentCell(0, 0);
         QTest::mouseClick(dialog->findChild<QPushButton *>("queuePause"), Qt::LeftButton); QVERIFY(queue.jobs().front().state == JobQueue::State::Paused);

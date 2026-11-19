@@ -1,4 +1,4 @@
-#include "jobqueue.h"
+#include "operations/jobqueue.h"
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QDir>
