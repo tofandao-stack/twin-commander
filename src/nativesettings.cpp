@@ -1,6 +1,7 @@
 #include "nativesettings.h"
 #include "directorymodel.h"
 #include "extendedtools.h"
+#include "gapsettings.h"
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -150,7 +151,7 @@ bool launchAssociated(const std::filesystem::path &path, const QString &kind) {
     }
     return false;
 }
-QString mountUrl(const QString &uri) {
+QString mountUrl(const QString &uri) try {
     for (const auto &entry : plugins("filesystem")) {
         const auto plugin = entry.toMap();
         if (!QDir::match(plugin.value("mask", "*").toString(), uri))
@@ -188,9 +189,13 @@ QString mountUrl(const QString &uri) {
             !QDir::isAbsolutePath(directory) || !QDir(directory).exists())
             throw std::runtime_error(
                 "Filesystem extension must return an existing absolute local mount path");
+        GapSettings::log("filesystem", "success", "Native filesystem provider mounted " + directory);
         return directory;
     }
     return {};
+} catch (const std::exception &e) {
+    GapSettings::log("filesystem", "error", QString::fromLocal8Bit(e.what()));
+    throw;
 }
 QString field(const std::filesystem::path &path, const QString &name) {
     if (name == "comment")

@@ -1,0 +1,29 @@
+{
+    "buttonBarEditors": [
+    ],
+    "configuration": [
+    ],
+    "disabledActionsAtStartup": [
+        {
+            "caption": "FTP Disconn&ect\tCtrl+Shift+F",
+            "id": "tc_552",
+            "referenceAvailable": true
+        },
+        {
+            "caption": "FTP Sho&w Hidden Files",
+            "id": "tc_553",
+            "referenceAvailable": true
+        },
+        {
+            "caption": "&Unshare Directory...",
+            "id": "tc_515",
+            "referenceAvailable": true
+        },
+        {
+            "caption": "&Help",
+            "id": "",
+            "referenceAvailable": false
+        }
+    ],
+    "nativeFieldSearchEnabled": true
+}

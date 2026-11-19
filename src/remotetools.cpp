@@ -1,6 +1,8 @@
 #include "remotetools.h"
 #include "backgroundpool.h"
 #include "directorymodel.h"
+#include "finalsettings.h"
+#include "gapsettings.h"
 #include "nativefs.h"
 #include "productivitytools.h"
 #include <QDateTime>
@@ -12,12 +14,15 @@
 #include <QFormLayout>
 #include <QFutureWatcher>
 #include <QInputDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPointer>
 #include <QProcess>
+#include <QProgressDialog>
 #include <QPushButton>
 #include <QSettings>
 #include <QTcpSocket>
@@ -65,8 +70,50 @@ Result request(QUrl url, const Credentials &credentials, const QStringList &opti
         "--disable",           "--config",          "-",  "--silent",   "--show-error", "--fail",
         "--globoff",           "--connect-timeout", "15", "--max-time", "300",          "--proto",
         "=ftp,ftps,http,https"};
+    try {
+        arguments << GapSettings::curlOptions(
+            url, options.contains("--output") || options.contains("--upload-file"),
+            options.contains("--upload-file"));
+    } catch (const std::exception &e) {
+        return {{}, QString::fromLocal8Bit(e.what()), false};
+    }
     arguments << options;
-    process.start("curl", arguments);
+    QString program = "curl";
+    if (FinalSettings::flag("FtpModeZ") && (url.scheme() == "ftp" || url.scheme() == "ftps")) {
+        QFile script(":/transport/ftp_modez.py");
+        if (!script.open(QIODevice::ReadOnly))
+            return {{}, "Missing MODE Z transport", false};
+        const bool upload = options.contains("--upload-file"), download = options.contains("--output");
+        const int mode = QSettings().value("ftp/mode", 0).toInt();
+        const bool ascii =
+            mode == 1 || (mode == 2 && QDir::match({"*.txt", "*.csv", "*.html", "*.xml", "*.md"},
+                                                   QFileInfo(url.path()).fileName()));
+        const QJsonObject request{
+            {"url", url.toString(QUrl::FullyEncoded)},
+            {"user", credentials.user},
+            {"password", credentials.password},
+            {"method", upload     ? "upload"
+                       : download ? "download"
+                                  : "list"},
+            {"hidden", options.contains("NLST -a")},
+            {"output", download ? options.value(options.indexOf("--output") + 1) : QString()},
+            {"fd", inherited},
+            {"ascii", ascii},
+            {"passive", QSettings().value("ftp/passive", true).toBool()},
+            {"range", QSettings().value("ftp/portRange").toBool()},
+            {"portFrom", QSettings().value("ftp/portFrom", 50000).toInt()},
+            {"portTo", QSettings().value("ftp/portTo", 50100).toInt()},
+            {"external", QSettings().value("ftp/externalIP").toBool()},
+            {"address", QSettings().value("ftp/portAddress", "-").toString()},
+            {"skipLAN", FinalSettings::flag("FtpModeZnotonLAN")},
+            {"retries", qBound(0, QSettings().value("ftp/retries", 0).toInt(), 5)},
+            {"delay", qBound(0, QSettings().value("ftp/retryDelay", 1).toInt(), 60)},
+            {"stall", QSettings().value("ftp/stallRetry").toBool()}};
+        configuration = QJsonDocument(request).toJson(QJsonDocument::Compact);
+        program = "python3";
+        arguments = {"-c", QString::fromUtf8(script.readAll())};
+    }
+    process.start(program, arguments);
     if (!process.waitForStarted(3000)) {
         result.error = "curl could not start: " + process.errorString();
         return result;
@@ -344,6 +391,48 @@ RemoteDialog::RemoteDialog(const std::filesystem::path &local, QWidget *parent)
     status_->setMaximumHeight(120);
     status_->setTextInteractionFlags(Qt::TextSelectableByMouse);
     layout->addWidget(status_);
+    auto *changes = new QTimer(this);
+    changes->setInterval(1500);
+    connect(changes, &QTimer::timeout, this, [this] {
+        if (!FinalSettings::flag("IdAutoReUpload") || busy_ || url_.isEmpty())
+            return;
+        auto tracked = property("trackedDownloads").toMap();
+        for (const auto &entryKey : tracked.keys()) {
+            auto record = tracked.value(entryKey).toMap();
+            const auto path =
+                std::filesystem::path(QByteArray::fromBase64(entryKey.toLatin1()).toStdString());
+            try {
+                const auto st = NativeFs::inspect(path);
+                if (!S_ISREG(st.st_mode))
+                    continue;
+                const auto stamp = QString("%1:%2:%3:%4:%5")
+                                       .arg(st.st_ino)
+                                       .arg(st.st_size)
+                                       .arg(st.st_mtim.tv_sec)
+                                       .arg(st.st_mtim.tv_nsec)
+                                       .arg(st.st_ctim.tv_nsec);
+                if (stamp == record.value("stamp").toString())
+                    continue;
+                if (stamp != record.value("candidate").toString()) {
+                    record["candidate"] = stamp;
+                    tracked[entryKey] = record;
+                    setProperty("trackedDownloads", tracked);
+                    continue;
+                }
+                record["stamp"] = stamp;
+                record.remove("candidate");
+                tracked[entryKey] = record;
+                setProperty("trackedDownloads", tracked);
+                const auto target = record.value("url").toUrl();
+                run([path, target, credentials = credentials_](const auto &control) {
+                    return RemoteTools::upload(target, credentials, path, control);
+                });
+                return;
+            } catch (const std::exception &) {
+            }
+        }
+    });
+    changes->start();
     auto *buttons = new QHBoxLayout;
     for (const auto &label : {QString("Open directory"), QString("Parent"), QString("Download"),
                               QString("Upload"), QString("Refresh"), QString("Stop")}) {
@@ -351,6 +440,7 @@ RemoteDialog::RemoteDialog(const std::filesystem::path &local, QWidget *parent)
         buttons->addWidget(button);
         connect(button, &QPushButton::clicked, this, [this, label] {
             if (label == "Stop") {
+                setProperty("trackedDownloads", QVariantMap{});
                 if (control_)
                     control_->cancelled = true;
                 return;
@@ -379,6 +469,10 @@ RemoteDialog::RemoteDialog(const std::filesystem::path &local, QWidget *parent)
                     QMessageBox::question(this, "Overwrite remote file",
                                           name + " already exists. Replace it?") != QMessageBox::Yes)
                     return;
+                if (name == "." || name == ".." || name.contains('/') || name.contains(QChar::Null)) {
+                    status_->setText("Remote name is not a safe single filename");
+                    return;
+                }
                 auto target = url_;
                 target.setPath(url_.path() + name);
                 run([target, credentials = credentials_, path](const auto &control) {
@@ -399,10 +493,14 @@ RemoteDialog::RemoteDialog(const std::filesystem::path &local, QWidget *parent)
                 url_ = target;
                 refresh();
             } else {
-                const auto output = QFileDialog::getSaveFileName(this, "Download to a new file",
-                                                                 displayPath(local_) + "/" + name);
+                const auto output = QSettings().value("ftp/downloadTarget", 0).toInt() == 1
+                                        ? displayPath(local_ / nativePath(name))
+                                        : QFileDialog::getSaveFileName(this, "Download to a new file",
+                                                                       displayPath(local_) + "/" + name);
                 if (output.isEmpty())
                     return;
+                setProperty("pendingDownloadPath", QFile::encodeName(output));
+                setProperty("pendingDownloadUrl", target);
                 run([target, credentials = credentials_, output](const auto &control) {
                     return RemoteTools::download(target, credentials, nativePath(output), control);
                 });
@@ -431,6 +529,7 @@ void RemoteDialog::connectTo(const QUrl &url, const RemoteTools::Credentials &cr
         status_->setText("Stop the current operation before connecting to another server.");
         return;
     }
+    setProperty("trackedDownloads", QVariantMap{});
     setProperty("lastGoodUrl", QUrl());
     setProperty("lastTransfer", QString());
     url_ = url;
@@ -499,8 +598,42 @@ void RemoteDialog::run(std::function<QString(const std::shared_ptr<LocalFiles::C
     busy_ = true;
     control_ = std::make_shared<LocalFiles::Control>();
     status_->setText("Transferring…");
+    QProgressDialog *progress = nullptr;
+    if (!QSettings().value("ftp/background", true).toBool()) {
+        progress = new QProgressDialog("Remote transfer", "Cancel", 0, 0, this);
+        progress->setWindowModality(Qt::ApplicationModal);
+        progress->setMinimumDuration(0);
+        connect(progress, &QProgressDialog::canceled, this,
+                [control = control_] { control->cancelled = true; });
+        progress->show();
+    }
     auto *watcher = new QFutureWatcher<QString>(this);
-    connect(watcher, &QFutureWatcher<QString>::finished, this, [this, watcher] {
+    connect(watcher, &QFutureWatcher<QString>::finished, this, [this, watcher, progress] {
+        if (progress) {
+            progress->close();
+            progress->deleteLater();
+        }
+        if (watcher->result().startsWith("Downloaded ") && FinalSettings::flag("IdAutoReUpload") &&
+            !property("pendingDownloadPath").toByteArray().isEmpty())
+            try {
+                const auto bytes = property("pendingDownloadPath").toByteArray();
+                const auto st = NativeFs::inspect(std::filesystem::path(bytes.toStdString()));
+                auto tracked = property("trackedDownloads").toMap();
+                if (tracked.size() < 32) {
+                    tracked[QString::fromLatin1(bytes.toBase64())] =
+                        QVariantMap{{"url", property("pendingDownloadUrl")},
+                                    {"stamp", QString("%1:%2:%3:%4:%5")
+                                                  .arg(st.st_ino)
+                                                  .arg(st.st_size)
+                                                  .arg(st.st_mtim.tv_sec)
+                                                  .arg(st.st_mtim.tv_nsec)
+                                                  .arg(st.st_ctim.tv_nsec)}};
+                    setProperty("trackedDownloads", tracked);
+                }
+            } catch (const std::exception &) {
+            }
+        setProperty("pendingDownloadPath", QByteArray());
+        setProperty("pendingDownloadUrl", QUrl());
         setProperty("lastTransfer", watcher->result().left(2048));
         status_->setText(watcher->result().left(2048));
         watcher->deleteLater();
@@ -537,6 +670,7 @@ void RemoteDialog::disconnectServer() {
     credentials_.password.fill(QChar::Null);
     url_ = QUrl();
     pendingRefresh_ = false;
+    setProperty("trackedDownloads", QVariantMap{});
     setProperty("lastGoodUrl", QUrl());
     files_->clear();
     status_->setText("Disconnected");

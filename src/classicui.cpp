@@ -1,11 +1,13 @@
 #include "classicui.h"
 #include "filepanel.h"
+#include "finalsettings.h"
 #include <QApplication>
 #include <QComboBox>
 #include <QDialog>
 #include <QDir>
 #include <QFile>
 #include <QFontDatabase>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QJsonDocument>
 #include <QLabel>
@@ -16,10 +18,14 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QProxyStyle>
+#include <QResizeEvent>
 #include <QResource>
+#include <QScrollArea>
 #include <QSettings>
 #include <QStorageInfo>
 #include <QStyleFactory>
+#include <QStyleOptionButton>
+#include <QStyleOptionMenuItem>
 #include <QTabWidget>
 #include <QTableView>
 #include <QToolButton>
@@ -203,6 +209,24 @@ namespace {
 class CommanderStyle : public QProxyStyle {
   public:
     CommanderStyle() : QProxyStyle(QStyleFactory::create("Windows")) {}
+    void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter,
+                     const QWidget *widget = nullptr) const override {
+        const auto *menu = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
+        if (element == CE_MenuItem && menu && menu->checked &&
+            QSettings().value("icons/pressedChecks").toBool()) {
+            auto copy = *menu;
+            copy.checked = false;
+            QProxyStyle::drawControl(element, &copy, painter, widget);
+            QStyleOptionButton button;
+            button.rect = QRect(menu->rect.left() + 3, menu->rect.center().y() - 8, 16, 16);
+            button.state = State_Enabled | State_Sunken;
+            QProxyStyle::drawPrimitive(PE_PanelButtonCommand, &button, painter, widget);
+            if (!menu->icon.isNull())
+                menu->icon.paint(painter, button.rect.adjusted(1, 1, -1, -1));
+            return;
+        }
+        QProxyStyle::drawControl(element, option, painter, widget);
+    }
     int pixelMetric(PixelMetric metric, const QStyleOption *option = nullptr,
                     const QWidget *widget = nullptr) const override {
         if (metric == QStyle::PM_SmallIconSize && qobject_cast<const QMenu *>(widget)) {
@@ -252,14 +276,21 @@ PanelHost::PanelHost(QTabWidget *tabs, QWidget *parent)
         button->setText(text);
         button->setIcon(commanderIcon("drive", 16));
         button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        button->setAutoRaise(true);
+        button->setAutoRaise(QSettings().value("layout/flatDrives", true).toBool());
         button->setFixedHeight(22);
+        button->setProperty("driveRoot", path);
         button->setToolTip(path);
         buttons->addWidget(button);
         drive_->addItem(commanderIcon("drive", 16), text, path);
         connect(button, &QToolButton::clicked, this, [this, path] {
             if (auto *panel = qobject_cast<FilePanel *>(tabs_->currentWidget())) {
-                panel->navigate(nativePath(path));
+                const auto remembered = QSettings()
+                                            .value("volumes/" + QString::fromLatin1(path.toUtf8().toBase64()))
+                                            .toByteArray();
+                panel->navigate(!QSettings().value("navigation/volumeRoot", true).toBool() &&
+                                        !remembered.isEmpty()
+                                    ? std::filesystem::path(remembered.toStdString())
+                                    : nativePath(path));
                 panel->focusFiles();
             }
         });
@@ -303,21 +334,65 @@ PanelHost::PanelHost(QTabWidget *tabs, QWidget *parent)
         });
     }
     layout->addLayout(row);
+    wrappedTabs_ = new QWidget(this);
+    wrappedTabs_->setObjectName("wrappedTabs");
+    auto *wrap = new QGridLayout(wrappedTabs_);
+    wrap->setContentsMargins(0, 0, 0, 0);
+    wrap->setSpacing(1);
+    auto *scroll = new QScrollArea(this);
+    wrappedScroller_ = scroll;
+    scroll->setFrameShape(QFrame::NoFrame);
+    scroll->setWidgetResizable(true);
+    scroll->setWidget(wrappedTabs_);
+    layout->addWidget(scroll);
+    scroll->hide();
     layout->addWidget(tabs_, 1);
     connect(drive_, &QComboBox::activated, this, [this](int index) {
         if (!updating_)
             if (auto *panel = qobject_cast<FilePanel *>(tabs_->currentWidget())) {
-                panel->navigate(nativePath(drive_->itemData(index).toString()));
+                const auto root = drive_->itemData(index).toString();
+                const auto remembered = QSettings()
+                                            .value("volumes/" + QString::fromLatin1(root.toUtf8().toBase64()))
+                                            .toByteArray();
+                panel->navigate(!QSettings().value("navigation/volumeRoot", true).toBool() &&
+                                        !remembered.isEmpty()
+                                    ? std::filesystem::path(remembered.toStdString())
+                                    : nativePath(root));
                 panel->focusFiles();
             }
     });
     connect(tabs_, &QTabWidget::currentChanged, this, [this] { refresh(); });
 }
-void PanelHost::showDriveButtons(bool visible) { drives_->setVisible(visible); }
+void PanelHost::showDriveButtons(bool visible) {
+    drives_->setVisible(visible);
+    for (int i = 0; i < drive_->count(); ++i)
+        drive_->setItemIcon(i, FinalSettings::flag("IdDriveIconsFromExplorer")
+                                   ? QIcon::fromTheme("drive-harddisk", commanderIcon("drive", 16))
+                                   : commanderIcon("drive", 16));
+    const int spaces[]{0, 2, 4, 8, 16};
+    const int x = spaces[qBound(0, QSettings().value("icons/driveX", 0).toInt(), 4)],
+              y = spaces[qBound(0, QSettings().value("icons/driveY", 0).toInt(), 4)];
+    for (auto *button : drives_->findChildren<QToolButton *>()) {
+        button->setAutoRaise(QSettings().value("layout/flatDrives", true).toBool());
+        button->setMinimumWidth(26 + x);
+        button->setFixedHeight(22 + y);
+        const auto root = button->property("driveRoot").toString();
+        const QStorageInfo volume(root);
+        button->setToolTip(FinalSettings::flag("IdConf_drivetips") ? volume.displayName() + " · " + root
+                                                                   : QString());
+        button->setIcon(FinalSettings::flag("IdDriveIconsFromExplorer")
+                            ? QIcon::fromTheme("drive-harddisk", commanderIcon("drive", 16))
+                            : commanderIcon("drive", 16));
+    }
+}
 void PanelHost::refresh() {
     auto *panel = qobject_cast<FilePanel *>(tabs_->currentWidget());
     if (!panel || panel->path().empty())
         return;
+    const QStorageInfo mounted(displayPath(panel->path()));
+    if (mounted.isValid())
+        QSettings().setValue("volumes/" + QString::fromLatin1(mounted.rootPath().toUtf8().toBase64()),
+                             QByteArray::fromStdString(panel->path().native()));
     auto path = panel->path();
     while (nativePath(displayPath(path)) != path && path.has_parent_path() && path != path.parent_path())
         path = path.parent_path();
@@ -346,6 +421,18 @@ void PanelHost::refresh() {
 void applySavedAppearance() {
     QSettings settings;
     auto palette = qApp->palette();
+    if (settings.contains("appearance/theme")) {
+        const bool dark = settings.value("appearance/theme").toInt() == 1;
+        palette = qApp->style()->standardPalette();
+        palette.setColor(QPalette::Window, dark ? QColor("#25252b") : QColor("#e5e5eb"));
+        palette.setColor(QPalette::Button, palette.color(QPalette::Window));
+        palette.setColor(QPalette::Base, dark ? QColor("#17171b") : QColor("#ffffff"));
+        palette.setColor(QPalette::AlternateBase, dark ? QColor("#303038") : QColor("#f2f3f7"));
+        for (auto role : {QPalette::Text, QPalette::WindowText, QPalette::ButtonText})
+            palette.setColor(role, dark ? Qt::white : Qt::black);
+        palette.setColor(QPalette::Highlight, QColor("#000080"));
+        palette.setColor(QPalette::HighlightedText, Qt::white);
+    }
     for (const auto &pair : {std::pair<QString, QPalette::ColorRole>{"textColor", QPalette::Text},
                              {"baseColor", QPalette::Base},
                              {"cursorColor", QPalette::Highlight},
@@ -354,11 +441,39 @@ void applySavedAppearance() {
                              {"buttonColor", QPalette::Button}})
         if (settings.contains("appearance/" + pair.first))
             palette.setColor(pair.second, QColor(settings.value("appearance/" + pair.first).toString()));
+    const QMap<QString, QPalette::ColorRole> roles{{"Window", QPalette::Window},
+                                                   {"WindowText", QPalette::WindowText},
+                                                   {"Button", QPalette::Button},
+                                                   {"ButtonText", QPalette::ButtonText},
+                                                   {"Mid", QPalette::Mid},
+                                                   {"Light", QPalette::Light},
+                                                   {"Dark", QPalette::Dark},
+                                                   {"Link", QPalette::Link},
+                                                   {"ToolTipBase", QPalette::ToolTipBase},
+                                                   {"ToolTipText", QPalette::ToolTipText}};
+    for (auto it = roles.begin(); it != roles.end(); ++it)
+        if (settings.contains("appearance/roles/" + it.key()))
+            palette.setColor(it.value(), QColor(settings.value("appearance/roles/" + it.key()).toString()));
+    if (settings.value("appearance/systemCursor").toBool()) {
+        palette.setColor(QPalette::Highlight, qApp->style()->standardPalette().color(QPalette::Highlight));
+        palette.setColor(QPalette::HighlightedText,
+                         qApp->style()->standardPalette().color(QPalette::HighlightedText));
+    }
     qApp->setPalette(palette);
+    if (!qApp->property("basePreferenceFont").isValid())
+        qApp->setProperty("basePreferenceFont", qApp->font());
     const auto fontFor = [&settings](const QString &key, const QFont &fallback) {
-        QFont font = fallback;
+        Q_UNUSED(fallback);
+        QFont font = qvariant_cast<QFont>(qApp->property("basePreferenceFont"));
         if (settings.contains("appearance/" + key))
             font.fromString(settings.value("appearance/" + key).toString());
+        if (settings.value("appearance/manualDpi").toBool()) {
+            const double scale = qBound(72, settings.value("appearance/dpi", 96).toInt(), 240) / 96.0;
+            if (font.pixelSize() > 0)
+                font.setPixelSize(qMax(6, qRound(font.pixelSize() * scale)));
+            else
+                font.setPointSizeF(qMax(4.0, font.pointSizeF() * scale));
+        }
         return font;
     };
     qApp->setFont(fontFor("dialogFont", qApp->font()));
@@ -376,4 +491,51 @@ void applySavedAppearance() {
         if (qobject_cast<QDialog *>(widget))
             widget->setFont(fontFor("dialogFont", qApp->font()));
     }
+}
+
+void PanelHost::updateTabLayout(bool visible) {
+    tabLayoutVisible_ = visible;
+    if (!wrappedTabs_)
+        return;
+    const bool multi = FinalSettings::flag("ChkTabsMultiLines") && visible &&
+                       (tabs_->count() > 1 || QSettings().value("classic/alwaysShowTabs").toBool());
+    wrappedScroller_->setVisible(multi);
+    wrappedTabs_->show();
+    if (!multi)
+        return;
+    tabs_->tabBar()->hide();
+    auto *grid = qobject_cast<QGridLayout *>(wrappedTabs_->layout());
+    while (auto *item = grid->takeAt(0)) {
+        if (auto *old = item->widget()) {
+            old->hide();
+            old->deleteLater();
+        }
+        delete item;
+    }
+    const int columns = qMax(1, width() / 130);
+    const int rows = (tabs_->count() + columns - 1) / columns;
+    const int rowHeight = qMax(26, fontMetrics().height() + 8);
+    wrappedTabs_->setMinimumHeight(rows * rowHeight);
+    wrappedScroller_->setFixedHeight(qMin(8, rows) * rowHeight + 4);
+    for (int i = 0; i < tabs_->count(); ++i) {
+        auto *button = new QToolButton(wrappedTabs_);
+        button->setText(tabs_->tabText(i));
+        button->setIcon(tabs_->tabIcon(i));
+        button->setToolTip(tabs_->tabToolTip(i));
+        button->setCheckable(true);
+        button->setChecked(i == tabs_->currentIndex());
+        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        button->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(button, &QToolButton::clicked, tabs_, [tabs = tabs_, i] { tabs->setCurrentIndex(i); });
+        connect(button, &QWidget::customContextMenuRequested, tabs_,
+                [tabs = tabs_, button, i](const QPoint &point) {
+                    FinalSettings::tabMenu(tabs, i, button->mapToGlobal(point));
+                });
+        grid->addWidget(button, i / columns, i % columns);
+    }
+}
+void PanelHost::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
+    if (FinalSettings::flag("ChkTabsMultiLines"))
+        updateTabLayout(tabLayoutVisible_);
 }

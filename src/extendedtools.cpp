@@ -1,5 +1,6 @@
 #include "extendedtools.h"
 #include "directorymodel.h"
+#include "finalsettings.h"
 #include <QElapsedTimer>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -8,6 +9,7 @@
 #include <QUuid>
 #include <QtEndian>
 #include <algorithm>
+#include <sys/resource.h>
 #include <sys/xattr.h>
 
 namespace ExtendedTools {
@@ -358,7 +360,8 @@ QByteArray decode(const QByteArray &input, const QString &format) {
 }
 LocalFiles::Result packExternal(const std::vector<fs::path> &sources, const fs::path &output,
                                 const QString &program, const QStringList &prefix,
-                                const std::shared_ptr<LocalFiles::Control> &control) {
+                                const std::shared_ptr<LocalFiles::Control> &control,
+                                const QByteArray &standardInput) {
     LocalFiles::Result result;
     const auto stage = output.parent_path() /
                        (".tc-external-" + QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString());
@@ -412,10 +415,23 @@ LocalFiles::Result packExternal(const std::vector<fs::path> &sources, const fs::
         for (const auto &path : sources)
             arguments << "./" + displayPath(path.filename());
         QProcess process;
+        process.setChildProcessModifier([] {
+            const struct rlimit memory {
+                2ULL * 1024 * 1024 * 1024, 2ULL * 1024 * 1024 * 1024
+            };
+            const struct rlimit size {
+                5ULL * 1024 * 1024 * 1024, 5ULL * 1024 * 1024 * 1024
+            };
+            ::setrlimit(RLIMIT_AS, &memory);
+            ::setrlimit(RLIMIT_FSIZE, &size);
+        });
         process.setWorkingDirectory(displayPath(root));
         process.start(program, arguments);
         if (!process.waitForStarted(3000))
             throw Error("External archiver could not start");
+        if (!standardInput.isEmpty())
+            process.write(standardInput);
+        process.closeWriteChannel();
         QElapsedTimer timer;
         timer.start();
         QByteArray diagnostics;
@@ -430,6 +446,11 @@ LocalFiles::Result packExternal(const std::vector<fs::path> &sources, const fs::
                     throw LocalFiles::Cancelled{};
                 throw Error("External archiver time/output limit exceeded");
             }
+        }
+        if (!standardInput.isEmpty()) {
+            const auto secret = standardInput.split('\n').value(0);
+            if (!secret.isEmpty())
+                diagnostics.replace(secret, "<redacted>");
         }
         if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0)
             throw Error(
@@ -455,21 +476,6 @@ LocalFiles::Result packExternal(const std::vector<fs::path> &sources, const fs::
     }
     return result;
 }
-QString comment(const fs::path &path) {
-    const auto size = ::lgetxattr(path.c_str(), "user.twincommander.comment", nullptr, 0);
-    if (size < 0)
-        return {};
-    if (size > 65536)
-        return {};
-    QByteArray data(size, 0);
-    if (::lgetxattr(path.c_str(), "user.twincommander.comment", data.data(), data.size()) < 0)
-        return {};
-    return QString::fromUtf8(data);
-}
-void setComment(const fs::path &path, const QString &text) {
-    const auto data = text.toUtf8();
-    if (data.size() > 65536)
-        throw Error("Comment limit is 64 KiB");
-    check(::lsetxattr(path.c_str(), "user.twincommander.comment", data.data(), data.size(), 0));
-}
+QString comment(const fs::path &path) { return FinalSettings::comment(path); }
+void setComment(const fs::path &path, const QString &text) { FinalSettings::setComment(path, text); }
 } // namespace ExtendedTools

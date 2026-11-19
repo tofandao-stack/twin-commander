@@ -1,0 +1,790 @@
+{
+    "baseline": "disabled-controls-0.8.json",
+    "count": 106,
+    "remainingPersistentDisabled": 0,
+    "controls": [
+        {
+            "caption": "Sh&ow two drive button bars (fixed width, above file windows)",
+            "id": "idTwoDriveBars",
+            "page": "Layout",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "R&un command line only when focused",
+            "id": "idExecCmdLineFocused",
+            "page": "Layout",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Windows &XP theme background (menu+all bars)",
+            "id": "idXPthemeBackground",
+            "page": "Layout",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Show old &8.3 filenames lowercase (like explorer)",
+            "id": "IdConfLower83Names",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Use long names (recommended)",
+            "id": "IdConf_longnames",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Show s&ystem files",
+            "id": "IdConfshowSystem",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Show &volume labels/network paths for drives",
+            "id": "IdConf_drivetips",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "W&in32-style tips with file comments (if available)",
+            "id": "IdConf_Win32Tips",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Comments from descript.ion/files.bbs",
+            "id": "IdConf_DescriptComments",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Comments from &Explorer (OLE2)",
+            "id": "IdConf_ExplorerComments",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Always load complete directory tree",
+            "id": "IdConfOldStyleTree",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Tree: Press ENTER to open dir in other window",
+            "id": "IdTreeNoAutoChange",
+            "page": "Display",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "All associated + &EXE/LNK (slow)",
+            "id": "IdConfAllAndEXE",
+            "page": "Icons",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "E&XE/LNK not on floppy",
+            "id": "NotOnFloppy",
+            "page": "Icons",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "EXE/&LNK not on net",
+            "id": "NotOnNet",
+            "page": "Icons",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Show icons for special folders: &Virtual folders (e.g. Network)",
+            "id": "IdShowSpecialFoldersRemote",
+            "page": "Icons",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Show d&rive icons from Explorer",
+            "id": "IdDriveIconsFromExplorer",
+            "page": "Icons",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Tabs on multiple lines",
+            "id": "ChkTabsMultiLines",
+            "page": "Folder-Tabs",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Show locked tabs &with an asterisk *",
+            "id": "ChkTabsLockedAsterisk",
+            "page": "Folder-Tabs",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Return to locked tab root directory on tab change",
+            "id": "ChkTabsRevertToRoot",
+            "page": "Folder-Tabs",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "",
+            "id": "FileSystemCombo",
+            "page": "Custom Columns",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Priority",
+            "id": "PriorityCheckbox",
+            "page": "View Mode",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Change the language/ Sprache wechseln/ Changer de langue",
+            "id": "W_langlist",
+            "page": "Language",
+            "type": "QListWidget",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&when selecting with the space bar",
+            "id": "IdConf_Countfiles",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&before copying/deleting",
+            "id": "IdConf_CountfilesCopy",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "'Everything'",
+            "id": "IdConf_EverythingForSize",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "",
+            "id": "IdConf_GetDirSize",
+            "page": "Operation",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Ignore 1 ho&ur time delay",
+            "id": "Idconf_1hourdif",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Read from bot&h",
+            "id": "IdConf_comments_bothformats",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "C&opy comments with files",
+            "id": "IdConf_comments_copy",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "DOS ch&arset",
+            "id": "IdConf_comments_doscharset",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "",
+            "id": "IdPreferredCommentFormat",
+            "page": "Operation",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Allow only &1 copy of Total Commander at a time",
+            "id": "IdConf_oneinstanceonly",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Mo&ve icon to system tray when minimized",
+            "id": "Id_ConfMoveToTray",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Check for updates",
+            "id": "id_checkforupdates",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Extra lines below cursor:",
+            "id": "id_scrollahead",
+            "page": "Operation",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "",
+            "id": "id_extralines",
+            "page": "Operation",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Internal Viewer with file under cursor",
+            "id": "ViewerHotkeyCombo",
+            "page": "Edit/View",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Plugins/FTP: Automatically re-upload changed files",
+            "id": "IdAutoReUpload",
+            "page": "Edit/View",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Source+Target on same disk:",
+            "id": "EdSmallSame",
+            "page": "Copy/Delete",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Source+Target on different disks:",
+            "id": "EdSmallOther",
+            "page": "Copy/Delete",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Source+Target on same disk:",
+            "id": "EdBigSame",
+            "page": "Copy/Delete",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Source+Target on different disks:",
+            "id": "EdBigOther",
+            "page": "Copy/Delete",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Use &compatibility mode for the following drives:",
+            "id": "ChkCompatibility",
+            "page": "Copy/Delete",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "",
+            "id": "EdCompatLetters",
+            "page": "Copy/Delete",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Use &default method only (reliable, not very fast)",
+            "id": "RdDefaultCopy",
+            "page": "Copy/Delete",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Also use big file copy mode (not using cache)",
+            "id": "RdBigfileCopy",
+            "page": "Copy/Delete",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Use copy+paste via Explorer (only in case of copy problems)",
+            "id": "RdCopyPaste",
+            "page": "Copy/Delete",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "The following drive letters are on the same physical &harddisk (example: CDE,FGH ):",
+            "id": "EdPhysDisks",
+            "page": "Copy/Delete",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "USB sticks",
+            "id": "ChkUsbSticks",
+            "page": "Copy/Delete",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Cop&y date/time of directories",
+            "id": "ChkCopyStamp",
+            "page": "Copy/Delete",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Use E&xplorer delete method (faster, cannot handle comments)",
+            "id": "ChkExplorerDelete",
+            "page": "Copy/Delete",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&F8/Del deletes to recycle bin (Shift=directly)",
+            "id": "IdConf_trashcan",
+            "page": "Copy/Delete",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Verify after copying (MD5 checksum)",
+            "id": "ChkVerifyAfterCopy",
+            "page": "Copy/Delete",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Use standard copy &method (recommended)",
+            "id": "id_StandardCopyMethod",
+            "page": "Copy/Delete",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Compress during transfer (MODE &Z)",
+            "id": "FtpModeZ",
+            "page": "FTP",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Not on &LAN",
+            "id": "FtpModeZnotonLAN",
+            "page": "FTP",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Copy/delete thumbnails with files",
+            "id": "ThumbsCopyDeleteChk",
+            "page": "Thumbnails",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Re&move thumbnails for currently ejected CDs",
+            "id": "RemoveThumbsForCDs",
+            "page": "Thumbnails",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Use Explorer method (OLE2) for:",
+            "id": "ThumbsFromExplorerChk",
+            "page": "Thumbnails",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Get from &Lister plugins for:",
+            "id": "ThumbsFromListerPluginsChk",
+            "page": "Thumbnails",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromExplorerEdt",
+            "page": "Thumbnails",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromListerPluginsEdt",
+            "page": "Thumbnails",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Get from &Irfan-/Xnview for:",
+            "id": "ThumbsFromIrfanXnChk",
+            "page": "Thumbnails",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "",
+            "id": "ThumbsFromIrfanXnEdt",
+            "page": "Thumbnails",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Storage &location for list of most frequently used folders:",
+            "id": "DirUsageLocationCombo",
+            "page": "History",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Treat archives like &directories",
+            "id": "zip_likedirs",
+            "page": "Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Use internal un-ARJ if possible",
+            "id": "arj_useinternal",
+            "page": "Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Pass long filenames to ARJ (ARJ 2.55 or later required)",
+            "id": "arj_longnames",
+            "page": "Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Use &internal un-LZH if possible",
+            "id": "lzh_useinternal",
+            "page": "Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Use internal un-RAR if possible",
+            "id": "rar_useinternal",
+            "page": "Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Use internal un-ACE if possible",
+            "id": "ace_useinternal",
+            "page": "Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Create &TAR archives for Linux (unchecked: for SunOS)",
+            "id": "tar_linuxcompatible",
+            "page": "Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Use internal ZIP &packer",
+            "id": "zip_internalpack",
+            "page": "ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "U&se ZIP-NT 2.01",
+            "id": "zip_zipnt",
+            "page": "ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Always use &internal unzipping (if possible)",
+            "id": "zip_useinternal",
+            "page": "ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&7Z",
+            "id": "zip_use7z",
+            "page": "ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&default (run 'cd %TEMP%' in command line to see directory)",
+            "id": "internalzip_settemp",
+            "page": "ZIP Packer",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "o&ther:",
+            "id": "internalzip_otherdir",
+            "page": "ZIP Packer",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "",
+            "id": "internalzip_tempdir",
+            "page": "ZIP Packer",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Use &8.3 short filenames",
+            "id": "zip_83name",
+            "page": "ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Open p&artial ZIP files",
+            "id": "zip_openpartial",
+            "page": "ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Keep damaged files (bad CRC)",
+            "id": "zip_keepdamaged",
+            "page": "ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Pack Unicode names:",
+            "id": "internalzip_unicodemethod",
+            "page": "ZIP Packer",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Use &internal 7-Zip packer",
+            "id": "z7_internalpack",
+            "page": "7-ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Prefer 7-Zip plugin if installed",
+            "id": "z7_preferplugin",
+            "page": "7-ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "E&xtra parameters:",
+            "id": "z7_extraparameters",
+            "page": "7-ZIP Packer",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&normal compression (6)",
+            "id": "z7_default",
+            "page": "7-ZIP Packer",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&maximum compression (9)",
+            "id": "z7_max",
+            "page": "7-ZIP Packer",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&fastest compression (1)",
+            "id": "z7_min",
+            "page": "7-ZIP Packer",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&other:",
+            "id": "z7_other",
+            "page": "7-ZIP Packer",
+            "type": "QRadioButton",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "",
+            "id": "z7_value",
+            "page": "7-ZIP Packer",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Compression method:",
+            "id": "z7_method",
+            "page": "7-ZIP Packer",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Dictionary size:",
+            "id": "z7_dict",
+            "page": "7-ZIP Packer",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Word size:",
+            "id": "z7_word",
+            "page": "7-ZIP Packer",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Solid &block size:",
+            "id": "z7_solidblock",
+            "page": "7-ZIP Packer",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Create &solid archive",
+            "id": "z7_solid",
+            "page": "7-ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "Number of CPU &threads:",
+            "id": "z7_threads",
+            "page": "7-ZIP Packer",
+            "type": "QComboBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Also encrypt names",
+            "id": "z7_encryptnames",
+            "page": "7-ZIP Packer",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md",
+            "availability": "backend/tool and input dependent"
+        },
+        {
+            "caption": "&Overwriting files",
+            "id": "confirm_overwrite",
+            "page": "Misc.",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Overwriting/Deleting &read-only files",
+            "id": "confirm_readonly",
+            "page": "Misc.",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Overwriting/Deleting &hidden/system files",
+            "id": "confirm_hidsys",
+            "page": "Misc.",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Drag&&Drop (copying files with mouse)",
+            "id": "confirm_mouse",
+            "page": "Misc.",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Deleting &non-empty directories",
+            "id": "confirm_dirs",
+            "page": "Misc.",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "Drag&&Drop to the 'F8 Delete' &button",
+            "id": "confirm_mouse_delete",
+            "page": "Misc.",
+            "type": "QCheckBox",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        },
+        {
+            "caption": "&Parameters:",
+            "id": "Hot_Params_Edit",
+            "page": "Misc.",
+            "type": "QLineEdit",
+            "implementation": "native Linux behavior; see docs/control-implementation-0.9.md"
+        }
+    ]
+}

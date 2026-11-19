@@ -142,6 +142,8 @@ ArchiveDialog::ArchiveDialog(const std::filesystem::path &path, const std::files
                                             .arg(listing_.entries.size())
                              : listing_.cancelled ? "Cancelled"
                                                   : listing_.error);
+            if (!listing_.warning.isEmpty())
+                status_->setText(status_->text() + "\n" + listing_.warning);
         });
 }
 ArchiveDialog::~ArchiveDialog() { control_->cancelled = true; }

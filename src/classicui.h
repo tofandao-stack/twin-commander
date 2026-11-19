@@ -21,10 +21,18 @@ class PanelHost : public QWidget {
     explicit PanelHost(QTabWidget *tabs, QWidget *parent = nullptr);
     void refresh();
     void showDriveButtons(bool visible);
+    void updateTabLayout(bool visible = true);
 
+  protected:
+    void resizeEvent(QResizeEvent *) override;
+
+  private:
   private:
     QTabWidget *tabs_;
     QWidget *drives_;
+    QWidget *wrappedTabs_ = nullptr;
+    QWidget *wrappedScroller_ = nullptr;
+    bool tabLayoutVisible_ = true;
     QComboBox *drive_;
     QLabel *space_;
     bool updating_ = false;

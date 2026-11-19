@@ -246,9 +246,19 @@ SearchDialog::SearchDialog(const std::filesystem::path &root, QWidget *parent)
     auto *profilesLayout = new QVBoxLayout(profilesPage);
     auto *pluginsLayout = new QVBoxLayout(plugins);
     auto *pluginOption = new QCheckBox("Search in plugins", plugins);
-    pluginOption->setEnabled(false);
-    pluginOption->setToolTip("Content plugins are not implemented yet.");
+    pluginOption->setEnabled(true);
+    pluginOption->setObjectName("searchNativeFields");
+    pluginOption->setToolTip("Filter by a native content field using a bounded executable provider; Windows "
+                             "DLL plugins are unsupported.");
     pluginsLayout->addWidget(pluginOption);
+    auto *field = new QLineEdit("comment", plugins);
+    field->setObjectName("searchFieldName");
+    field->setPlaceholderText("Native field name: comment, parent, size, or configured provider");
+    pluginsLayout->addWidget(field);
+    auto *value = new QLineEdit(plugins);
+    value->setObjectName("searchFieldValue");
+    value->setPlaceholderText("Field contains");
+    pluginsLayout->addWidget(value);
     pluginsLayout->addStretch();
     top->addWidget(tabs, 1);
     auto *side = new QVBoxLayout;
@@ -262,9 +272,10 @@ SearchDialog::SearchDialog(const std::filesystem::path &root, QWidget *parent)
     top->addLayout(side);
     layout->addLayout(top);
     connect(help, &QPushButton::clicked, this, [this] {
-        QMessageBox::information(this, "Find Files",
-                                 "Search file names and UTF-8 contents. Advanced contains byte-size and "
-                                 "modification-date limits. Plugin searches are not implemented.");
+        QMessageBox::information(
+            this, "Find Files",
+            "Search file names and UTF-8 contents. Advanced contains byte-size and "
+            "modification-date limits. Native content-field filtering is available on the Plugins tab.");
     });
     auto *form = new QFormLayout;
     start_->setObjectName("searchStart");
@@ -489,6 +500,14 @@ void SearchDialog::start() {
                           hidden_->isChecked(),
                           recursive_->isChecked(),
                           5000};
+    if (findChild<QCheckBox *>("searchNativeFields")->isChecked()) {
+        request.field = findChild<QLineEdit *>("searchFieldName")->text().trimmed();
+        request.fieldValue = findChild<QLineEdit *>("searchFieldValue")->text();
+        if (request.field.isEmpty()) {
+            status_->setText("Enter a native field name");
+            return;
+        }
+    }
     request.nameRegex = nameRegex_->isChecked();
     request.contentRegex = contentRegex_->isChecked();
     request.minBytes = minBytes_->text().isEmpty() ? -1 : minBytes_->text().toLongLong();

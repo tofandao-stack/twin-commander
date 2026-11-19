@@ -3,10 +3,15 @@
 #include "backgroundpool.h"
 #include "classicui.h"
 #include "extendedtools.h"
+#include "finalarchives.h"
+#include "finalsettings.h"
+#include "gapsettings.h"
 #include "nativesettings.h"
 #include "preferences.h"
 #include "remotetools.h"
 #include "toolwindows.h"
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QJsonArray>
@@ -64,6 +69,7 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
     : QMainWindow(parent), left_(new QTabWidget(this)), right_(new QTabWidget(this)),
       splitter_(new QSplitter(this)), commandLine_(new QLineEdit(this)), commands_(this) {
     applyCommanderAppearance();
+    setProperty("nativeCommanderWindow", true);
     queue_ = new JobQueue(this);
     queue_->setJournalDirectory(journalDirectory());
     setWindowTitle("Twin Commander");
@@ -72,7 +78,13 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
             panel->refresh();
         QSettings settings;
         const auto sound = settings.value("sound/file").toString();
-        if (!sound.isEmpty())
+        const auto job = std::find_if(queue_->jobs().begin(), queue_->jobs().end(),
+                                      [id](const auto &job) { return job.id == id; });
+        const auto elapsed =
+            job == queue_->jobs().end() ? 0 : QDateTime::currentMSecsSinceEpoch() - job->startedAt;
+        if (!sound.isEmpty() &&
+            (!settings.value("sound/onlyLong").toBool() ||
+             elapsed >= qBound(0, settings.value("sound/minSeconds", 10).toInt(), 3600) * 1000LL))
             for (const auto &player : {QString("paplay"), QString("aplay")}) {
                 const auto program = QStandardPaths::findExecutable(player);
                 if (!program.isEmpty()) {
@@ -80,27 +92,35 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
                     break;
                 }
             }
-        if (settings.value("logging/enabled").toBool()) {
-            const auto file = nativePath(settings.value("logging/file").toString());
-            const int descriptor = ::open(
-                file.c_str(), O_WRONLY | O_APPEND | O_CREAT | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK, 0600);
-            if (descriptor >= 0) {
-                struct stat logInfo {};
-                if (::fstat(descriptor, &logInfo) == 0 && S_ISREG(logInfo.st_mode)) {
-                    const auto line = (QDateTime::currentDateTimeUtc().toString(Qt::ISODate) + " job " +
-                                       QString::number(id) + " finished\n")
-                                          .toUtf8();
-                    const auto written = ::write(descriptor, line.data(), line.size());
-                    Q_UNUSED(written);
-                }
-                ::close(descriptor);
-            }
+        if (job != queue_->jobs().end()) {
+            const auto label = job->label.toLower();
+            const QString category = (label.contains("archive") || label.contains("pack"))   ? "archive"
+                                     : (label.contains("delete") || label.contains("trash")) ? "delete"
+                                     : (label.contains("folder") || label.contains("mkdir")) ? "folders"
+                                                                                             : "transfer";
+            if (job->result.cancelled)
+                GapSettings::log(category, "error", job->label + ": cancelled");
+            for (const auto &item : job->result.items)
+                GapSettings::log(category,
+                                 item.skipped           ? "skipped"
+                                 : item.error.isEmpty() ? "success"
+                                                        : "error",
+                                 job->label + ": " + displayPath(item.source) + " → " +
+                                     displayPath(item.destination) +
+                                     (item.error.isEmpty() ? QString() : " — " + item.error));
         }
     });
     resize(1200, 740);
     QFont mainFont = font();
     if (QSettings().contains("appearance/mainFont")) {
         mainFont.fromString(QSettings().value("appearance/mainFont").toString());
+        if (QSettings().value("appearance/manualDpi").toBool()) {
+            const double scale = qBound(72, QSettings().value("appearance/dpi", 96).toInt(), 240) / 96.0;
+            if (mainFont.pixelSize() > 0)
+                mainFont.setPixelSize(qMax(6, qRound(mainFont.pixelSize() * scale)));
+            else
+                mainFont.setPointSizeF(qMax(4.0, mainFont.pointSizeF() * scale));
+        }
         setFont(mainFont);
     }
     commands_.add("cm_GoToParent", "Parent directory", QKeySequence("Alt+Up"),
@@ -137,8 +157,10 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
     commands_.add("cm_CreateFile", "New text file", QKeySequence("Shift+F4"),
                   [this] { runOperation(LocalFiles::Operation::MakeFile); });
     commands_.add("cm_Checksum", "SHA-256 checksums", QKeySequence(), [this] { showChecksums(); });
-    commands_.add("cm_Delete", "Move to trash", QKeySequence("F8"),
-                  [this] { runOperation(LocalFiles::Operation::Trash); });
+    commands_.add("cm_Delete", "Move to trash", QKeySequence("F8"), [this] {
+        runOperation(FinalSettings::flag("IdConf_trashcan") ? LocalFiles::Operation::Trash
+                                                            : LocalFiles::Operation::Delete);
+    });
     commands_.get("cm_Delete")->setShortcuts({QKeySequence("F8"), QKeySequence("Delete")});
     commands_.add("cm_DeletePermanently", "Delete permanently", QKeySequence("Shift+Delete"),
                   [this] { runOperation(LocalFiles::Operation::Delete); });
@@ -234,14 +256,50 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
     commands_.add("cm_JobQueue", "Background operations", QKeySequence("Ctrl+J"), [this] { showQueue(); });
     commands_.add("cm_OperationHistory", "Previous job reports", QKeySequence(), [this] { showHistory(); });
     buildReferenceUi();
+    commands_.add("cm_CloseOtherTabs", "Close all other tabs", QKeySequence("Ctrl+Shift+W"), [this] {
+        auto *tabs = left_->indexOf(active_) >= 0 ? left_ : right_;
+        if (tabs->count() <= 1)
+            return;
+        if (QSettings().value("tabs/confirmClose").toBool() &&
+            QMessageBox::question(this, "Close other tabs", "Close all tabs except the current tab?",
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+            return;
+        auto *keep = tabs->currentWidget();
+        for (int i = tabs->count() - 1; i >= 0; --i)
+            if (tabs->widget(i) != keep) {
+                auto *w = tabs->widget(i);
+                tabs->removeTab(i);
+                w->deleteLater();
+            }
+    });
 
     for (auto *tabs : {left_, right_}) {
         tabs->setDocumentMode(true);
         tabs->setTabsClosable(false);
         tabs->setTabBarAutoHide(true);
+        tabs->tabBar()->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(tabs->tabBar(), &QWidget::customContextMenuRequested, this, [tabs](const QPoint &point) {
+            FinalSettings::tabMenu(tabs, tabs->tabBar()->tabAt(point), tabs->tabBar()->mapToGlobal(point));
+        });
         connect(tabs, &QTabWidget::currentChanged, this, [this, tabs](int index) {
             if (index >= 0) {
                 auto *panel = qobject_cast<FilePanel *>(tabs->widget(index));
+                if (!QSettings().value("tabs/separateFilters", true).toBool())
+                    for (int i = 0; i < tabs->count(); ++i)
+                        if (tabs->widget(i)->property("tabIdentity") == tabs->property("lastTab")) {
+                            auto *previous = qobject_cast<FilePanel *>(tabs->widget(i));
+                            if (previous != panel)
+                                panel->filterView(previous->property("viewMask").toString(),
+                                                  previous->property("viewPrograms").toBool());
+                            break;
+                        }
+                if (FinalSettings::flag("ChkTabsRevertToRoot") &&
+                    !panel->property("lockedRoot").toByteArray().isEmpty()) {
+                    const auto root =
+                        std::filesystem::path(panel->property("lockedRoot").toByteArray().toStdString());
+                    if (panel->path() != root)
+                        panel->navigate(root);
+                }
                 tabs->setProperty("previousTab", tabs->property("lastTab"));
                 tabs->setProperty("lastTab", panel->property("tabIdentity"));
                 if (QSettings().value("tabs/activate", true).toBool() || tabs->indexOf(active_) >= 0) {
@@ -272,6 +330,17 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
     applyLayoutOptions();
     updateUiState();
     applyFunctionalPreferences();
+    FinalSettings::apply();
+    for (auto *button : functionBar_->findChildren<QPushButton *>())
+        if (button->objectName() == "function_cm_Delete") {
+            button->setAcceptDrops(true);
+            button->setProperty("deleteDropTarget", true);
+            button->installEventFilter(this);
+        }
+    connect(commandLine_, &QLineEdit::textChanged, this, [this](const QString &text) {
+        for (auto *panel : findChildren<FilePanel *>())
+            panel->setProperty("commandLineText", text);
+    });
     auto *cycle = new QShortcut(QKeySequence("Ctrl+Tab"), this);
     connect(cycle, &QShortcut::activated, this, [this] {
         auto *tabs = left_->indexOf(active_) >= 0 ? left_ : right_;
@@ -308,6 +377,29 @@ void MainWindow::addTab(QTabWidget *tabs, const std::filesystem::path &path) {
     auto *panel = new FilePanel(path.empty() ? nativePath(QDir::homePath()) : path, tabs);
     panel->setProperty("tabIdentity", QUuid::createUuid().toString());
     connect(panel, &FilePanel::activated, this, [this, panel] { activate(panel); });
+    panel->setProperty("commandLineText", commandLine_->text());
+    connect(panel, &FilePanel::executeCommandRequested, this, &MainWindow::executeCommandLine);
+    connect(panel, &FilePanel::treeDirectoryRequested, this, [this, panel](const auto &path) {
+        activate(panel);
+        oppositePanel()->navigate(path);
+    });
+    connect(panel, &FilePanel::filesDropped, this, [this, panel](const auto &paths, bool move) {
+        QString summary;
+        if (FinalSettings::flag("IdConf_CountfilesCopy") &&
+            !FinalSettings::countBeforeOperation(paths, this, summary))
+            return;
+        if (FinalSettings::flag("confirm_mouse") &&
+            QMessageBox::question(
+                this, move ? "Move dropped files" : "Copy dropped files",
+                QString("%1 items to %2?\n%3").arg(paths.size()).arg(displayPath(panel->path()), summary),
+                QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+            return;
+        LocalFiles::Request request;
+        request.operation = move ? LocalFiles::Operation::Move : LocalFiles::Operation::Copy;
+        request.sources = paths;
+        request.destination = panel->path();
+        startOperation(request);
+    });
     connect(panel, &FilePanel::switchPanel, this, &MainWindow::switchPanel);
     connect(panel->table()->selectionModel(), &QItemSelectionModel::currentChanged, this,
             [this] { updateQuickView(); });
@@ -324,9 +416,11 @@ void MainWindow::addTab(QTabWidget *tabs, const std::filesystem::path &path) {
             return;
         }
         const auto lower = displayPath(path.filename()).toLower();
-        if (lower.endsWith(".zip") || lower.endsWith(".tar") || lower.endsWith(".tar.gz") ||
-            lower.endsWith(".tgz") || lower.endsWith(".tar.xz") || lower.endsWith(".tar.bz2") ||
-            lower.endsWith(".7z")) {
+        if (FinalSettings::flag("zip_likedirs") &&
+            (lower.endsWith(".zip") || lower.endsWith(".tar") || lower.endsWith(".tar.gz") ||
+             lower.endsWith(".tgz") || lower.endsWith(".tar.xz") || lower.endsWith(".tar.bz2") ||
+             lower.endsWith(".7z") || lower.endsWith(".arj") || lower.endsWith(".lzh") ||
+             lower.endsWith(".rar") || lower.endsWith(".ace"))) {
             (new ArchiveDialog(path, oppositePanel()->path(), queue_, this))->show();
             return;
         }
@@ -377,6 +471,9 @@ void MainWindow::addTab(QTabWidget *tabs, const std::filesystem::path &path) {
                                               .value(rule.value("mode").toString())
                                               .toMap();
                         if (!mode.isEmpty()) {
+                            if (panel->property("viewModePriority").toBool() &&
+                                !mode.value("priority").toBool())
+                                continue;
                             if (panel == active_)
                                 applyViewMode(mode);
                             else
@@ -522,7 +619,7 @@ void MainWindow::saveSession() {
         QVariantList nativePaths;
         for (int index = 0; index < tabs->count(); ++index) {
             const auto path = qobject_cast<FilePanel *>(tabs->widget(index))->path();
-            if (!path.empty()) {
+            if (!path.empty() && !GapSettings::matches(path, "session/exclude")) {
                 paths.push_back(displayPath(path));
                 nativePaths.append(QByteArray::fromStdString(path.native()));
             }
@@ -562,7 +659,17 @@ void MainWindow::openCurrent(bool editable) {
     const auto paths = active_->selectedPaths();
     if (!paths.empty()) {
         try {
-            if (NativeSettings::launchAssociated(paths.front(), editable ? "editor" : "viewer"))
+            bool external = editable || FinalSettings::text("ViewerHotkeyCombo", "Configured viewer first") !=
+                                            "Internal viewer";
+            if (!editable && FinalSettings::text("ViewerHotkeyCombo") == "Ask each time") {
+                const auto answer =
+                    QMessageBox::question(this, "Viewer", "Use the internal viewer?",
+                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+                if (answer == QMessageBox::Cancel)
+                    return;
+                external = answer == QMessageBox::No;
+            }
+            if (external && NativeSettings::launchAssociated(paths.front(), editable ? "editor" : "viewer"))
                 return;
         } catch (const std::exception &error) {
             QMessageBox::warning(this, "Open file", QString::fromLocal8Bit(error.what()));
@@ -587,13 +694,21 @@ void MainWindow::runOperation(LocalFiles::Operation operation) {
         }
         bool ok = false;
         const bool rename = operation == Operation::Rename;
-        const auto name =
-            QInputDialog::getText(this,
-                                  rename                             ? "Rename"
-                                  : operation == Operation::MakeFile ? "New text file"
-                                                                     : "New folder",
-                                  "Name (one path component):", QLineEdit::Normal,
-                                  rename ? displayPath(request.sources.front().filename()) : QString(), &ok);
+        QInputDialog input(this);
+        input.setWindowTitle(rename                             ? "Rename"
+                             : operation == Operation::MakeFile ? "New text file"
+                                                                : "New folder");
+        input.setLabelText("Name (one path component):");
+        input.setTextValue(rename ? displayPath(request.sources.front().filename()) : QString());
+        if (rename && QSettings().value("rename/nameOnly").toBool())
+            QTimer::singleShot(0, &input, [&input] {
+                auto *edit = input.findChild<QLineEdit *>();
+                const auto name = edit->text();
+                const int dot = name.lastIndexOf('.');
+                edit->setSelection(0, dot > 0 ? dot : name.size());
+            });
+        ok = input.exec() == QDialog::Accepted;
+        const auto name = input.textValue();
         if (!ok)
             return;
         if (name.isEmpty() || name == "." || name == ".." || name.contains('/') ||
@@ -607,6 +722,10 @@ void MainWindow::runOperation(LocalFiles::Operation operation) {
         if (request.sources.empty())
             return;
         const bool transfer = operation == Operation::Copy || operation == Operation::Move;
+        QString counted;
+        if (FinalSettings::flag("IdConf_CountfilesCopy") &&
+            !FinalSettings::countBeforeOperation(request.sources, this, counted))
+            return;
         QDialog dialog(this);
         dialog.setWindowTitle(operation == Operation::Copy    ? "Copy to opposite panel"
                               : operation == Operation::Move  ? "Move to opposite panel"
@@ -619,8 +738,10 @@ void MainWindow::runOperation(LocalFiles::Operation operation) {
         for (const auto &path : request.sources)
             names << displayPath(path);
         summary->setPlainText(names.join('\n'));
-        layout->addWidget(new QLabel(
-            QString("%1 selected item(s), including directory contents").arg(names.size()), &dialog));
+        layout->addWidget(
+            new QLabel(QString("%1 selected item(s), including directory contents").arg(names.size()) +
+                           (counted.isEmpty() ? QString() : "\n" + counted),
+                       &dialog));
         layout->addWidget(summary);
         auto *destination = new QLineEdit(displayPath(request.destination), &dialog);
         auto *conflict = new QComboBox(&dialog);
@@ -669,6 +790,30 @@ void MainWindow::runOperation(LocalFiles::Operation operation) {
     }
     request.journalDirectory =
         QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/jobs";
+    bool special = false;
+    for (const auto &p : request.sources) {
+        std::error_code error;
+        const auto st = std::filesystem::symlink_status(p, error);
+        if (error)
+            continue;
+        const bool readonly =
+            (st.permissions() & (std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
+                                 std::filesystem::perms::others_write)) == std::filesystem::perms::none;
+        special |=
+            (FinalSettings::flag("confirm_readonly") && readonly && request.operation != Operation::Copy) ||
+            (FinalSettings::flag("confirm_hidsys") && displayPath(p.filename()).startsWith('.') &&
+             request.operation != Operation::Copy) ||
+            (FinalSettings::flag("confirm_dirs") && std::filesystem::is_directory(st) &&
+             (request.operation == Operation::Delete));
+    }
+    if (request.conflict == Conflict::ReplaceFiles && FinalSettings::flag("confirm_overwrite"))
+        for (const auto &p : request.sources)
+            special |= std::filesystem::exists(request.destination / p.filename());
+    if (special &&
+        QMessageBox::question(this, "Confirm selected entries",
+                              "Proceed with the selected overwrite, protected-file or directory operation?",
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+        return;
     startOperation(request);
 }
 void MainWindow::startOperation(const LocalFiles::Request &request) {
@@ -974,6 +1119,7 @@ void MainWindow::packArchive() {
     path->setObjectName("archiveDestination");
     auto *format = new QComboBox(&dialog);
     format->addItems({"ZIP", "TAR + gzip", "TAR"});
+    format->addItem("7-Zip", QString("native7z"));
     for (const auto &key :
          {QString("zip_packer"), QString("z7_packer"), QString("rar_packer"), QString("arj_packer"),
           QString("lha_packer"), QString("uc2_packer"), QString("ace_packer")})
@@ -998,7 +1144,9 @@ void MainWindow::packArchive() {
                 suffix = QRegularExpression("^\\*\\.[A-Za-z0-9.]+$").match(mask).hasMatch() ? mask.mid(1)
                                                                                             : ".archive";
             } else
-                suffix = "." + provider.toString().section('_', 0, 0).replace("z7", "7z");
+                suffix = provider.toString() == "native7z"
+                             ? ".7z"
+                             : "." + provider.toString().section('_', 0, 0).replace("z7", "7z");
         }
         path->setText(text + suffix);
         path->setProperty("archiveSuffix", suffix);
@@ -1024,6 +1172,29 @@ void MainWindow::packArchive() {
         destination = nativePath(path->text());
     if (!destination.is_absolute())
         destination = active_->path() / destination;
+    if (format->currentData().toString() == "native7z" ||
+        (format->currentIndex() == 0 &&
+         (!FinalSettings::flag("zip_internalpack") || FinalSettings::flag("zip_zipnt") ||
+          FinalSettings::flag("zip_use7z")))) {
+        const bool zip = format->currentIndex() == 0;
+        auto password = std::make_shared<QByteArray>();
+        if (!zip && FinalSettings::flag("z7_encryptnames")) {
+            bool ok = false;
+            QString secret = QInputDialog::getText(this, "Encrypted 7-Zip",
+                                                   "Password (not saved):", QLineEdit::Password, {}, &ok);
+            if (!ok || secret.isEmpty())
+                return;
+            *password = secret.toUtf8();
+            secret.fill(QChar::Null);
+        }
+        queue_->enqueue("Create native archive " + displayPath(destination.filename()),
+                        [sources, destination, zip, password](const auto &control) {
+                            auto result = FinalArchives::pack(sources, destination, zip, *password, control);
+                            password->fill('\0');
+                            return result;
+                        });
+        return;
+    }
     if (format->currentIndex() >= 3) {
         const auto provider = format->currentData();
         QString program;
@@ -1279,4 +1450,62 @@ MainWindow::~MainWindow() {
         delete share_;
         share_ = nullptr;
     }
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event) {
+    if (object->property("deleteDropTarget").toBool()) {
+        if (event->type() == QEvent::DragEnter) {
+            auto *drag = static_cast<QDragEnterEvent *>(event);
+            if (drag->mimeData()->hasFormat(FinalSettings::dragType())) {
+                drag->acceptProposedAction();
+                return true;
+            }
+        }
+        if (event->type() == QEvent::Drop) {
+            auto *drop = static_cast<QDropEvent *>(event);
+            const auto paths = FinalSettings::dropPaths(drop->mimeData());
+            if (paths.empty())
+                return true;
+            const bool trash = FinalSettings::flag("IdConf_trashcan");
+            if ((FinalSettings::flag("confirm_mouse_delete") || !trash) &&
+                QMessageBox::question(this, "Dropped deletion",
+                                      QString("%1 %2 selected entries?")
+                                          .arg(trash ? "Trash" : "Permanently delete")
+                                          .arg(paths.size()),
+                                      QMessageBox::Yes | QMessageBox::No,
+                                      QMessageBox::No) != QMessageBox::Yes)
+                return true;
+            LocalFiles::Request request;
+            request.sources = paths;
+            request.operation = trash ? LocalFiles::Operation::Trash : LocalFiles::Operation::Delete;
+            startOperation(request);
+            drop->acceptProposedAction();
+            return true;
+        }
+    }
+    return QMainWindow::eventFilter(object, event);
+}
+void MainWindow::invokeParameterized(QAction *action, const QString &parameters) {
+    if (!action || !action->isEnabled())
+        return;
+    if (parameters.trimmed().isEmpty()) {
+        action->trigger();
+        return;
+    }
+    const auto name = action->objectName();
+    if (name == "cm_OpenNewTab") {
+        addTab(left_->indexOf(active_) >= 0 ? left_ : right_, nativePath(parameters));
+        return;
+    }
+    if (name == "cm_SrcUserDef" || name == "cm_SrcAllFiles") {
+        active_->filterView(parameters);
+        return;
+    }
+    if (name == "cm_GoHome") {
+        active_->navigate(nativePath(parameters));
+        return;
+    }
+    QMessageBox::information(this, "Command parameters",
+                             "Parameters are supported for New tab (directory), Home (directory), and "
+                             "custom/all file view (mask). Other commands require an empty parameter field.");
 }

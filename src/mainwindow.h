@@ -32,6 +32,7 @@ class MainWindow : public QMainWindow {
 
   protected:
     void closeEvent(QCloseEvent *event) override;
+    bool eventFilter(QObject *, QEvent *) override;
 
   private:
     void buildReferenceUi();
@@ -62,6 +63,7 @@ class MainWindow : public QMainWindow {
     void activate(FilePanel *panel);
     void switchPanel();
     void executeCommandLine();
+    void invokeParameterized(QAction *action, const QString &parameters);
     void restoreSession(const QStringList &initialPaths);
     FilePanel *oppositePanel() const;
     void runOperation(LocalFiles::Operation operation);

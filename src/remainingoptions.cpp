@@ -37,6 +37,9 @@
 #include <QVBoxLayout>
 
 void MainWindow::applyUserCommands() {
+    for (auto *old : findChildren<QAction *>())
+        if (old->property("parameterBinding").toBool())
+            delete old;
     const auto actions = findChildren<QAction *>();
     for (auto *action : actions)
         if (!action->objectName().isEmpty()) {
@@ -62,9 +65,20 @@ void MainWindow::applyUserCommands() {
             if (keys.removeAll(key))
                 action->setShortcuts(keys);
         }
-        auto keys = target->shortcuts();
-        keys << key;
-        target->setShortcuts(keys);
+        if (!record.value("parameters").toString().isEmpty()) {
+            auto *binding = new QAction(target->text(), this);
+            binding->setProperty("parameterBinding", true);
+            binding->setShortcut(key);
+            addAction(binding);
+            connect(binding, &QAction::triggered, this,
+                    [this, target, parameters = record.value("parameters").toString()] {
+                        invokeParameterized(target, parameters);
+                    });
+        } else {
+            auto keys = target->shortcuts();
+            keys << key;
+            target->setShortcuts(keys);
+        }
     }
     const auto aliases = QSettings().value("commandAliases").toMap();
     for (auto it = aliases.begin(); it != aliases.end(); ++it)
@@ -173,8 +187,7 @@ void MainWindow::configureRemainingOptions(QDialog *dialog) {
             if (action == "save")
                 Preferences::saveFrequent();
             else {
-                qApp->setProperty("frequentUsage", QVariantMap{});
-                QSettings().remove("frequent/saved");
+                Preferences::clearFrequent();
             }
         });
     auto *saveFrequency = dialog->findChild<QCheckBox *>("SaveFrequentlyUsedOnExitChk");
@@ -346,7 +359,12 @@ void MainWindow::configureRemainingOptions(QDialog *dialog) {
                 QLineEdit::Normal, original.value("fields", "comment;path").toString(), &ok);
             if (!ok)
                 return;
-            const QVariantMap record{{"name", title}, {"fields", fields}};
+            const QVariantMap record{
+                {"name", title},
+                {"fields", fields},
+                {"scope", dialog->findChild<QComboBox *>("FileSystemCombo")->currentIndex() == 2
+                              ? "Native providers"
+                              : "Local Linux"}};
             if (name == "CustomEdit")
                 rows[selected] = record;
             else
@@ -449,9 +467,12 @@ void MainWindow::configureRemainingOptions(QDialog *dialog) {
     });
     auto *ruleList = dialog->findChild<QListWidget *>("ModeChangeList");
     ruleList->setEnabled(true);
-    const auto refreshRules = [ruleList] {
+    const auto refreshRules = [dialog, ruleList] {
         ruleList->clear();
-        for (const auto &entry : QSettings().value("autoViewRules").toList()) {
+        for (const auto &entry : dialog->property("appearanceDraft")
+                                     .toMap()
+                                     .value("autoViewRules", QSettings().value("autoViewRules"))
+                                     .toList()) {
             const auto row = entry.toMap();
             ruleList->addItem(row.value("path").toString() + " | " + row.value("masks").toString() + " → " +
                               row.value("mode").toString());
@@ -460,48 +481,52 @@ void MainWindow::configureRemainingOptions(QDialog *dialog) {
     refreshRules();
     for (const auto &name : {QString("AddRulesButton"), QString("DeleteRulesButton"),
                              QString("MoreRulesButton"), QString("LessRulesButton")})
-        connect(enable(name), &QAbstractButton::clicked, dialog, [dialog, ruleList, refreshRules, name] {
-            auto rules = QSettings().value("autoViewRules").toList();
-            const int selected = ruleList->currentRow();
-            if (name == "AddRulesButton") {
-                bool ok = false;
-                const auto path = QInputDialog::getText(dialog, "Auto view mode",
-                                                        "Directory path glob:", QLineEdit::Normal, "*", &ok);
-                if (!ok)
-                    return;
-                const auto modes = dialog->property("viewModesDraft").toMap();
-                const auto mode = QInputDialog::getItem(dialog, "Auto view mode", "View mode:", modes.keys(),
-                                                        0, false, &ok);
-                if (!ok || mode.isEmpty())
-                    return;
-                rules.append(QVariantMap{{"path", path}, {"masks", QString()}, {"mode", mode}});
-            } else {
-                if (selected < 0)
-                    return;
-                if (name == "DeleteRulesButton")
-                    rules.removeAt(selected);
-                else {
-                    auto rule = rules[selected].toMap();
-                    auto masks = rule.value("masks").toString().split(';', Qt::SkipEmptyParts);
-                    if (name == "MoreRulesButton") {
+        connect(enable(name), &QAbstractButton::clicked, dialog,
+                [dialog, ruleList, refreshRules, name, draft] {
+                    auto rules = dialog->property("appearanceDraft")
+                                     .toMap()
+                                     .value("autoViewRules", QSettings().value("autoViewRules"))
+                                     .toList();
+                    const int selected = ruleList->currentRow();
+                    if (name == "AddRulesButton") {
                         bool ok = false;
-                        const auto mask = QInputDialog::getText(
-                            dialog, "Add sub-rule",
-                            "A matching filename must exist (glob):", QLineEdit::Normal, "*", &ok);
-                        if (!ok || mask.isEmpty())
+                        const auto path = QInputDialog::getText(
+                            dialog, "Auto view mode", "Directory path glob:", QLineEdit::Normal, "*", &ok);
+                        if (!ok)
                             return;
-                        masks << mask;
-                    } else if (!masks.isEmpty())
-                        masks.removeLast();
-                    rule["masks"] = masks.join(';');
-                    rules[selected] = rule;
-                }
-            }
-            QSettings().setValue("autoViewRules", rules);
-            refreshRules();
-            if (ruleList->count())
-                ruleList->setCurrentRow(qBound(0, selected, ruleList->count() - 1));
-        });
+                        const auto modes = dialog->property("viewModesDraft").toMap();
+                        const auto mode = QInputDialog::getItem(dialog, "Auto view mode",
+                                                                "View mode:", modes.keys(), 0, false, &ok);
+                        if (!ok || mode.isEmpty())
+                            return;
+                        rules.append(QVariantMap{{"path", path}, {"masks", QString()}, {"mode", mode}});
+                    } else {
+                        if (selected < 0)
+                            return;
+                        if (name == "DeleteRulesButton")
+                            rules.removeAt(selected);
+                        else {
+                            auto rule = rules[selected].toMap();
+                            auto masks = rule.value("masks").toString().split(';', Qt::SkipEmptyParts);
+                            if (name == "MoreRulesButton") {
+                                bool ok = false;
+                                const auto mask = QInputDialog::getText(
+                                    dialog, "Add sub-rule",
+                                    "A matching filename must exist (glob):", QLineEdit::Normal, "*", &ok);
+                                if (!ok || mask.isEmpty())
+                                    return;
+                                masks << mask;
+                            } else if (!masks.isEmpty())
+                                masks.removeLast();
+                            rule["masks"] = masks.join(';');
+                            rules[selected] = rule;
+                        }
+                    }
+                    draft("autoViewRules", rules);
+                    refreshRules();
+                    if (ruleList->count())
+                        ruleList->setCurrentRow(qBound(0, selected, ruleList->count() - 1));
+                });
     auto *keys = dialog->findChild<QComboBox *>("HOT_Keys");
     keys->setEnabled(true);
     keys->setEditable(true);
@@ -542,36 +567,39 @@ void MainWindow::configureRemainingOptions(QDialog *dialog) {
                 text += pair.second;
         return QKeySequence(text + keys->currentText()).toString(QKeySequence::PortableText);
     };
-    connect(enable("HOT_OKBTN", "Assign hotkey or alias"), &QAbstractButton::clicked, dialog,
-            [this, dialog, command, alias, sequence] {
-                auto *target = commands_.get(command->text());
-                if (!target) {
-                    QMessageBox::warning(dialog, "Hotkey", "Choose a registered internal command.");
+    connect(
+        enable("HOT_OKBTN", "Assign hotkey or alias"), &QAbstractButton::clicked, dialog,
+        [this, dialog, command, alias, sequence] {
+            auto *target = commands_.get(command->text());
+            if (!target) {
+                QMessageBox::warning(dialog, "Hotkey", "Choose a registered internal command.");
+                return;
+            }
+            if (dialog->findChild<QAbstractButton *>("AliasRadioBtn")->isChecked()) {
+                const auto name = alias->currentText().trimmed().toCaseFolded();
+                if (!QRegularExpression("^[A-Za-z][A-Za-z0-9_]*$").match(name).hasMatch())
+                    return;
+                if (!commands_.addUserAlias(name, target)) {
+                    QMessageBox::warning(dialog, "Alias", "Aliases cannot replace built-in command names.");
                     return;
                 }
-                if (dialog->findChild<QAbstractButton *>("AliasRadioBtn")->isChecked()) {
-                    const auto name = alias->currentText().trimmed().toCaseFolded();
-                    if (!QRegularExpression("^[A-Za-z][A-Za-z0-9_]*$").match(name).hasMatch())
-                        return;
-                    if (!commands_.addUserAlias(name, target)) {
-                        QMessageBox::warning(dialog, "Alias",
-                                             "Aliases cannot replace built-in command names.");
-                        return;
-                    }
-                    auto values = QSettings().value("commandAliases").toMap();
-                    values[name] = command->text();
-                    QSettings().setValue("commandAliases", values);
-                } else {
-                    const auto key = sequence();
-                    auto bindings = QSettings().value("keyBindings").toList();
-                    for (int i = bindings.size() - 1; i >= 0; --i)
-                        if (bindings[i].toMap().value("key") == key)
-                            bindings.removeAt(i);
-                    bindings.append(QVariantMap{{"key", key}, {"command", command->text()}});
-                    QSettings().setValue("keyBindings", bindings);
-                }
-                applyUserCommands();
-            });
+                auto values = QSettings().value("commandAliases").toMap();
+                values[name] = command->text();
+                QSettings().setValue("commandAliases", values);
+            } else {
+                const auto key = sequence();
+                auto bindings = QSettings().value("keyBindings").toList();
+                for (int i = bindings.size() - 1; i >= 0; --i)
+                    if (bindings[i].toMap().value("key") == key)
+                        bindings.removeAt(i);
+                bindings.append(
+                    QVariantMap{{"key", key},
+                                {"command", command->text()},
+                                {"parameters", dialog->findChild<QLineEdit *>("Hot_Params_Edit")->text()}});
+                QSettings().setValue("keyBindings", bindings);
+            }
+            applyUserCommands();
+        });
     connect(enable("HOT_list_button", "List and edit key bindings"), &QAbstractButton::clicked, dialog,
             [this, dialog] {
                 NativeSettings::editRecords(dialog, "Keyboard bindings", "keyBindings", {"key", "command"});

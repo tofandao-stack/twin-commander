@@ -1,9 +1,11 @@
-# Capability inventory — internal alpha 0.7
+# Capability inventory — internal alpha 0.9
 
 These are concrete locally implemented capabilities. This list is not the exhaustive final TC inventory, and its row count cannot establish a percentage of final parity. `docs/parity-matrix.csv` retains scenario-level reference status; static GUI structure has been audited against 11.58.1 resources; installed runtime behavior remains unverified.
 
 | Area | Available capabilities |
 | --- | --- |
+| Controls 0.9 | Remaining 106 audited settings: native layout/navigation, copy verification and I/O, comments, MODE Z/re-upload, ZIP recovery and 7-Zip encryption, thumbnail providers, language/lifecycle preferences; zero persistent disabled inventory entries; [scope](control-implementation-0.9.md) |
+| Controls 0.8 | Another 100 audited controls: external bar commands and presentation, FTP behavior, filtered/rotating logs, native field search, direct view editors and appearance/interaction settings; 106 remained at that increment; [scope](control-implementation-0.8.md) |
 | Settings 0.7 | 93 audited control gaps resolved: file display/formatting, icons/colors, tab behavior, session switches, history, quick search, bounded automatic refresh and bookmark editing; [scope and limits](settings-implementation-0.7.md) |
 | Main window | Two independent panels; resizable splitter; active path highlighting; dense sortable columns; project-owned icons and link indication; shared menus/toolbar/function-key actions; right-click actions |
 | Navigation | Editable paths; parent; previous/next directory; home; root; directory Enter/double-click; desktop file opening; opposite-panel matching; swap current panel directories; tabs; per-tab history |

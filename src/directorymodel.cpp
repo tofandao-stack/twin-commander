@@ -2,6 +2,7 @@
 #include "backgroundpool.h"
 #include "classicui.h"
 #include "extendedtools.h"
+#include "finalsettings.h"
 #include "nativesettings.h"
 #include "preferences.h"
 #include <QBuffer>
@@ -18,6 +19,8 @@
 #include <QSaveFile>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QStorageInfo>
+#include <sys/xattr.h>
 #include <unordered_set>
 
 #include <QColor>
@@ -147,6 +150,20 @@ Listing enumerate(const std::filesystem::path &path, bool hidden, const QString 
             continue;
         }
         const auto filename = item.path().filename().native();
+        char dos[64]{};
+        const auto dosBytes = ::lgetxattr(item.path().c_str(), "user.DOSATTRIB", dos, sizeof(dos) - 1);
+        bool isSystem = false;
+        if (dosBytes > 0) {
+            bool valid = false;
+            isSystem = (QString::fromLatin1(dos, dosBytes).toUInt(&valid, 0) & 4) && valid;
+        }
+        if (isSystem && !FinalSettings::flag("IdConfshowSystem")) {
+            if (resultMode)
+                ++resultIndex;
+            else
+                iterator.increment(error);
+            continue;
+        }
         if ((resultMode || hidden || filename.empty() || filename.front() != '.') &&
             (filter.isEmpty() || displayPath(item.path().filename()).contains(filter, Qt::CaseInsensitive))) {
             DirectoryEntry entry;
@@ -214,12 +231,19 @@ Listing enumerate(const std::filesystem::path &path, bool hidden, const QString 
                             entry.fields[field] = QString("ERROR: ") + QString::fromLocal8Bit(error.what());
                         }
                 }
-                if (thumbnails)
+                if (thumbnails && QSettings().value("thumbnail/showFields", true).toBool())
                     for (const auto &key : requestedFields)
                         if (!entry.fields.value(key).isEmpty())
                             entry.thumbnailText +=
                                 (entry.thumbnailText.isEmpty() ? QString() : "\n") + entry.fields.value(key);
-                if (thumbnails && regular && !entry.symlink && entry.size <= 8 * 1024 * 1024) {
+                if (thumbnails && QSettings().value("thumbnail/images", true).toBool() &&
+                    QDir::match(QSettings()
+                                    .value("thumbnail/imageMasks",
+                                           "*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp;*.tif;*.tiff;*.ico")
+                                    .toString()
+                                    .split(';'),
+                                entry.name) &&
+                    regular && !entry.symlink && entry.size <= 8 * 1024 * 1024) {
                     try {
                         const auto st = NativeFs::inspect(entry.path);
                         const auto identity =
@@ -264,6 +288,9 @@ Listing enumerate(const std::filesystem::path &path, bool hidden, const QString 
                                 QJsonDocument(
                                     QJsonObject{
                                         {"format", "TwinCommander-thumbnail-1"},
+                                        {"width", thumbnailSize.width()},
+                                        {"height", thumbnailSize.height()},
+                                        {"volume", QStorageInfo(displayPath(entry.path)).rootPath()},
                                         {"path",
                                          QString::fromLatin1(
                                              QByteArray::fromStdString(entry.path.native()).toBase64())}})
@@ -273,6 +300,42 @@ Listing enumerate(const std::filesystem::path &path, bool hidden, const QString 
                         }
                     } catch (const std::exception &) {
                     }
+                }
+                if (thumbnails && QSettings().value("thumbnail/text").toBool() && regular && !entry.symlink &&
+                    QDir::match(QSettings()
+                                    .value("thumbnail/textMasks", "*.txt;*.md;*.log;*.csv;*.json")
+                                    .toString()
+                                    .split(';'),
+                                entry.name)) {
+                    try {
+                        NativeFs::Fd input(
+                            ::open(entry.path.c_str(), O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC));
+                        const auto st = NativeFs::inspectFd(input.value);
+                        if (S_ISREG(st.st_mode)) {
+                            char bytes[4096];
+                            const auto n = ::read(input.value, bytes, sizeof(bytes));
+                            if (n >= 0 && !QByteArray(bytes, n).contains('\0')) {
+                                QImage preview(thumbnailSize, QImage::Format_ARGB32_Premultiplied);
+                                preview.fill(Qt::white);
+                                QPainter painter(&preview);
+                                QFont font("Monospace");
+                                font.setPixelSize(10);
+                                painter.setFont(font);
+                                painter.setPen(Qt::black);
+                                painter.drawText(preview.rect().adjusted(4, 4, -4, -4),
+                                                 Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap,
+                                                 QString::fromUtf8(bytes, n));
+                                painter.end();
+                                entry.thumbnail = preview;
+                            }
+                        }
+                    } catch (const std::exception &) {
+                    }
+                }
+                if (thumbnails) {
+                    const auto preview = FinalSettings::externalThumbnail(entry.path, thumbnailSize);
+                    if (!preview.isNull())
+                        entry.thumbnail = preview;
                 }
                 listing.entries.push_back(std::move(entry));
             }
@@ -337,15 +400,38 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
         const int sizes[]{16, 20, 24, 32, 48};
         const int size = sizes[qBound(0, QSettings().value("icons/size", 0).toInt(), 4)];
         QIcon icon;
-        if (mode == 0 && nativePath(displayPath(item->path)) == item->path) {
+        if ((mode == 0 || mode == 3 || QSettings().value("icons/nativeDefaults").toBool() ||
+             (item->directory && QSettings().value("icons/specialFolders").toBool())) &&
+            nativePath(displayPath(item->path)) == item->path) {
             static QFileIconProvider provider;
-            provider.setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
+            provider.setOptions(QSettings().value("icons/specialFolders").toBool()
+                                    ? QFileIconProvider::Options{}
+                                    : QFileIconProvider::DontUseCustomDirectoryIcons);
             icon = provider.icon(QFileInfo(displayPath(item->path)));
         }
+        const QStorageInfo volume(displayPath(item->path));
+        const auto fs = volume.fileSystemType();
+        const bool net = fs.contains("nfs") || fs.contains("cifs") || fs.contains("sshfs");
+        const bool removable =
+            volume.rootPath().startsWith("/media/") || volume.rootPath().startsWith("/run/media/");
+        if (mode == 3 && !item->directory && !(net && FinalSettings::flag("NotOnNet")) &&
+            !(removable && FinalSettings::flag("NotOnFloppy"))) {
+            if (item->path.extension() == ".desktop" && item->size <= 65536 && !item->symlink) {
+                QSettings desktop(displayPath(item->path), QSettings::IniFormat);
+                const auto name = desktop.value("Desktop Entry/Icon").toString();
+                if (!name.contains('/'))
+                    icon = QIcon::fromTheme(name, icon);
+            } else if ((item->permissions & std::filesystem::perms::owner_exec) !=
+                       std::filesystem::perms::none)
+                icon = QIcon::fromTheme("application-x-executable", icon);
+        }
+        if (item->directory && net && !FinalSettings::flag("IdShowSpecialFoldersRemote"))
+            icon = commanderIcon("folder", size);
         if (icon.isNull())
             icon = commanderIcon(item->parent ? "parent" : item->directory ? "folder" : "file", size);
         if ((item->symlink && QSettings().value("icons/overlay", true).toBool()) ||
-            QSettings().value("icons/frame", false).toBool()) {
+            QSettings().value("icons/frame", false).toBool() ||
+            (QSettings().value("icons/hiddenBadge").toBool() && item->name.startsWith('.'))) {
             auto pixmap = icon.pixmap(size, size);
             QPainter painter(&pixmap);
             if (QSettings().value("icons/frame", false).toBool()) {
@@ -357,14 +443,20 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
                 painter.drawText(QRect(0, size / 2, size, size / 2), Qt::AlignLeft | Qt::AlignBottom,
                                  QString::fromUtf8("↗"));
             }
+            if (QSettings().value("icons/hiddenBadge").toBool() && item->name.startsWith('.')) {
+                painter.setPen(Qt::red);
+                painter.drawText(QRect(0, 0, size, size), Qt::AlignRight | Qt::AlignBottom, "!");
+            }
             return QIcon(pixmap);
         }
         return icon;
     }
     if (role == Qt::ToolTipRole) {
-        if (!QSettings().value("display/nameTips", true).toBool())
+        if (!QSettings().value("display/nameTips", true).toBool() && !FinalSettings::flag("IdConf_Win32Tips"))
             return {};
         QString tip = displayPath(item->path) + (item->symlink ? "\nSymbolic link" : "");
+        if (FinalSettings::flag("IdConf_Win32Tips"))
+            tip += "\n" + FinalSettings::comment(item->path);
         for (const auto &entry : QSettings().value("hintRules").toList()) {
             const auto rule = entry.toMap();
             if (QDir::match(rule.value("mask", "*").toString(), displayPath(item->path.filename()))) {
@@ -393,6 +485,11 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
         }
     const auto displayName = [&] {
         QString name = item->name;
+        if (!item->parent && !FinalSettings::flag("IdConf_longnames"))
+            name = FinalSettings::alias83(name);
+        else if (!item->parent && FinalSettings::flag("IdConfLower83Names") &&
+                 QRegularExpression("^[A-Z0-9_$~-]{1,8}(\\.[A-Z0-9_$~-]{1,3})?$").match(name).hasMatch())
+            name = name.toLower();
         if (item->directory && !item->parent) {
             if (QSettings().value("display/brackets").toBool())
                 name = "[" + name + "]";
@@ -413,15 +510,18 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
     if (role != Qt::DisplayRole)
         return {};
     const auto basename = displayPath(item->path.filename());
-    const int dot = basename.lastIndexOf('.');
-    const bool split = !item->directory && dot > 0 && QSettings().value("format/extension", 1).toInt() == 1;
+    const auto shown = displayName();
+    const int dot = shown.lastIndexOf('.');
+    const bool split = !item->directory && dot > shown.lastIndexOf('/') + 1 &&
+                       QSettings().value("format/extension", 1).toInt() == 1;
     switch (index.column()) {
     case 0:
-        return split ? item->name.left(item->name.size() - basename.size() + dot) : displayName();
+        return split ? shown.left(dot) : shown;
     case 1:
-        return split ? basename.mid(dot + 1) : QString();
+        return split ? shown.mid(dot + 1) : QString();
     case 2:
-        return item->directory ? QVariant("<DIR>") : QVariant(Preferences::sizeText(item->size));
+        return item->directory && !item->directorySizeKnown ? QVariant("<DIR>")
+                                                            : QVariant(Preferences::sizeText(item->size));
     case 3:
         return item->parent ? QString() : Preferences::dateText(item->modified);
     case 4: {
@@ -445,7 +545,8 @@ QVariant DirectoryModel::headerData(int section, Qt::Orientation orientation, in
         return {};
     QStringList labels{"Name", "Ext", "Size", "Date", "Attr"};
     labels.append(columns_);
-    return section >= 0 && section < labels.size() ? QVariant(labels[section]) : QVariant();
+    return section >= 0 && section < labels.size() ? QVariant(FinalSettings::translated(labels[section]))
+                                                   : QVariant();
 }
 
 void DirectoryModel::sort(int column, Qt::SortOrder order) {
@@ -647,4 +748,14 @@ void DirectoryModel::setThumbnails(bool enabled) {
 void DirectoryModel::setSecondarySort(int column) {
     secondarySort_ = column >= 0 && column < 4 ? column : 0;
     sort(sortColumn_, sortOrder_);
+}
+
+void DirectoryModel::setDirectorySize(const std::filesystem::path &path, quint64 size) {
+    for (int row = 0; row < rowCount(); ++row)
+        if (entries_[row].path == path) {
+            entries_[row].size = size;
+            entries_[row].directorySizeKnown = true;
+            emit dataChanged(index(row, 2), index(row, 2));
+            break;
+        }
 }

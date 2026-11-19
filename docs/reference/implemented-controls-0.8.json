@@ -1,0 +1,731 @@
+{
+  "baselineTotal": 206,
+  "implementedCount": 100,
+  "remainingTotal": 106,
+  "baselineInventory": "disabled-controls-0.7.json",
+  "remainingInventory": "disabled-controls-0.8.json",
+  "implementedConfiguration": [
+    {
+      "page": "Layout",
+      "id": "idFlatDriveBar",
+      "type": "QCheckBox",
+      "caption": "F&lat icons",
+      "status": "implemented"
+    },
+    {
+      "page": "Layout",
+      "id": "idShowBreadcrumb",
+      "type": "QCheckBox",
+      "caption": "Show clickable &path parts ('breadcrumb bar')",
+      "status": "implemented"
+    },
+    {
+      "page": "Layout",
+      "id": "idAutoOpenBreadcrumb",
+      "type": "QCheckBox",
+      "caption": "&Auto-open when moving mouse over it",
+      "status": "implemented"
+    },
+    {
+      "page": "Layout",
+      "id": "idFlatInterface",
+      "type": "QCheckBox",
+      "caption": "Flat user &interface (button bar configured separately)",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdShowSpecialFoldersLocal",
+      "type": "QCheckBox",
+      "caption": "Sho&w icons for special folders: Normal file system",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdShowDefIconsFromExplorer",
+      "type": "QCheckBox",
+      "caption": "Show default &folder/file icons from Explorer",
+      "status": "native-adaptation"
+    },
+    {
+      "page": "Icons",
+      "id": "IdHidSysExclamation",
+      "type": "QCheckBox",
+      "caption": "Show '!' on hidden/s&ystem",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdPressedButtons",
+      "type": "QCheckBox",
+      "caption": "Show checked items as &pressed buttons instead of checkmarks",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "idDriveExtraX",
+      "type": "QComboBox",
+      "caption": "Ex&tra drive space:",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "idDriveExtraY",
+      "type": "QComboBox",
+      "caption": "Ex&tra drive space:",
+      "status": "implemented"
+    },
+    {
+      "page": "Font",
+      "id": "DpiCheck",
+      "type": "QCheckBox",
+      "caption": "Set dots per inch (DPI) to:",
+      "status": "implemented"
+    },
+    {
+      "page": "Font",
+      "id": "DpiEdit",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Font",
+      "id": "AutoSizeCheck",
+      "type": "QCheckBox",
+      "caption": "&Automatically adjust dialog boxes to larger fonts",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_DarkModeCombo",
+      "type": "QComboBox",
+      "caption": "D&ark mode:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_OtherColor",
+      "type": "QComboBox",
+      "caption": "Others:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_OtherName",
+      "type": "QComboBox",
+      "caption": "Others:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_CursorThemed",
+      "type": "QCheckBox",
+      "caption": "Use Windows &theme for cursor",
+      "status": "native-adaptation"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsConfirmClose",
+      "type": "QCheckBox",
+      "caption": "&Confirm close all tabs",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsDriveInTitle",
+      "type": "QCheckBox",
+      "caption": "Always show &drive letter in tab title",
+      "status": "native-adaptation"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsSaveFiltersSeparately",
+      "type": "QCheckBox",
+      "caption": "Save displayed &file types separately for each tab",
+      "status": "implemented"
+    },
+    {
+      "page": "View Mode",
+      "id": "AdditionalSortEdit",
+      "type": "QLineEdit",
+      "caption": "Sort order:",
+      "status": "implemented"
+    },
+    {
+      "page": "View Mode",
+      "id": "id_TabColorBg",
+      "type": "QComboBox",
+      "caption": "Tab color and icon:",
+      "status": "implemented"
+    },
+    {
+      "page": "View Mode",
+      "id": "id_TabColorBg2",
+      "type": "QComboBox",
+      "caption": "&Background:",
+      "status": "implemented"
+    },
+    {
+      "page": "View Mode",
+      "id": "AutoRunEdit",
+      "type": "QLineEdit",
+      "caption": "Background &2:",
+      "status": "implemented"
+    },
+    {
+      "page": "View Mode",
+      "id": "id_TabColor",
+      "type": "QComboBox",
+      "caption": "Additional sort orders:",
+      "status": "implemented"
+    },
+    {
+      "page": "Auto Switch Mode",
+      "id": "ModeChooseCombo",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdConfrightbutton",
+      "type": "QRadioButton",
+      "caption": "Use &right mouse button (as in NC) - context menu after 1 second",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdConfleftbutton",
+      "type": "QRadioButton",
+      "caption": "&Left mouse button (Windows standard)",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdClickOnIcon",
+      "type": "QCheckBox",
+      "caption": "By clic&king on icon",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdOnlyOnTouchscreen",
+      "type": "QCheckBox",
+      "caption": "Only on touch&screen",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdRubberband",
+      "type": "QCheckBox",
+      "caption": "Rubber band selection",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "Id_ConfAlwaysToRoot",
+      "type": "QCheckBox",
+      "caption": "Always &go to the root of a drive when changing drives",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "Id_ConfselOnlyName",
+      "type": "QCheckBox",
+      "caption": "Select only the file name when renaming (not the e&xtension)",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "Id_ConfSingleClickStart",
+      "type": "QCheckBox",
+      "caption": "Op&en files and directories with a single click",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "id_ConfAutoComplete",
+      "type": "QCheckBox",
+      "caption": "Auto-comple&te paths",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "id_ConfAutoSuggest",
+      "type": "QCheckBox",
+      "caption": "Auto-append suggested &name",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "NoRereadEdit",
+      "type": "QLineEdit",
+      "caption": "&No refresh for these drives:",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "NoReread2Edit",
+      "type": "QLineEdit",
+      "caption": "&Do not remember these drives on exit:",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "WatchDirsExcludeEdit",
+      "type": "QLineEdit",
+      "caption": "No refresh for &these drives:",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FTP_Retry",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpTransferModeBox",
+      "type": "QComboBox",
+      "caption": "&Delay between retries (seconds)",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FTP_retry_delay",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpOpenInBox",
+      "type": "QComboBox",
+      "caption": "Default &transfer mode:",
+      "status": "native-adaptation"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpBackGnd",
+      "type": "QCheckBox",
+      "caption": "&All uploads/downloads in background",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpPassiveMode",
+      "type": "QCheckBox",
+      "caption": "&Use passive mode by default",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpPORTlimitrange",
+      "type": "QCheckBox",
+      "caption": "&PORT mode: only use ports from limited range:",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpPortFrom",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpPortTo",
+      "type": "QLineEdit",
+      "caption": "-",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpAutoResumeOption",
+      "type": "QCheckBox",
+      "caption": "Auto-&resume transfer if no data received for:",
+      "status": "native-adaptation"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpAutoResumeValue",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "native-adaptation"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpPortIPbox",
+      "type": "QCheckBox",
+      "caption": "PORT mode: e&xternal address (IP/DNS/HTTP):",
+      "status": "implemented"
+    },
+    {
+      "page": "FTP",
+      "id": "FtpPortIPedit",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Thumbnails",
+      "id": "ThumbsCustomFieldsChk",
+      "type": "QCheckBox",
+      "caption": "&Show custom fields below thumbnails (e.g. image size):",
+      "status": "implemented"
+    },
+    {
+      "page": "Thumbnails",
+      "id": "ThumbsFromTextChk",
+      "type": "QCheckBox",
+      "caption": "&Plain Text file thumbnails for:",
+      "status": "implemented"
+    },
+    {
+      "page": "Thumbnails",
+      "id": "ThumbsFromTextEdt",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Thumbnails",
+      "id": "ThumbsFromInternalChk",
+      "type": "QCheckBox",
+      "caption": "I&nternal thumbnails from images:",
+      "status": "implemented"
+    },
+    {
+      "page": "Thumbnails",
+      "id": "ThumbsFromInternalEdt",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogCpMvShChk",
+      "type": "QCheckBox",
+      "caption": "C&opy/Move/Create shortcut",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogDeleteChk",
+      "type": "QCheckBox",
+      "caption": "&Delete",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogFoldersChk",
+      "type": "QCheckBox",
+      "caption": "C&reate/Delete folders",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogArchiveChk",
+      "type": "QCheckBox",
+      "caption": "&Pack/Unpack/Test archives",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogFsChk",
+      "type": "QCheckBox",
+      "caption": "&File system plugins",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogSuccess",
+      "type": "QCheckBox",
+      "caption": "Log &successful operations",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogErrors",
+      "type": "QCheckBox",
+      "caption": "Log &errors",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "LogSkipped",
+      "type": "QCheckBox",
+      "caption": "Log s&kipped files (when choosing skip or skip all)",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "IdLogNever",
+      "type": "QRadioButton",
+      "caption": "&Never (always log to same log file)",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "IdLogEveryDay",
+      "type": "QRadioButton",
+      "caption": "Every day &after midnight",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "IdLogWhenLarger",
+      "type": "QRadioButton",
+      "caption": "&When the log file becomes larger than",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "IdLogSizeLimit",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "IdKeepMaximum",
+      "type": "QCheckBox",
+      "caption": "Keep a &maximum of",
+      "status": "implemented"
+    },
+    {
+      "page": "Log file",
+      "id": "IdLogFileCount",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Packer",
+      "id": "zip_setdate",
+      "type": "QCheckBox",
+      "caption": "Set archive date to &newest file date",
+      "status": "implemented"
+    },
+    {
+      "page": "ZIP Packer",
+      "id": "internalzip_default",
+      "type": "QRadioButton",
+      "caption": "&normal compression (6)",
+      "status": "implemented"
+    },
+    {
+      "page": "ZIP Packer",
+      "id": "internalzip_max",
+      "type": "QRadioButton",
+      "caption": "&maximum compression (9)",
+      "status": "implemented"
+    },
+    {
+      "page": "ZIP Packer",
+      "id": "internalzip_min",
+      "type": "QRadioButton",
+      "caption": "&fastest compression (1)",
+      "status": "implemented"
+    },
+    {
+      "page": "ZIP Packer",
+      "id": "internalzip_other",
+      "type": "QRadioButton",
+      "caption": "&other:",
+      "status": "implemented"
+    },
+    {
+      "page": "ZIP Packer",
+      "id": "internalzip_value",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Misc.",
+      "id": "SND_onlylong",
+      "type": "QCheckBox",
+      "caption": "Only play for &long operations:",
+      "status": "implemented"
+    },
+    {
+      "page": "Misc.",
+      "id": "SND_Delay",
+      "type": "QLineEdit",
+      "caption": ">",
+      "status": "implemented"
+    }
+  ],
+  "implementedBarControls": [
+    {
+      "caption": "",
+      "editor": "horizontalBarEditor",
+      "id": "id_btn_iconindex",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "horizontalBarEditor",
+      "id": "W_btn_param",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "Run mi&nimized",
+      "editor": "horizontalBarEditor",
+      "id": "id_btn_assymbol",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "horizontalBarEditor",
+      "id": "W_btn_startpath",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "Run ma&ximized",
+      "editor": "horizontalBarEditor",
+      "id": "id_btn_maximized",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "horizontalBarEditor",
+      "id": "id_btn_barsize",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "F&lat icons",
+      "editor": "horizontalBarEditor",
+      "id": "id_FlatIcons",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "S&mall icons:",
+      "editor": "horizontalBarEditor",
+      "id": "id_SmallIcons",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "XP st&yle",
+      "editor": "horizontalBarEditor",
+      "id": "id_XPstyle",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "horizontalBarEditor",
+      "id": "id_smalliconsize",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "",
+      "editor": "verticalBarEditor",
+      "id": "id_btn_iconindex",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "verticalBarEditor",
+      "id": "W_btn_param",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "Run mi&nimized",
+      "editor": "verticalBarEditor",
+      "id": "id_btn_assymbol",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "verticalBarEditor",
+      "id": "W_btn_startpath",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "Run ma&ximized",
+      "editor": "verticalBarEditor",
+      "id": "id_btn_maximized",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "verticalBarEditor",
+      "id": "id_btn_barsize",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "F&lat icons",
+      "editor": "verticalBarEditor",
+      "id": "id_FlatIcons",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "S&mall icons:",
+      "editor": "verticalBarEditor",
+      "id": "id_SmallIcons",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "implemented"
+    },
+    {
+      "caption": "XP st&yle",
+      "editor": "verticalBarEditor",
+      "id": "id_XPstyle",
+      "type": "QCheckBox",
+      "visible": true,
+      "status": "native-adaptation"
+    },
+    {
+      "caption": "",
+      "editor": "verticalBarEditor",
+      "id": "id_smalliconsize",
+      "type": "QLineEdit",
+      "visible": true,
+      "status": "implemented"
+    }
+  ],
+  "otherImplemented": [
+    {
+      "id": "searchNativeFields",
+      "caption": "Search in native content providers",
+      "status": "native-adaptation"
+    }
+  ]
+}

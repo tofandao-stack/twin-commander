@@ -10,7 +10,8 @@ QByteArray decode(const QByteArray &data, const QString &format);
 LocalFiles::Result packExternal(const std::vector<std::filesystem::path> &sources,
                                 const std::filesystem::path &output, const QString &program,
                                 const QStringList &prefix,
-                                const std::shared_ptr<LocalFiles::Control> &control);
+                                const std::shared_ptr<LocalFiles::Control> &control,
+                                const QByteArray &standardInput = {});
 QString comment(const std::filesystem::path &path);
 void setComment(const std::filesystem::path &path, const QString &text);
 } // namespace ExtendedTools

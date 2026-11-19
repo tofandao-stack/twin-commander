@@ -1,6 +1,6 @@
 # Twin Commander
 
-A native Linux two-panel file manager, implemented in C++20 and Qt 6 Widgets according to [PLAN.md](PLAN.md). Version 0.7 is an internal local-manager alpha with file operations, viewer/editor and search. Total Commander parity has not been established.
+A native Linux two-panel file manager, implemented in C++20 and Qt 6 Widgets according to [PLAN.md](PLAN.md). Version 0.9 is an internal local-manager alpha with file operations, viewer/editor and search. Total Commander parity has not been established.
 
 ## Build and run
 
@@ -13,6 +13,8 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 cmake --build build -j 4
 ./build/twin-commander
 ```
+
+Optional native archive/thumbnail/FTP backends use `p7zip-full`, `bubblewrap`, `imagemagick` and `python3`; ordinary FTP also uses `curl`. Configure native alternatives in preferences as needed.
 
 Optionally supply left and right directories:
 
@@ -120,3 +122,5 @@ Version 0.5 implements 62 of the 155 previously disabled buttons/commands (40%),
 Version 0.6 implements the remaining buttons/commands from the frozen inventory, including FTP/FTPS, native PC sharing, split/combine, encoders, comments, views and settings editors. See [remaining control implementation](docs/remaining-controls-0.6.md) for Linux mappings and unsupported Windows-specific options. FTP requires `curl`; its loopback tests also use `python3` and `openssl`.
 
 Version 0.7 implements 93 of the 299 controls in the subsequent full disabled-controls audit (31.1%), including display/formatting, icons/colors, tabs/session, history, quick search, automatic refresh and bookmark editing. See [settings implementation](docs/settings-implementation-0.7.md) for behavior and remaining gaps.
+
+Version 0.9 connects the remaining 106 audited configuration controls. The runtime inventory now has zero persistently disabled configuration/bar-editor inputs. New work includes copy verification and I/O policies, comments, archive recovery and 7-Zip encryption, MODE Z and edit re-upload, wrapped/locked tabs, native thumbnail providers and language packs. Some backends require installed tools. See [control implementation](docs/control-implementation-0.9.md) for behavior, validation and Linux mappings.

@@ -4,6 +4,7 @@ import socket
 import socketserver
 import sys
 import ssl
+import zlib
 
 ROOT = pathlib.Path(sys.argv[1]).resolve()
 TLS = None
@@ -20,6 +21,8 @@ class Handler(socketserver.StreamRequestHandler):
     def handle(self):
         self.cwd = ROOT
         self.data = None
+        self.active = None
+        self.compressed = False
         self.send('220 test fixture')
         try:
             while True:
@@ -33,6 +36,15 @@ class Handler(socketserver.StreamRequestHandler):
                 elif command == 'SYST': self.send('215 UNIX Type: L8')
                 elif command == 'FEAT': self.send('211 no extensions')
                 elif command == 'PWD': self.send('257 "/' + str(self.cwd.relative_to(ROOT)).replace('.', '') + '"')
+                elif command == 'MODE':
+                    self.compressed = argument.upper() == 'Z'
+                    if self.compressed: print('MODE Z', flush=True)
+                    self.send('200 transfer mode set')
+                elif command == 'PORT':
+                    parts = list(map(int, argument.split(',')))
+                    host = '.'.join(map(str, parts[:4]))
+                    if host != '127.0.0.1': self.send('500 loopback only'); continue
+                    self.active = (host, parts[4] * 256 + parts[5]); self.send('200 port set')
                 elif command == 'TYPE': self.send('200 type set')
                 elif command == 'CWD':
                     path = self.path(argument)
@@ -50,28 +62,34 @@ class Handler(socketserver.StreamRequestHandler):
                     path = self.path(argument)
                     self.send(f'213 {path.stat().st_size}' if path.is_file() else '550 missing')
                 elif command in ('NLST', 'LIST', 'RETR', 'STOR'):
-                    if self.data is None: self.send('425 no data connection'); continue
+                    if self.data is None and self.active is None: self.send('425 no data connection'); continue
                     if command == 'RETR' and not self.path(argument).is_file(): self.send('550 missing'); continue
                     self.send('150 opening data')
-                    connection, _ = self.data.accept()
+                    connection = socket.create_connection(self.active) if self.active else self.data.accept()[0]
                     if TLS: connection = TLS.wrap_socket(connection, server_side=True)
                     with connection:
                         if command in ('NLST', 'LIST'):
                             names = sorted(p.name for p in self.cwd.iterdir()
                                            if argument == '-a' or not p.name.startswith('.'))
-                            connection.sendall(('\r\n'.join(names) + '\r\n').encode())
-                        elif command == 'RETR': connection.sendall(self.path(argument).read_bytes())
+                            payload = ('\r\n'.join(names) + '\r\n').encode()
+                            connection.sendall(zlib.compress(payload) if self.compressed else payload)
+                        elif command == 'RETR':
+                            payload = self.path(argument).read_bytes()
+                            connection.sendall(zlib.compress(payload) if self.compressed else payload)
                         else:
+                            decompressor = zlib.decompressobj() if self.compressed else None
                             with self.path(argument).open('wb') as output:
                                 while True:
                                     data = connection.recv(65536)
                                     if not data: break
-                                    output.write(data)
+                                    output.write(decompressor.decompress(data) if decompressor else data)
+                                if decompressor: output.write(decompressor.flush())
                         if TLS:
                             connection.settimeout(3)
                             try: connection.unwrap()
                             except (OSError, ValueError): pass
-                    self.data.close(); self.data = None
+                    if self.data: self.data.close()
+                    self.data = None; self.active = None
                     self.send('226 complete')
                 elif command == 'QUIT': self.send('221 goodbye'); return
                 else: self.send('200 okay')

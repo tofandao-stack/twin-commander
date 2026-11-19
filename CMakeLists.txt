@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(TwinCommander VERSION 0.7.0 LANGUAGES CXX)
+project(TwinCommander VERSION 0.9.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,6 +20,10 @@ add_library(commander_ui
     resources/commander.qrc
     src/classicui.cpp
     src/classicui.h
+    src/finalsettings.cpp
+    src/finalarchives.cpp
+    src/finalthumbnails.cpp
+    src/gapsettings.cpp
     src/preferences.cpp
     src/remainingoptions.cpp
     src/remotetools.cpp
@@ -74,6 +78,14 @@ target_link_libraries(twin-commander PRIVATE commander_ui)
 include(CTest)
 if(BUILD_TESTING)
     find_package(Qt6 REQUIRED COMPONENTS Test)
+    add_executable(final_controls_tests tests/final_controls_tests.cpp)
+    target_link_libraries(final_controls_tests PRIVATE commander_ui Qt6::Test)
+    add_test(NAME final_controls_tests COMMAND final_controls_tests)
+    set_tests_properties(final_controls_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 180)
+    add_executable(gaps_tests tests/gaps_tests.cpp)
+    target_link_libraries(gaps_tests PRIVATE commander_ui Qt6::Test)
+    add_test(NAME gaps_tests COMMAND gaps_tests)
+    set_tests_properties(gaps_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 90)
     add_executable(preferences_tests tests/preferences_tests.cpp)
     target_link_libraries(preferences_tests PRIVATE commander_ui Qt6::Test)
     add_test(NAME preferences_tests COMMAND preferences_tests)

@@ -1,5 +1,6 @@
 #include "preferences.h"
 #include "classicui.h"
+#include "finalsettings.h"
 #include "mainwindow.h"
 #include <QAction>
 #include <QApplication>
@@ -9,15 +10,21 @@
 #include <QComboBox>
 #include <QDateTime>
 #include <QDialog>
+#include <QDir>
 #include <QEvent>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QIntValidator>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QLocale>
 #include <QRadioButton>
+#include <QSaveFile>
 #include <QSettings>
+#include <QStandardPaths>
+#include <QStorageInfo>
 #include <QTabBar>
 #include <QTabWidget>
 #include <QTableView>
@@ -84,7 +91,19 @@ void Preferences::saveFrequent() {
     const int limit = qBound(1, settings.value("frequent/saveLimit", 100).toInt(), 1000);
     for (int i = 0; i < qMin(limit, int(ranked.size())); ++i)
         saved[ranked[i].second] = ranked[i].first;
-    settings.setValue("frequent/saved", saved);
+    const auto location = FinalSettings::text("DirUsageLocationCombo", "Settings");
+    if (location == "Session only")
+        qApp->setProperty("sessionFrequent", saved);
+    else if (location == "JSON data file") {
+        const auto dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(dir);
+        QSaveFile file(dir + "/frequent.json");
+        if (file.open(QIODevice::WriteOnly)) {
+            file.write(QJsonDocument::fromVariant(saved).toJson());
+            file.commit();
+        }
+    } else
+        settings.setValue("frequent/saved", saved);
 }
 void MainWindow::configureFunctionalOptions(QDialog *dialog) {
     const auto draft = [dialog](const QString &key, const QVariant &value) {
@@ -316,6 +335,11 @@ void MainWindow::applyFunctionalPreferences(bool panels) {
                 title = displayPath(panel->path());
             if (title.isEmpty())
                 title = "Loading…";
+            if (s.value("tabs/volumeTitle").toBool())
+                title = QStorageInfo(displayPath(panel->path())).rootPath() + " : " + title;
+            if (FinalSettings::flag("ChkTabsLockedAsterisk") &&
+                !panel->property("lockedRoot").toByteArray().isEmpty())
+                title += "*";
             if (s.value("tabs/limit").toBool())
                 title = title.left(limit);
             tabs->setTabText(i, title);
@@ -330,4 +354,23 @@ void MainWindow::applyFunctionalPreferences(bool panels) {
                                 : QString());
         tabs->setTabBarAutoHide(!s.value("classic/alwaysShowTabs").toBool());
     }
+}
+
+QVariantMap Preferences::frequent() {
+    const auto location = FinalSettings::text("DirUsageLocationCombo", "Settings");
+    if (location == "Session only")
+        return qApp->property("sessionFrequent").toMap();
+    if (location == "JSON data file") {
+        QFile file(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/frequent.json");
+        if (file.open(QIODevice::ReadOnly) && file.size() <= 1024 * 1024)
+            return QJsonDocument::fromJson(file.readAll()).object().toVariantMap();
+        return {};
+    }
+    return QSettings().value("frequent/saved").toMap();
+}
+void Preferences::clearFrequent() {
+    qApp->setProperty("sessionFrequent", QVariantMap{});
+    qApp->setProperty("frequentUsage", QVariantMap{});
+    QSettings().remove("frequent/saved");
+    QFile::remove(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/frequent.json");
 }

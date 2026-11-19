@@ -2,7 +2,11 @@
 
 ## Current increment
 
-Version 0.7 implements 92 audited configuration inputs and bookmark configuration (93 of 299 disabled controls, 31.1%). All seven CTest suites pass in Debug and ASan/UBSan builds (leak reporting disabled; optional large-directory measurement skipped), and installed 0.7.0 smoke checks pass. See [settings implementation](settings-implementation-0.7.md). The frozen 0.6 audit remains the baseline; unsupported fields are still disabled.
+Version 0.9 connects the remaining 106 audited configuration inputs. The runtime audit records zero persistent disabled configuration and bar-editor controls; startup-only FTP disconnect/sharing actions remain conditional. Native Linux mappings, optional codecs/tools and implementation limits are described in [0.9 implementation](control-implementation-0.9.md). All nine CTest suites pass in Debug and ASan/UBSan (leak reporting disabled; optional large-directory measurement skipped), and installed 0.9.0 smoke checks pass. This resolves the original 299-control inventory, not full product parity.
+
+Version 0.8 implements another 100 disabled controls from the 0.7 inventory: 79 configuration inputs, 20 bar-editor fields and native content-field search. That increment left 106 configuration inputs, subsequently addressed in 0.9. All eight CTest suites pass in Debug and ASan/UBSan builds, and installed 0.8.0 smoke checks pass. See [0.8 implementation and limits](control-implementation-0.8.md).
+
+Version 0.7 implements 92 audited configuration inputs and bookmark configuration (93 of 299 disabled controls, 31.1%). All seven CTest suites pass in Debug and ASan/UBSan builds (leak reporting disabled; optional large-directory measurement skipped), and installed 0.7.0 smoke checks pass. See [settings implementation](settings-implementation-0.7.md). The frozen 0.6 audit remains the baseline; its then-remaining fields were handled in subsequent increments.
 
 Version 0.6 adds the remaining baseline command/configuration/rename button handlers, native views and extensions, FTP/FTPS and sharing. The button/action inventory is distinct from the many reference settings fields and from Windows binary/proprietary protocol compatibility. See [remaining control implementation](remaining-controls-0.6.md) for actual behavior and limits. A subsequent [runtime disabled-controls audit](disabled-controls-audit.md) found 277 disabled configuration inputs, 20 disabled bar-editor inputs and two other unavailable functions; the earlier button inventory did not cover these.
 

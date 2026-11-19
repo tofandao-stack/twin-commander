@@ -1,4 +1,6 @@
 #include "classicui.h"
+#include "finalsettings.h"
+#include "gapsettings.h"
 #include "mainwindow.h"
 #include "referenceforms.h"
 #include "toolwindows.h"
@@ -220,22 +222,12 @@ void MainWindow::buildReferenceUi() {
     });
     commands_.add("cm_ConfigSaveSettings", "Save settings", {}, [this] { saveSession(); });
     commands_.add("cm_DarkNormal", "Dark/Normal", {}, [this] {
-        const bool dark = !qApp->property("commanderDark").toBool();
+        const bool dark =
+            QSettings().value("appearance/theme", qApp->property("commanderDark").toBool() ? 1 : 0).toInt() !=
+            1;
+        QSettings().setValue("appearance/theme", dark ? 1 : 0);
         qApp->setProperty("commanderDark", dark);
-        if (!dark) {
-            qApp->setProperty("commanderAppearanceInstalled", false);
-            applyCommanderAppearance();
-        } else {
-            QPalette palette = qApp->palette();
-            for (auto role : {QPalette::Window, QPalette::Button})
-                palette.setColor(role, QColor("#303030"));
-            palette.setColor(QPalette::Base, QColor("#181818"));
-            palette.setColor(QPalette::Mid, QColor("#555555"));
-            for (auto role : {QPalette::Text, QPalette::ButtonText, QPalette::WindowText})
-                palette.setColor(role, QColor("#e8e8e8"));
-            palette.setColor(QPalette::Highlight, QColor("#294c8c"));
-            qApp->setPalette(palette);
-        }
+        applySavedAppearance();
         for (auto *panel : findChildren<FilePanel *>())
             panel->setActive(panel == active_);
     });
@@ -473,7 +465,7 @@ void MainWindow::applyLayoutOptions() {
     commandRow_->setVisible(show("CmdLine"));
     functionBar_->setVisible(show("KeyButtons"));
     for (auto *host : {leftHost_, rightHost_}) {
-        host->showDriveButtons(show("DriveBar1"));
+        host->showDriveButtons(show("DriveBar1") && (FinalSettings::flag("idTwoDriveBars") || (host==leftHost_ ? left_->indexOf(active_)>=0 : right_->indexOf(active_)>=0)));
         host->findChild<QComboBox *>("volumeSelector")->setVisible(show("DriveCombo"));
     }
     for (auto *panel : findChildren<FilePanel *>()) {
@@ -490,6 +482,7 @@ void MainWindow::applyLayoutOptions() {
         tabs->tabBar()->setVisible(
             show("DirectoryTabs") &&
             (tabs->count() > 1 || settings.value("classic/alwaysShowTabs", false).toBool()));
+    leftHost_->updateTabLayout(show("DirectoryTabs"));rightHost_->updateTabLayout(show("DirectoryTabs"));
 }
 void MainWindow::updateUiState() {
     if (!active_ || !leftHost_ || !commandPrompt_)
@@ -608,6 +601,8 @@ void MainWindow::showOptions() {
     configureAppearance(dialog);
     configureRemainingOptions(dialog);
     configureFunctionalOptions(dialog);
+    GapSettings::configure(dialog);
+    FinalSettings::configure(dialog);
     auto apply = [this, dialog, bindings] {
         QSettings settings;
         for (auto it = bindings.begin(); it != bindings.end(); ++it)
@@ -627,6 +622,7 @@ void MainWindow::showOptions() {
             }
         applySavedAppearance();
         applyFunctionalPreferences();
+        FinalSettings::apply();
         reloadCustomMenu();
         rebuildButtonBar(false);
         rebuildButtonBar(true);
@@ -661,6 +657,7 @@ void MainWindow::showOptions() {
         if (i == 3)
             connect(button, &QPushButton::clicked, dialog, apply);
     }
+    GapSettings::adaptDialog(dialog);
     dialog->show();
 }
 void MainWindow::showCommandBrowser() {

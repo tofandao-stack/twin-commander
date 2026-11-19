@@ -1,6 +1,7 @@
 #pragma once
 
 #include "directorymodel.h"
+#include "fileoperations.h"
 #include <QWidget>
 #include <unordered_set>
 
@@ -16,6 +17,7 @@ class FilePanel : public QWidget {
     Q_OBJECT
 
   public:
+    ~FilePanel() override;
     explicit FilePanel(const std::filesystem::path &initialPath, QWidget *parent = nullptr);
     void navigate(const std::filesystem::path &path);
     void parentDirectory();
@@ -54,6 +56,9 @@ class FilePanel : public QWidget {
     void errorOccurred(const QString &message);
     void openFileRequested(const std::filesystem::path &path);
     void hotlistRequested();
+    void executeCommandRequested();
+    void filesDropped(const std::vector<std::filesystem::path> &paths, bool move);
+    void treeDirectoryRequested(const std::filesystem::path &path);
     void contextMenuRequested(const QPoint &position);
 
   protected:
@@ -61,10 +66,18 @@ class FilePanel : public QWidget {
 
   private:
     void openCurrent();
+    void updateBreadcrumbs();
+    void countDirectory(const std::filesystem::path &path);
+    void preloadTree();
     void updateStatus();
     QFileSystemWatcher *watcher_;
     QTimer *refreshTimer_;
+    QWidget *breadcrumbs_ = nullptr;
+    std::shared_ptr<LocalFiles::Control> treeControl_;
+    QPoint dragStart_;
+    bool dragMarked_ = false;
     QString quickText_;
+    QTimer *rightMenuTimer_ = nullptr;
     qint64 quickTime_ = 0;
     int refreshCursor_ = 0;
     bool refreshPending_ = false;

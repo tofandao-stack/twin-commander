@@ -1,5 +1,7 @@
 # Disabled controls audit — 0.6.0
 
+This is the frozen baseline. The 0.7–0.9 increments resolve its 299 persistent disabled control instances; the [0.9 runtime inventory](reference/disabled-controls-0.9.json) has zero disabled configuration/bar-editor inputs. See [current behavior and platform limits](control-implementation-0.9.md).
+
 Audited on 2026-11-18 against the current native Linux build, using a fresh isolated settings profile. This is an audit of controls actually disabled in the running GUI, supplemented by source inspection of conditional controls. No application functionality was changed.
 
 **Finding: 277 disabled configuration controls across 24 of 26 pages, 20 disabled button-bar controls (10 repeated in each editor), and two additional unavailable functions: bookmark configuration and plugin search. Total: 299 persistently disabled control instances in the audited surfaces.** This is not a count of distinct missing features or a certification that every other feature is complete.

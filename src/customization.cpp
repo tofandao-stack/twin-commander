@@ -1,4 +1,5 @@
 #include "classicui.h"
+#include "gapsettings.h"
 #include "mainwindow.h"
 #include "productivitytools.h"
 #include "referenceforms.h"
@@ -10,7 +11,9 @@
 #include <QFileDialog>
 #include <QFontDialog>
 #include <QHeaderView>
+#include <QImageReader>
 #include <QInputDialog>
+#include <QIntValidator>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLabel>
@@ -18,15 +21,18 @@
 #include <QListWidget>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
 #include <QSignalBlocker>
 #include <QTabWidget>
 #include <QTableView>
+#include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <stdexcept>
 namespace {
 QString barKey(bool vertical) { return vertical ? "customBars/vertical" : "customBars/horizontal"; }
 QJsonArray barDefinitions(bool vertical) {
@@ -36,6 +42,15 @@ QJsonArray barDefinitions(bool vertical) {
 }
 QIcon slotIcon(const QJsonObject &slot) {
     const auto file = slot.value("iconFile").toString();
+    if (!file.isEmpty() && slot.value("iconIndex").toInt() > 0) {
+        QImageReader reader(file);
+        const int index = qBound(0, slot.value("iconIndex").toInt(), 255);
+        for (int i = 0; i < index && reader.canRead(); ++i)
+            reader.read();
+        const auto image = reader.read();
+        if (!image.isNull())
+            return QIcon(QPixmap::fromImage(image));
+    }
     return file.isEmpty() ? commanderIcon(slot.value("command").toString() == "notepad.exe"
                                               ? "editor"
                                               : slot.value("command").toString())
@@ -44,6 +59,18 @@ QIcon slotIcon(const QJsonObject &slot) {
 } // namespace
 void MainWindow::rebuildButtonBar(bool vertical) {
     const auto definitions = barDefinitions(vertical);
+    const auto appearance =
+        QSettings().value(vertical ? "barAppearance/vertical" : "barAppearance/horizontal").toMap();
+    const int buttonSize = qBound(16, appearance.value("size", 26).toInt(), 96);
+    const int iconSize = appearance.value("small").toBool()
+                             ? qBound(8, appearance.value("smallSize", 16).toInt(), 64)
+                             : qMax(12, buttonSize - 6);
+    if (!vertical) {
+        buttonBar_->setIconSize(QSize(iconSize, iconSize));
+        buttonBar_->setStyleSheet(appearance.value("raised").toBool()
+                                      ? "QToolButton { border: 1px outset gray; padding: 2px; }"
+                                      : QString());
+    }
     if (!vertical) {
         const auto old = buttonBar_->actions();
         buttonBar_->clear();
@@ -81,6 +108,22 @@ void MainWindow::rebuildButtonBar(bool vertical) {
                     target = candidate;
                     break;
                 }
+        if (!target && !name.isEmpty() && !name.startsWith("cm_", Qt::CaseInsensitive) &&
+            !name.startsWith("tc_", Qt::CaseInsensitive)) {
+            target = new QAction(name, this);
+            target->setProperty("externalButton", true);
+            connect(target, &QAction::triggered, this, [this, slot, name] {
+                try {
+                    if (slot.value("minimized").toBool() || slot.value("maximized").toBool())
+                        throw std::runtime_error("Window-state options apply to internal Qt windows; clear "
+                                                 "them for external programs.");
+                    GapSettings::launch(name, slot.value("parameters").toString(),
+                                        slot.value("startPath").toString());
+                } catch (const std::exception &e) {
+                    QMessageBox::warning(this, "Button command", e.what());
+                }
+            });
+        }
         if (!target) {
             target = commands_.get("bar_" + name);
             if (!target) {
@@ -91,13 +134,28 @@ void MainWindow::rebuildButtonBar(bool vertical) {
         if (!vertical) {
             auto *proxy =
                 new QAction(slotIcon(slot), slot.value("tooltip").toString(target->text()), buttonBar_);
+            if (target->property("externalButton").toBool())
+                target->setParent(proxy);
             proxy->setEnabled(target->isEnabled());
             proxy->setCheckable(target->isCheckable());
             proxy->setChecked(target->isChecked());
             proxy->setProperty("referenceSlot", position);
             proxy->setProperty("referenceToolbarCommand", name);
             proxy->setToolTip(slot.value("tooltip").toString(target->text().section('\t', 0, 0).remove('&')));
-            connect(proxy, &QAction::triggered, target, [proxy, target] {
+            connect(proxy, &QAction::triggered, target, [proxy, target, slot] {
+                if (slot.value("minimized").toBool() || slot.value("maximized").toBool()) {
+                    const auto existing = qApp->topLevelWidgets();
+                    QTimer::singleShot(0, target, [existing, slot] {
+                        for (auto *w : qApp->topLevelWidgets())
+                            if (!existing.contains(w) &&
+                                (qobject_cast<QDialog *>(w) || qobject_cast<QMainWindow *>(w))) {
+                                if (slot.value("maximized").toBool())
+                                    w->showMaximized();
+                                else
+                                    w->showMinimized();
+                            }
+                    });
+                }
                 target->trigger();
                 proxy->setChecked(target->isChecked());
             });
@@ -108,20 +166,44 @@ void MainWindow::rebuildButtonBar(bool vertical) {
             buttonBar_->addAction(proxy);
         } else {
             auto *button = new QToolButton(verticalBar_);
+            if (target->property("externalButton").toBool())
+                target->setParent(button);
             button->setDefaultAction(target);
             button->setIcon(slotIcon(slot));
             connect(target, &QAction::changed, button, [button, slot] { button->setIcon(slotIcon(slot)); });
             if (slot.contains("tooltip"))
                 button->setToolTip(slot.value("tooltip").toString());
-            button->setIconSize(QSize(20, 20));
-            button->setAutoRaise(true);
-            button->setFixedSize(26, 26);
+            if (slot.value("minimized").toBool() || slot.value("maximized").toBool())
+                connect(button, &QToolButton::pressed, target, [target, slot] {
+                    const auto existing = qApp->topLevelWidgets();
+                    QTimer::singleShot(0, target, [existing, slot] {
+                        for (auto *w : qApp->topLevelWidgets())
+                            if (!existing.contains(w) &&
+                                (qobject_cast<QDialog *>(w) || qobject_cast<QMainWindow *>(w))) {
+                                if (slot.value("maximized").toBool())
+                                    w->showMaximized();
+                                else
+                                    w->showMinimized();
+                            }
+                    });
+                });
+            button->setIconSize(QSize(iconSize, iconSize));
+            button->setAutoRaise(appearance.value("flat", true).toBool() &&
+                                 !appearance.value("raised").toBool());
+            button->setFixedSize(buttonSize, buttonSize);
             button->setProperty("referenceSlot", position);
             verticalBar_->layout()->addWidget(button);
         }
     }
     if (vertical)
         qobject_cast<QVBoxLayout *>(verticalBar_->layout())->addStretch();
+    else
+        for (auto *action : buttonBar_->actions())
+            if (auto *button = qobject_cast<QToolButton *>(buttonBar_->widgetForAction(action))) {
+                button->setFixedSize(buttonSize, buttonSize);
+                button->setAutoRaise(appearance.value("flat", true).toBool() &&
+                                     !appearance.value("raised").toBool());
+            }
 }
 void MainWindow::showButtonBarEditor(bool vertical) {
     auto *dialog = new QDialog(this);
@@ -143,9 +225,56 @@ void MainWindow::showButtonBarEditor(bool vertical) {
                                 "W_btn_command",
                                 "W_btn_iconfilename",
                                 "W_btn_ToolTip",
-                                "id_btn_icon"};
+                                "id_btn_icon",
+                                "id_btn_iconindex",
+                                "W_btn_param",
+                                "W_btn_startpath",
+                                "id_btn_assymbol",
+                                "id_btn_maximized",
+                                "id_btn_barsize",
+                                "id_FlatIcons",
+                                "id_SmallIcons",
+                                "id_XPstyle",
+                                "id_smalliconsize"};
     for (const auto &child : referenceDialogMetadata("BUTTONCHANGEDLG").value("children").toArray())
         renderReferenceControls(child.toObject(), dialog, enabled);
+    auto *parameters = dialog->findChild<QLineEdit *>("W_btn_param"),
+         *startPath = dialog->findChild<QLineEdit *>("W_btn_startpath"),
+         *iconIndex = dialog->findChild<QLineEdit *>("id_btn_iconindex");
+    auto *minimized = dialog->findChild<QCheckBox *>("id_btn_assymbol"),
+         *maximized = dialog->findChild<QCheckBox *>("id_btn_maximized");
+    minimized->setToolTip("Minimize a newly opened internal Qt window. Unsupported for external programs.");
+    maximized->setToolTip("Maximize a newly opened internal Qt window. Unsupported for external programs.");
+    iconIndex->setValidator(new QIntValidator(0, 255, iconIndex));
+    iconIndex->setToolTip(
+        "Frame index in a multi-image file (GIF, ICO, TIFF); Windows DLL icon extraction is unsupported.");
+    const auto profile = vertical ? "barAppearance/vertical" : "barAppearance/horizontal";
+    const auto appearance = QSettings().value(profile).toMap();
+    dialog->setProperty("barAppearanceDraft", appearance);
+    for (const auto &p : {std::pair{"id_btn_barsize", "size"}, {"id_smalliconsize", "smallSize"}}) {
+        auto *w = dialog->findChild<QLineEdit *>(p.first);
+        w->setValidator(new QIntValidator(p.second == QString("size") ? 16 : 8, 96, w));
+        w->setText(appearance.value(p.second, p.second == QString("size") ? 26 : 16).toString());
+        connect(w, &QLineEdit::textEdited, dialog, [dialog, w, key = QString(p.second)](const QString &text) {
+            if (!w->hasAcceptableInput())
+                return;
+            auto draft = dialog->property("barAppearanceDraft").toMap();
+            draft[key] = text.toInt();
+            dialog->setProperty("barAppearanceDraft", draft);
+        });
+    }
+    for (const auto &p :
+         {std::pair{"id_FlatIcons", "flat"}, {"id_SmallIcons", "small"}, {"id_XPstyle", "raised"}}) {
+        auto *w = dialog->findChild<QCheckBox *>(p.first);
+        w->setChecked(appearance.value(p.second, QString(p.second) == "flat").toBool());
+        if (QString(p.second) == "raised")
+            w->setToolTip("Raised Qt button borders (native adaptation of XP style).");
+        connect(w, &QCheckBox::toggled, dialog, [dialog, key = QString(p.second)](bool on) {
+            auto draft = dialog->property("barAppearanceDraft").toMap();
+            draft[key] = on;
+            dialog->setProperty("barAppearanceDraft", draft);
+        });
+    }
     auto *buttons = dialog->findChild<QListWidget *>("id_btn_bar");
     buttons->setViewMode(QListView::IconMode);
     buttons->setFlow(QListView::LeftToRight);
@@ -197,17 +326,31 @@ void MainWindow::showButtonBarEditor(bool vertical) {
         buttons->setCurrentRow(0);
     };
     connect(buttons, &QListWidget::currentRowChanged, dialog,
-            [buttons, command, icon, tip, iconPreview](int row) {
+            [buttons, command, icon, tip, iconPreview, parameters, startPath, iconIndex, minimized,
+             maximized](int row) {
                 const QSignalBlocker a(command), b(icon), c(tip);
                 const auto slot = row >= 0 ? buttons->item(row)->data(Qt::UserRole).toMap() : QVariantMap{};
                 command->setText(slot.value("command").toString());
                 icon->setText(slot.value("iconFile").toString());
                 tip->setText(slot.value("tooltip").toString());
+                for (auto *w : {parameters, startPath, iconIndex}) {
+                    const QSignalBlocker block(w);
+                    w->setText(slot.value(w == parameters  ? "parameters"
+                                          : w == startPath ? "startPath"
+                                                           : "iconIndex",
+                                          w == iconIndex ? QVariant(0) : QVariant())
+                                   .toString());
+                }
+                {
+                    const QSignalBlocker a(minimized), b(maximized);
+                    minimized->setChecked(slot.value("minimized").toBool());
+                    maximized->setChecked(slot.value("maximized").toBool());
+                }
                 iconPreview->clear();
                 if (row >= 0)
                     new QListWidgetItem(buttons->item(row)->icon(), "", iconPreview);
             });
-    const auto edit = [buttons, command, icon, tip] {
+    const auto edit = [buttons, command, icon, tip, parameters, startPath, iconIndex, minimized, maximized] {
         auto *item = buttons->currentItem();
         if (!item)
             return;
@@ -216,13 +359,28 @@ void MainWindow::showButtonBarEditor(bool vertical) {
         slot["separator"] = command->text().trimmed().isEmpty();
         slot["iconFile"] = icon->text();
         slot["tooltip"] = tip->text();
+        slot["parameters"] = parameters->text();
+        slot["startPath"] = startPath->text();
+        slot["iconIndex"] = iconIndex->text().toInt();
+        slot["minimized"] = minimized->isChecked();
+        slot["maximized"] = maximized->isChecked();
         slot.remove("nativeId");
         item->setData(Qt::UserRole, slot);
         item->setIcon(slot.value("separator").toBool() ? QIcon()
                                                        : slotIcon(QJsonObject::fromVariantMap(slot)));
         item->setToolTip(command->text());
     };
-    for (auto *field : {command, icon, tip})
+    connect(minimized, &QCheckBox::clicked, dialog, [edit, maximized](bool on) {
+        if (on)
+            maximized->setChecked(false);
+        edit();
+    });
+    connect(maximized, &QCheckBox::clicked, dialog, [edit, minimized](bool on) {
+        if (on)
+            minimized->setChecked(false);
+        edit();
+    });
+    for (auto *field : {command, icon, tip, parameters, startPath, iconIndex})
         connect(field, &QLineEdit::textEdited, dialog, [edit](const auto &) { edit(); });
     const auto choose = [this, dialog, command, edit] {
         QStringList names;
@@ -322,12 +480,16 @@ void MainWindow::showButtonBarEditor(bool vertical) {
                     auto slot = QJsonObject::fromVariantMap(buttons->item(i)->data(Qt::UserRole).toMap());
                     const auto name = slot.value("command").toString();
                     if (!slot.value("separator").toBool() && !name.isEmpty() && name != "notepad.exe" &&
-                        !commands_.get(name) && !slot.value("nativeId").toInt()) {
+                        !commands_.get(name) && !slot.value("nativeId").toInt() &&
+                        (name.startsWith("cm_", Qt::CaseInsensitive) ||
+                         name.startsWith("tc_", Qt::CaseInsensitive))) {
                         QMessageBox::warning(dialog, "Button bar", "Unknown internal command: " + name);
                         return;
                     }
                     barSlots.append(slot);
                 }
+                QSettings().setValue(vertical ? "barAppearance/vertical" : "barAppearance/horizontal",
+                                     dialog->property("barAppearanceDraft"));
                 QSettings().setValue(barKey(vertical),
                                      QJsonDocument(barSlots).toJson(QJsonDocument::Compact));
                 rebuildButtonBar(vertical);
@@ -343,6 +505,7 @@ void MainWindow::showButtonBarEditor(bool vertical) {
             "unavailable.");
     });
     populate(barDefinitions(vertical));
+    GapSettings::adaptDialog(dialog);
     dialog->show();
 }
 

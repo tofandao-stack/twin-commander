@@ -1,11 +1,19 @@
 #include "filepanel.h"
+#include "backgroundpool.h"
 #include "classicui.h"
+#include "finalsettings.h"
+#include "gapsettings.h"
 #include "preferences.h"
 #include <QApplication>
+#include <QCompleter>
 #include <QDateTime>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFileIconProvider>
 #include <QFileSystemModel>
 #include <QFileSystemWatcher>
+#include <QFutureWatcher>
 #include <QListView>
 #include <QLocale>
 #include <QMenu>
@@ -16,6 +24,7 @@
 #include <QStyleOptionViewItem>
 #include <QStyledItemDelegate>
 #include <QTreeView>
+#include <QtConcurrent/QtConcurrentRun>
 #include <unordered_set>
 
 #include <QDir>
@@ -89,6 +98,9 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
     });
     connect(refreshTimer_, &QTimer::timeout, this, [this] {
         QSettings s;
+        if (GapSettings::matches(path(), "refresh/exclude") ||
+            GapSettings::matches(path(), "refresh/watchExclude"))
+            return;
         if (s.value("refresh/foregroundOnly").toBool() && !window()->isActiveWindow())
             return;
         if (s.value("refresh/metadata").toBool())
@@ -149,6 +161,12 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
     breadcrumb->setAutoRaise(true);
     breadcrumb->setToolTip("Edit current directory");
     navigation->addWidget(breadcrumb);
+    breadcrumbs_ = new QWidget(pathRow);
+    breadcrumbs_->setObjectName("breadcrumbParts");
+    auto *parts = new QHBoxLayout(breadcrumbs_);
+    parts->setContentsMargins(0, 0, 0, 0);
+    parts->setSpacing(0);
+    navigation->addWidget(breadcrumbs_, 1);
     navigation->addWidget(pathEdit_, 1);
     for (const auto &text : {QString("*"), QString::fromUtf8("▾")}) {
         auto *button = new QToolButton(this);
@@ -242,14 +260,28 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
     briefList_->setAccessibleName("Files (brief)");
     briefList_->hide();
     briefList_->installEventFilter(this);
-    connect(briefList_, &QListView::doubleClicked, this, [this] { openCurrent(); });
+    connect(briefList_, &QListView::doubleClicked, this, [this] {
+        if (!QSettings().value("mouse/singleClick").toBool())
+            openCurrent();
+    });
     table_->installEventFilter(this);
+    table_->viewport()->installEventFilter(this);
+    table_->viewport()->setAcceptDrops(true);
+    briefList_->viewport()->setAcceptDrops(true);
+    briefList_->viewport()->installEventFilter(this);
+    rightMenuTimer_ = new QTimer(this);
+    rightMenuTimer_->setSingleShot(true);
+    rightMenuTimer_->setInterval(1000);
+    connect(rightMenuTimer_, &QTimer::timeout, this, [this] { emit contextMenuRequested(QCursor::pos()); });
     pathEdit_->installEventFilter(this);
     connect(pathEdit_, &QLineEdit::returnPressed, this, [this] {
         navigate(nativePath(pathEdit_->text()));
         focusFiles();
     });
-    connect(table_, &QTableView::doubleClicked, this, [this] { openCurrent(); });
+    connect(table_, &QTableView::doubleClicked, this, [this] {
+        if (!QSettings().value("mouse/singleClick").toBool())
+            openCurrent();
+    });
     connect(model_, &DirectoryModel::loading, this, [this] {
         setProperty("listingBusy", true);
         if (!autoRefreshing_ || QSettings().value("refresh/footer", true).toBool())
@@ -322,6 +354,7 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
             watcher_->addPath(displayPath(currentPath));
         if (!autoRefreshing_ || QSettings().value("refresh/footer", true).toBool())
             updateStatus();
+        updateBreadcrumbs();
         emit pathChanged(displayPath(currentPath));
         autoRefreshing_ = false;
         setProperty("autoRefreshing", false);
@@ -338,6 +371,20 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
         emit errorOccurred(message);
     });
     connect(table_->selectionModel(), &QItemSelectionModel::selectionChanged, this, &FilePanel::updateStatus);
+    connect(table_->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            [this](const QModelIndex &index) {
+                if (!FinalSettings::flag("id_scrollahead") || !table_->isVisible() || !index.isValid())
+                    return;
+                QTimer::singleShot(0, this, [this, index] {
+                    const int extra = qBound(0, FinalSettings::number("id_extralines", 3), 100) *
+                                      table_->verticalHeader()->defaultSectionSize();
+                    const int bottom = table_->visualRect(index).bottom() + extra;
+                    const int delta = bottom - table_->viewport()->height();
+                    if (delta > 0)
+                        table_->verticalScrollBar()->setValue(table_->verticalScrollBar()->value() + delta);
+                });
+            });
+    table_->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     applyPreferences();
     navigate(initialPath);
 }
@@ -347,6 +394,8 @@ void FilePanel::navigate(const std::filesystem::path &requested) {
         model_->setResultPaths(nullptr);
         model_->setViewFilter();
         setProperty("viewFilter", 312);
+        setProperty("viewMask", QString());
+        setProperty("viewPrograms", false);
     }
 
     if (!historyTraversal_)
@@ -391,6 +440,8 @@ void FilePanel::focusFiles() {
         table_->setFocus();
 }
 void FilePanel::focusPath() {
+    breadcrumbs_->hide();
+    pathEdit_->show();
     pathEdit_->setFocus();
     pathEdit_->setText(displayPath(path()));
     pathEdit_->selectAll();
@@ -514,7 +565,7 @@ void FilePanel::showHistory() {
         if (target == path())
             recent = action;
     }
-    const auto frequent = settings.value("frequent/saved").toMap();
+    const auto frequent = Preferences::frequent();
     if (!frequent.isEmpty()) {
         menu->addSeparator();
         menu->addSection("Frequently used");
@@ -571,9 +622,16 @@ void FilePanel::invertSelection() {
 }
 
 std::vector<std::filesystem::path> FilePanel::selectedPaths() const {
-    if (property("displayMode") == "tree")
-        return path().empty() || path() == path().parent_path() ? std::vector<std::filesystem::path>{}
-                                                                : std::vector<std::filesystem::path>{path()};
+    if (property("displayMode") == "tree") {
+        const auto selected =
+            tree_ && tree_->currentIndex().isValid()
+                ? nativePath(
+                      qobject_cast<QFileSystemModel *>(tree_->model())->filePath(tree_->currentIndex()))
+                : path();
+        return selected.empty() || selected == selected.parent_path()
+                   ? std::vector<std::filesystem::path>{}
+                   : std::vector<std::filesystem::path>{selected};
+    }
     std::vector<std::filesystem::path> paths;
     for (const auto &index : table_->selectionModel()->selectedRows())
         if (!model_->entry(index.row())->parent)
@@ -630,12 +688,134 @@ void FilePanel::updateStatus() {
 }
 
 bool FilePanel::eventFilter(QObject *watched, QEvent *event) {
+    if (event->type() == QEvent::Enter && watched->property("breadcrumbPath").isValid() &&
+        QSettings().value("layout/breadcrumbHover").toBool()) {
+        auto *button = qobject_cast<QToolButton *>(watched);
+        if (button) {
+            auto *menu = new QMenu(button);
+            menu->setAttribute(Qt::WA_DeleteOnClose);
+            const auto base =
+                std::filesystem::path(button->property("breadcrumbPath").toByteArray().toStdString());
+            size_t count = 0;
+            std::error_code error;
+            for (std::filesystem::directory_iterator
+                     it(base, std::filesystem::directory_options::skip_permission_denied, error),
+                 end;
+                 !error && it != end && count < 1000; it.increment(error)) {
+                if (!it->is_directory(error))
+                    continue;
+                const auto target = it->path();
+                if (!model_->showHidden() && displayPath(target.filename()).startsWith('.'))
+                    continue;
+                ++count;
+                connect(menu->addAction(displayPath(target.filename())), &QAction::triggered, this,
+                        [this, target] {
+                            navigate(target);
+                            focusFiles();
+                        });
+            }
+            if (!menu->isEmpty())
+                menu->popup(button->mapToGlobal(QPoint(0, button->height())));
+            else
+                menu->deleteLater();
+        }
+    }
+    if (watched == table_->viewport() || watched == briefList_->viewport()) {
+        if (event->type() == QEvent::DragEnter || event->type() == QEvent::DragMove) {
+            auto *drag = static_cast<QDragMoveEvent *>(event);
+            if (drag->mimeData()->hasFormat(FinalSettings::dragType())) {
+                drag->acceptProposedAction();
+                return true;
+            }
+        }
+        if (event->type() == QEvent::Drop) {
+            auto *drop = static_cast<QDropEvent *>(event);
+            const auto paths = FinalSettings::dropPaths(drop->mimeData());
+            if (!paths.empty()) {
+                emit filesDropped(paths, drop->proposedAction() == Qt::MoveAction);
+                drop->acceptProposedAction();
+                return true;
+            }
+        }
+        if (event->type() == QEvent::MouseMove &&
+            static_cast<QMouseEvent *>(event)->buttons().testFlag(Qt::LeftButton) && dragMarked_ &&
+            (static_cast<QMouseEvent *>(event)->position().toPoint() - dragStart_).manhattanLength() >=
+                QApplication::startDragDistance()) {
+            dragMarked_ = false;
+            auto *drag = new QDrag(this);
+            drag->setMimeData(FinalSettings::dragData(selectedPaths()));
+            drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+            drag->deleteLater();
+            return true;
+        }
+
+        auto *view = watched == table_->viewport() ? static_cast<QAbstractItemView *>(table_) : briefList_;
+        if (event->type() == QEvent::ContextMenu && QSettings().value("mouse/selection", 1).toInt() == 0) {
+            event->accept();
+            return true;
+        }
+        if (event->type() == QEvent::MouseMove && !QSettings().value("mouse/rubberband", true).toBool() &&
+            static_cast<QMouseEvent *>(event)->buttons().testFlag(Qt::LeftButton))
+            return true;
+        if (event->type() == QEvent::MouseButtonPress) {
+            auto *mouse = static_cast<QMouseEvent *>(event);
+            const auto index = view->indexAt(mouse->position().toPoint());
+            dragStart_ = mouse->position().toPoint();
+            dragMarked_ = mouse->button() == Qt::LeftButton && index.isValid() &&
+                          view->selectionModel()->isRowSelected(index.row(), {});
+            const bool right =
+                mouse->button() == Qt::RightButton && QSettings().value("mouse/selection", 1).toInt() == 0;
+            const bool icon =
+                mouse->button() == Qt::LeftButton && QSettings().value("mouse/iconSelect").toBool() &&
+                (!QSettings().value("mouse/touchOnly").toBool() ||
+                 mouse->source() != Qt::MouseEventNotSynthesized) &&
+                index.isValid() &&
+                mouse->position().x() < view->visualRect(index).left() + view->iconSize().width() + 6;
+            if (right || icon) {
+                emit activated();
+                if (index.isValid() && !model_->entry(index.row())->parent) {
+                    view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
+                    view->selectionModel()->select(index,
+                                                   QItemSelectionModel::Toggle | QItemSelectionModel::Rows);
+                }
+                setProperty("mouseMarking", true);
+                if (right)
+                    rightMenuTimer_->start();
+                return true;
+            }
+        }
+        if (event->type() == QEvent::MouseButtonDblClick && QSettings().value("mouse/singleClick").toBool()) {
+            setProperty("skipSingleRelease", true);
+            return true;
+        }
+        if (event->type() == QEvent::MouseButtonRelease) {
+            if (property("skipSingleRelease").toBool()) {
+                setProperty("skipSingleRelease", false);
+                return true;
+            }
+            auto *mouse = static_cast<QMouseEvent *>(event);
+            rightMenuTimer_->stop();
+            if (property("mouseMarking").toBool()) {
+                setProperty("mouseMarking", false);
+                return true;
+            }
+            if (mouse->button() == Qt::LeftButton && mouse->modifiers() == Qt::NoModifier &&
+                QSettings().value("mouse/singleClick").toBool() &&
+                view->indexAt(mouse->position().toPoint()).isValid()) {
+                openCurrent();
+                return true;
+            }
+        }
+    }
+
     if (event->type() == QEvent::FocusIn)
         emit activated();
     if (watched == pathEdit_ && event->type() == QEvent::FocusIn)
         pathEdit_->setText(displayPath(path()));
-    if (watched == pathEdit_ && event->type() == QEvent::FocusOut && !path().empty())
+    if (watched == pathEdit_ && event->type() == QEvent::FocusOut && !path().empty()) {
         pathEdit_->setText(displayPath(path()) + (displayPath(path()).endsWith('/') ? "*.*" : "/*.*"));
+        QTimer::singleShot(0, this, [this] { updateBreadcrumbs(); });
+    }
     if (watched == filter_ && event->type() == QEvent::KeyPress) {
         const auto *key = static_cast<QKeyEvent *>(event);
         if (key->key() == Qt::Key_Escape) {
@@ -718,7 +898,11 @@ bool FilePanel::eventFilter(QObject *watched, QEvent *event) {
                 return true;
             case Qt::Key_Return:
             case Qt::Key_Enter:
-                openCurrent();
+                if (!FinalSettings::flag("idExecCmdLineFocused") &&
+                    !property("commandLineText").toString().isEmpty())
+                    emit executeCommandRequested();
+                else
+                    openCurrent();
                 return true;
             case Qt::Key_Backspace:
                 parentDirectory();
@@ -727,6 +911,9 @@ bool FilePanel::eventFilter(QObject *watched, QEvent *event) {
             case Qt::Key_Space: {
                 const auto current = table_->currentIndex();
                 if (current.isValid() && !model_->entry(current.row())->parent) {
+                    if (key->key() == Qt::Key_Space && FinalSettings::flag("IdConf_Countfiles") &&
+                        model_->entry(current.row())->directory)
+                        countDirectory(model_->entry(current.row())->path);
                     table_->selectionModel()->select(current,
                                                      QItemSelectionModel::Toggle | QItemSelectionModel::Rows);
                     if (key->key() == Qt::Key_Insert && current.row() + 1 < model_->rowCount())
@@ -744,6 +931,8 @@ bool FilePanel::eventFilter(QObject *watched, QEvent *event) {
 }
 
 void FilePanel::filterView(const QString &mask, bool programs, bool selected) {
+    setProperty("viewMask", mask);
+    setProperty("viewPrograms", programs);
     setProperty("viewFilter", selected ? 2023 : programs ? 311 : mask.isEmpty() ? 312 : 314);
     std::vector<std::filesystem::path> paths;
     for (const auto &index : table_->selectionModel()->selectedRows())
@@ -775,18 +964,24 @@ void FilePanel::setDisplayMode(const QString &mode) {
         if (!tree_) {
             auto *filesystem = new QFileSystemModel(this);
             filesystem->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
+            filesystem->setResolveSymlinks(false);
             filesystem->setRootPath("/");
             tree_ = new QTreeView(this);
             tree_->setObjectName("panelTree");
             tree_->setModel(filesystem);
             tree_->installEventFilter(this);
             tree_->setHeaderHidden(true);
+            connect(tree_, &QTreeView::activated, this, [this, filesystem](const QModelIndex &index) {
+                if (FinalSettings::flag("IdTreeNoAutoChange") && index.isValid())
+                    emit treeDirectoryRequested(nativePath(filesystem->filePath(index)));
+            });
             for (int i = 1; i < 4; ++i)
                 tree_->hideColumn(i);
             qobject_cast<QVBoxLayout *>(layout())->insertWidget(2, tree_, 1);
             connect(tree_->selectionModel(), &QItemSelectionModel::currentChanged, this,
                     [this, filesystem](const QModelIndex &index) {
-                        navigate(nativePath(filesystem->filePath(index)));
+                        if (!FinalSettings::flag("IdTreeNoAutoChange") && index.isValid())
+                            navigate(nativePath(filesystem->filePath(index)));
                     });
         }
         table_->hide();
@@ -795,6 +990,7 @@ void FilePanel::setDisplayMode(const QString &mode) {
         setProperty("displayMode", mode);
         tree_->setCurrentIndex(qobject_cast<QFileSystemModel *>(tree_->model())->index(displayPath(path())));
         tree_->setFocus();
+        preloadTree();
         return;
     }
     setBrief(mode == "brief" || mode == "thumbnails");
@@ -815,6 +1011,40 @@ void FilePanel::setDisplayMode(const QString &mode) {
 
 void FilePanel::applyPreferences() {
     QSettings s;
+    if (s.contains("appearance/fileFont")) {
+        QFont font;
+        font.fromString(s.value("appearance/fileFont").toString());
+        if (s.value("appearance/manualDpi").toBool()) {
+            const double scale = qBound(72, s.value("appearance/dpi", 96).toInt(), 240) / 96.0;
+            if (font.pixelSize() > 0)
+                font.setPixelSize(qMax(6, qRound(font.pixelSize() * scale)));
+            else
+                font.setPointSizeF(qMax(4.0, font.pointSizeF() * scale));
+        }
+        table_->setFont(font);
+        briefList_->setFont(font);
+        if (tree_)
+            tree_->setFont(font);
+    }
+
+    const auto frame = s.value("layout/flatInterface", true).toBool() ? QFrame::NoFrame : QFrame::StyledPanel;
+    table_->setFrameShape(frame);
+    briefList_->setFrameShape(frame);
+    if (s.value("completion/enabled").toBool()) {
+        if (!pathEdit_->completer()) {
+            auto *files = new QFileSystemModel(pathEdit_);
+            files->setRootPath("/");
+            auto *completer = new QCompleter(files, pathEdit_);
+            completer->setCaseSensitivity(Qt::CaseSensitive);
+            pathEdit_->setCompleter(completer);
+        }
+        pathEdit_->completer()->setCompletionMode(s.value("completion/inline").toBool()
+                                                      ? QCompleter::InlineCompletion
+                                                      : QCompleter::PopupCompletion);
+    } else
+        pathEdit_->setCompleter(nullptr);
+    briefList_->setSelectionRectVisible(s.value("mouse/rubberband", true).toBool());
+    updateBreadcrumbs();
     const int sizes[]{16, 20, 24, 32, 48}, spaces[]{0, 2, 4, 8, 16};
     const int size = sizes[qBound(0, s.value("icons/size", 0).toInt(), 4)];
     const int x = spaces[qBound(0, s.value("icons/extraX", 0).toInt(), 4)],
@@ -839,4 +1069,101 @@ void FilePanel::applyPreferences() {
                   qMax(19, size + 3) + y));
     }
     updateStatus();
+}
+
+void FilePanel::updateBreadcrumbs() {
+    if (!breadcrumbs_)
+        return;
+    const bool show = QSettings().value("layout/breadcrumbs").toBool() && !pathEdit_->hasFocus();
+    breadcrumbs_->setVisible(show);
+    if (!pathEdit_->hasFocus())
+        pathEdit_->setVisible(!show);
+    if (!show)
+        return;
+    while (auto *item = breadcrumbs_->layout()->takeAt(0)) {
+        delete item->widget();
+        delete item;
+    }
+    std::filesystem::path target;
+    for (const auto &component : path()) {
+        target /= component;
+        auto *button = new QToolButton(breadcrumbs_);
+        button->setAutoRaise(true);
+        button->setText(displayPath(component));
+        button->setToolTip(displayPath(target));
+        button->setProperty("breadcrumbPath", QByteArray::fromStdString(target.native()));
+        button->installEventFilter(this);
+        breadcrumbs_->layout()->addWidget(button);
+        connect(button, &QToolButton::clicked, this, [this, target] {
+            navigate(target);
+            focusFiles();
+        });
+    }
+    qobject_cast<QHBoxLayout *>(breadcrumbs_->layout())->addStretch();
+}
+
+FilePanel::~FilePanel() {
+    if (treeControl_)
+        treeControl_->cancelled = true;
+}
+void FilePanel::countDirectory(const std::filesystem::path &path) {
+    auto control = std::make_shared<LocalFiles::Control>();
+    auto *watcher = new QFutureWatcher<FileTools::Statistics>(this);
+    connect(this, &QObject::destroyed, watcher, [control] { control->cancelled = true; });
+    connect(watcher, &QFutureWatcher<FileTools::Statistics>::finished, this, [this, watcher, path] {
+        const auto result = watcher->result();
+        watcher->deleteLater();
+        if (result.errors.isEmpty() && !result.cancelled && !result.truncated) {
+            model_->setDirectorySize(path, result.bytes);
+            updateStatus();
+        }
+    });
+    watcher->setFuture(
+        QtConcurrent::run(ioPool(), FinalSettings::sizes, std::vector<std::filesystem::path>{path}, control));
+}
+void FilePanel::preloadTree() {
+    if (!tree_ || !FinalSettings::flag("IdConfOldStyleTree"))
+        return;
+    if (treeControl_)
+        treeControl_->cancelled = true;
+    treeControl_ = std::make_shared<LocalFiles::Control>();
+    const auto root = path();
+    auto *watcher = new QFutureWatcher<QStringList>(this);
+    connect(watcher, &QFutureWatcher<QStringList>::finished, this, [this, watcher] {
+        const auto paths = watcher->result();
+        watcher->deleteLater();
+        if (!tree_)
+            return;
+        auto *model = qobject_cast<QFileSystemModel *>(tree_->model());
+        for (const auto &path : paths) {
+            const auto index = model->index(path);
+            if (index.isValid()) {
+                model->fetchMore(index);
+                tree_->expand(index);
+            }
+        }
+    });
+    watcher->setFuture(QtConcurrent::run(ioPool(), [root, control = treeControl_] {
+        QStringList result;
+        try {
+            std::error_code error;
+            const auto rootDevice = NativeFs::inspect(root).st_dev;
+            size_t scanned = 0;
+            for (std::filesystem::recursive_directory_iterator
+                     it(root, std::filesystem::directory_options::skip_permission_denied, error),
+                 end;
+                 !error && it != end && !control->cancelled && scanned++ < 100000 && result.size() < 10000;
+                 it.increment(error)) {
+                const auto st = NativeFs::inspect(it->path());
+                if (!S_ISDIR(st.st_mode) || st.st_dev != rootDevice || it.depth() > 32) {
+                    it.disable_recursion_pending();
+                    continue;
+                }
+                if (nativePath(displayPath(it->path())) == it->path())
+                    result << displayPath(it->path());
+            }
+        } catch (const std::exception &) {
+        }
+        return result;
+    }));
 }

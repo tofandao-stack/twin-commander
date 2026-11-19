@@ -4,8 +4,8 @@
 #include <QDateTime>
 #include <QImage>
 #include <QMap>
-#include <filesystem>
 #include <atomic>
+#include <filesystem>
 #include <memory>
 #include <vector>
 
@@ -14,19 +14,20 @@ struct DirectoryEntry {
     QString name;
     QImage thumbnail;
     QString thumbnailText;
-    QMap<QString,QString> fields;
+    QMap<QString, QString> fields;
     bool directory = false;
     bool symlink = false;
     quint64 size = 0, enumerationOrder = 0;
     QDateTime modified;
     bool parent = false;
+    bool directorySizeKnown = false;
     std::filesystem::perms permissions = std::filesystem::perms::unknown;
 };
 
 class DirectoryModel : public QAbstractTableModel {
     Q_OBJECT
 
-public:
+  public:
     explicit DirectoryModel(QObject *parent = nullptr);
     ~DirectoryModel() override;
     int rowCount(const QModelIndex &parent = {}) const override;
@@ -39,21 +40,23 @@ public:
     void setNameFilter(const QString &filter);
     void setShowParent(bool enabled);
     void setSecondarySort(int column);
+    void setDirectorySize(const std::filesystem::path &path, quint64 size);
     void setColumns(const QStringList &fields);
     void setThumbnails(bool enabled);
     void setResultPaths(const std::vector<std::filesystem::path> *paths);
-    void setViewFilter(const QString &mask = {}, bool programs = false, const std::vector<std::filesystem::path> *only = nullptr);
+    void setViewFilter(const QString &mask = {}, bool programs = false,
+                       const std::vector<std::filesystem::path> *only = nullptr);
     const DirectoryEntry *entry(int row) const;
     std::filesystem::path path() const;
     bool showHidden() const;
 
-signals:
+  signals:
     void loaded();
     void loadFailed(const QString &message);
     void loading();
     void batchReceived(int count, int total);
 
-private:
+  private:
     std::vector<DirectoryEntry> entries_;
     std::filesystem::path path_;
     quint64 generation_ = 0;

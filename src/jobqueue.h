@@ -1,13 +1,13 @@
 #pragma once
 #include "fileoperations.h"
-#include <QObject>
 #include <QDialog>
+#include <QObject>
 #include <functional>
 
 class QTableWidget;
 class JobQueue : public QObject {
     Q_OBJECT
-public:
+  public:
     enum class State { Waiting, Running, Paused, Completed, Failed, Cancelled };
     struct Job {
         quint64 id;
@@ -18,10 +18,12 @@ public:
         std::function<LocalFiles::Result(const std::shared_ptr<LocalFiles::Control> &)> work;
         std::function<void(const LocalFiles::Result &)> completion;
         QString reportName;
+        qint64 startedAt = 0;
     };
     explicit JobQueue(QObject *parent = nullptr);
     ~JobQueue() override;
-    quint64 enqueue(const QString &label, std::function<LocalFiles::Result(const std::shared_ptr<LocalFiles::Control> &)> work,
+    quint64 enqueue(const QString &label,
+                    std::function<LocalFiles::Result(const std::shared_ptr<LocalFiles::Control> &)> work,
                     std::function<void(const LocalFiles::Result &)> completion = {});
     const std::vector<Job> &jobs() const;
     bool busy() const;
@@ -31,10 +33,11 @@ public:
     void clearFinished();
     void setJournalDirectory(const QString &directory);
     static QString stateText(State state);
-signals:
+  signals:
     void changed();
     void jobFinished(quint64 id);
-private:
+
+  private:
     void next();
     void persist(Job &job);
     QString journalDirectory_;
@@ -44,9 +47,10 @@ private:
 };
 class QueueDialog : public QDialog {
     Q_OBJECT
-public:
+  public:
     explicit QueueDialog(JobQueue *queue, QWidget *parent = nullptr);
-private:
+
+  private:
     quint64 selected() const;
     void refresh();
     JobQueue *queue_;

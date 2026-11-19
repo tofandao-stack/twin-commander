@@ -12,6 +12,7 @@ struct SearchRequest {
     size_t limit = 5000;
     bool nameRegex = false;
     bool contentRegex = false;
+    QString field{}, fieldValue{};
     qint64 minBytes = -1, maxBytes = -1;
     qint64 modifiedAfter = -1, modifiedBefore = -1;
 };

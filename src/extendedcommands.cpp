@@ -427,6 +427,7 @@ void MainWindow::applyViewMode(const QVariantMap &mode) {
     if (applyingMode_ || !active_)
         return;
     QScopedValueRollback<bool> guard(applyingMode_, true);
+    active_->setProperty("viewModePriority",mode.value("priority").toBool());
     active_->setBrief(mode.value("brief").toBool());
     active_->model()->setColumns(mode.value("fields").toString().split(';', Qt::SkipEmptyParts));
     if (!mode.value("brief").toBool() && !mode.value("fields").toString().isEmpty())
