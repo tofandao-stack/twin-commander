@@ -1,11 +1,17 @@
 #include "filepanel.h"
 #include "classicui.h"
+#include "preferences.h"
 #include <QApplication>
+#include <QDateTime>
+#include <QFileIconProvider>
 #include <QFileSystemModel>
+#include <QFileSystemWatcher>
 #include <QListView>
 #include <QLocale>
 #include <QMenu>
+#include <QMouseEvent>
 #include <QPainter>
+#include <QScrollBar>
 #include <QStyle>
 #include <QStyleOptionViewItem>
 #include <QStyledItemDelegate>
@@ -26,6 +32,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <algorithm>
+#include <chrono>
 
 namespace {
 class CommanderDelegate : public QStyledItemDelegate {
@@ -48,6 +55,18 @@ class CommanderDelegate : public QStyledItemDelegate {
         if (marked && !cursor)
             styled.palette.setColor(QPalette::Text,
                                     QColor(QSettings().value("appearance/markColor", "#be0000").toString()));
+        if (cursor && QSettings().value("appearance/invertCursor").toBool()) {
+            const auto text = styled.palette.color(QPalette::Text),
+                       base = styled.palette.color(QPalette::Base);
+            styled.palette.setColor(QPalette::Highlight, text);
+            styled.palette.setColor(QPalette::HighlightedText, base);
+        }
+        if (marked && !cursor && QSettings().value("appearance/invertSelection").toBool()) {
+            const auto base = styled.palette.color(QPalette::Base),
+                       text = styled.palette.color(QPalette::Text);
+            styled.backgroundBrush = text;
+            styled.palette.setColor(QPalette::Text, base);
+        }
         view_->style()->drawControl(QStyle::CE_ItemViewItem, &styled, painter, view_);
     }
 
@@ -61,7 +80,55 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
     : QWidget(parent), model_(new DirectoryModel(this)), table_(new QTableView(this)),
       briefList_(new QListView(this)), pathEdit_(new QLineEdit(this)), status_(new QLabel(this)),
       filter_(new QLineEdit(this)) {
+    watcher_ = new QFileSystemWatcher(this);
+    refreshTimer_ = new QTimer(this);
+    refreshTimer_->setInterval(1000);
+    connect(watcher_, &QFileSystemWatcher::directoryChanged, this, [this] {
+        if (QSettings().value("refresh/names").toBool())
+            refreshPending_ = true;
+    });
+    connect(refreshTimer_, &QTimer::timeout, this, [this] {
+        QSettings s;
+        if (s.value("refresh/foregroundOnly").toBool() && !window()->isActiveWindow())
+            return;
+        if (s.value("refresh/metadata").toBool())
+            for (int checked = 0; checked < qMin(64, model_->rowCount()); ++checked) {
+                if (refreshCursor_ >= model_->rowCount())
+                    refreshCursor_ = 0;
+                const auto *entry = model_->entry(refreshCursor_++);
+                if (entry->parent)
+                    continue;
+                std::error_code error;
+                const auto modified = std::filesystem::last_write_time(entry->path, error);
+                if (error) {
+                    if (entry->modified.isValid())
+                        refreshPending_ = true;
+                    continue;
+                }
+                const auto time = QDateTime::fromMSecsSinceEpoch(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::file_clock::to_sys(modified).time_since_epoch())
+                        .count());
+                const auto permissions = std::filesystem::symlink_status(entry->path, error).permissions();
+                const auto bytes = std::filesystem::is_regular_file(entry->path, error)
+                                       ? std::filesystem::file_size(entry->path, error)
+                                       : 0;
+                if (time != entry->modified || permissions != entry->permissions ||
+                    (!entry->directory && bytes != entry->size)) {
+                    refreshPending_ = true;
+                    break;
+                }
+            }
+        if (refreshPending_ && !autoRefreshing_ && !property("listingBusy").toBool()) {
+            refreshPending_ = false;
+            autoRefreshing_ = true;
+            setProperty("autoRefreshing", true);
+            refresh();
+        }
+    });
+    refreshTimer_->start();
     model_->setShowParent(true);
+    model_->setShowHidden(QSettings().value("display/hidden").toBool());
     QFont font = qApp->font();
     if (QSettings().contains("appearance/fileFont")) {
         font.fromString(QSettings().value("appearance/fileFont").toString());
@@ -183,9 +250,15 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
         focusFiles();
     });
     connect(table_, &QTableView::doubleClicked, this, [this] { openCurrent(); });
-    connect(model_, &DirectoryModel::loading, this, [this] { status_->setText("Loading…"); });
-    connect(model_, &DirectoryModel::batchReceived, this,
-            [this](int, int total) { status_->setText(QString("Loading… %1 items").arg(total)); });
+    connect(model_, &DirectoryModel::loading, this, [this] {
+        setProperty("listingBusy", true);
+        if (!autoRefreshing_ || QSettings().value("refresh/footer", true).toBool())
+            status_->setText("Loading…");
+    });
+    connect(model_, &DirectoryModel::batchReceived, this, [this](int, int total) {
+        if (!autoRefreshing_ || QSettings().value("refresh/footer", true).toBool())
+            status_->setText(QString("Loading… %1 items").arg(total));
+    });
     connect(model_, &QAbstractItemModel::modelAboutToBeReset, this, [this] {
         previousPath_ = path();
         previousSelection_.clear();
@@ -198,14 +271,18 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
         previousCursor_ = entry ? entry->path : std::filesystem::path{};
     });
     connect(model_, &DirectoryModel::loaded, this, [this] {
+        setProperty("listingBusy", false);
         const auto currentPath = model_->path();
         if (backRequested_ && history_.size() >= 2 && history_[history_.size() - 2] == currentPath) {
             forward_.push_back(history_.back());
             history_.pop_back();
         }
         backRequested_ = false;
-        if (history_.empty() || history_.back() != currentPath)
+        if (history_.empty() || history_.back() != currentPath) {
             history_.push_back(currentPath);
+            if (history_.size() > 1000)
+                history_.erase(history_.begin());
+        }
         pathEdit_->setText(displayPath(currentPath) +
                            (displayPath(currentPath).endsWith('/') ? "*.*" : "/*.*"));
         const bool sameDirectory = previousPath_ == currentPath;
@@ -237,10 +314,23 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
             }
             revealPath_.clear();
         }
-        updateStatus();
+        const auto watches = watcher_->directories();
+        if (!watches.isEmpty())
+            watcher_->removePaths(watches);
+        if (QSettings().value("refresh/names").toBool() &&
+            nativePath(displayPath(currentPath)) == currentPath)
+            watcher_->addPath(displayPath(currentPath));
+        if (!autoRefreshing_ || QSettings().value("refresh/footer", true).toBool())
+            updateStatus();
         emit pathChanged(displayPath(currentPath));
+        autoRefreshing_ = false;
+        setProperty("autoRefreshing", false);
     });
+    connect(model_, &QAbstractItemModel::columnsInserted, this, [this] { applyPreferences(); });
     connect(model_, &DirectoryModel::loadFailed, this, [this](const QString &message) {
+        setProperty("listingBusy", false);
+        autoRefreshing_ = false;
+        setProperty("autoRefreshing", false);
         backRequested_ = false;
         pathEdit_->setText(displayPath(path()));
         updateStatus();
@@ -248,6 +338,7 @@ FilePanel::FilePanel(const std::filesystem::path &initialPath, QWidget *parent)
         emit errorOccurred(message);
     });
     connect(table_->selectionModel(), &QItemSelectionModel::selectionChanged, this, &FilePanel::updateStatus);
+    applyPreferences();
     navigate(initialPath);
 }
 
@@ -348,6 +439,7 @@ void FilePanel::setBrief(bool brief) {
     setProperty("displayMode", brief ? "brief" : "full");
     table_->setVisible(!brief);
     briefList_->setVisible(brief);
+    applyPreferences();
     focusFiles();
 }
 bool FilePanel::isBrief() const { return brief_; }
@@ -373,21 +465,56 @@ void FilePanel::selectPaths(const std::vector<std::filesystem::path> &paths) {
 void FilePanel::showHistory() {
     auto *menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);
+    menu->setObjectName("directoryHistoryMenu");
+    QSettings settings;
+    QFont font = menu->font();
+    const int family = settings.value("history/font", 0).toInt();
+    if (family)
+        font.setFamily(QStringList{"", "Monospace", "Sans Serif", "Serif"}.value(family));
+    menu->setFont(font);
     auto entries = history_;
-    for (const auto &value : QSettings().value("directoryHistoryNative").toList()) {
+    for (const auto &value : settings.value("directoryHistoryNative").toList()) {
         const auto entry = std::filesystem::path(value.toByteArray().toStdString());
         if (std::find(entries.begin(), entries.end(), entry) == entries.end())
             entries.insert(entries.begin(), entry);
     }
-    for (auto it = entries.rbegin(); it != entries.rend(); ++it) {
-        const auto target = *it;
-        auto *action = menu->addAction(displayPath(target));
+    if (settings.value("history/thin", true).toBool()) {
+        std::vector<std::filesystem::path> thinned;
+        for (const auto &entry : entries) {
+            if (!thinned.empty() && thinned.back() == entry.parent_path())
+                thinned.pop_back();
+            thinned.push_back(entry);
+        }
+        entries = std::move(thinned);
+    }
+    std::reverse(entries.begin(), entries.end());
+    entries.resize(
+        qMin(entries.size(), size_t(qBound(1, settings.value("history/showLimit", 30).toInt(), 1000))));
+    const int width =
+        qBound(20, settings.value("history/width", 100).toInt(), 300) * QFontMetrics(font).averageCharWidth();
+    QAction *recent = nullptr, *frequentAction = nullptr;
+    QFileIconProvider icons;
+    const auto add = [&](const std::filesystem::path &target) {
+        const auto full = displayPath(target);
+        auto *action = menu->addAction(QFontMetrics(font).elidedText(full, Qt::ElideMiddle, width));
+        action->setToolTip(full);
+        action->setData(QByteArray::fromStdString(target.native()));
+        if (settings.value("history/icons").toBool())
+            action->setIcon(icons.icon(QFileIconProvider::Folder));
         connect(action, &QAction::triggered, this, [this, target] {
             navigate(target);
             focusFiles();
         });
+        return action;
+    };
+    if (settings.value("history/recentMiddle").toBool() && entries.size() > 1)
+        std::rotate(entries.begin(), entries.begin() + 1, entries.begin() + 1 + entries.size() / 2);
+    for (const auto &target : entries) {
+        auto *action = add(target);
+        if (target == path())
+            recent = action;
     }
-    const auto frequent = QSettings().value("frequent/saved").toMap();
+    const auto frequent = settings.value("frequent/saved").toMap();
     if (!frequent.isEmpty()) {
         menu->addSeparator();
         menu->addSection("Frequently used");
@@ -395,18 +522,25 @@ void FilePanel::showHistory() {
         for (auto it = frequent.begin(); it != frequent.end(); ++it)
             ranked.emplace_back(it.value().toInt(), it.key());
         std::sort(ranked.rbegin(), ranked.rend());
-        int shown = 0;
+        ranked.resize(
+            qMin(ranked.size(), size_t(qBound(1, settings.value("frequent/showLimit", 20).toInt(), 1000))));
+        const auto top = ranked.front().second;
+        if (settings.value("history/frequentMiddle").toBool() && ranked.size() > 1)
+            std::rotate(ranked.begin(), ranked.begin() + 1, ranked.begin() + 1 + ranked.size() / 2);
         for (const auto &[count, encoded] : ranked) {
             Q_UNUSED(count);
-            if (++shown > 20)
-                break;
             const auto target =
                 std::filesystem::path(QByteArray::fromBase64(encoded.toLatin1()).toStdString());
-            auto *action = menu->addAction(displayPath(target));
-            connect(action, &QAction::triggered, this, [this, target] { navigate(target); });
+            auto *action = add(target);
+            if (encoded == top)
+                frequentAction = action;
         }
     }
-    menu->popup(pathEdit_->mapToGlobal(QPoint(0, pathEdit_->height())));
+    const int scroll = settings.value("history/scroll", 0).toInt();
+    auto *at = scroll == 1 ? recent : scroll == 2 ? frequentAction : nullptr;
+    menu->popup(pathEdit_->mapToGlobal(QPoint(0, pathEdit_->height())), at);
+    if (at)
+        menu->setActiveAction(at);
 }
 void FilePanel::forward() {
     if (!forward_.empty()) {
@@ -421,18 +555,19 @@ void FilePanel::selectMask(const QString &mask, bool select) {
     QItemSelection selection;
     for (int row = 0; row < model_->rowCount(); ++row)
         if (!model_->entry(row)->parent &&
+            (QSettings().value("selection/directories", 1).toInt() != 0 || !model_->entry(row)->directory) &&
             QDir::match(mask, displayPath(model_->entry(row)->path.filename())))
             selection.select(model_->index(row, 0), model_->index(row, model_->columnCount() - 1));
     table_->selectionModel()->select(selection,
                                      select ? QItemSelectionModel::Select : QItemSelectionModel::Deselect);
 }
 void FilePanel::invertSelection() {
-    const int first = model_->rowCount() && model_->entry(0)->parent ? 1 : 0;
-    if (model_->rowCount() > first)
-        table_->selectionModel()->select(
-            QItemSelection(model_->index(first, 0),
-                           model_->index(model_->rowCount() - 1, model_->columnCount() - 1)),
-            QItemSelectionModel::Toggle);
+    for (int row = 0; row < model_->rowCount(); ++row) {
+        const auto *e = model_->entry(row);
+        if (!e->parent && (!e->directory || QSettings().value("selection/directories", 1).toInt() != 0))
+            table_->selectionModel()->select(model_->index(row, 0),
+                                             QItemSelectionModel::Toggle | QItemSelectionModel::Rows);
+    }
 }
 
 std::vector<std::filesystem::path> FilePanel::selectedPaths() const {
@@ -460,6 +595,8 @@ void FilePanel::reveal(const std::filesystem::path &path) {
     navigate(path.parent_path());
 }
 void FilePanel::updateStatus() {
+    if (autoRefreshing_ && !QSettings().value("refresh/footer", true).toBool())
+        return;
     quint64 bytes = 0, total = 0;
     int files = 0, dirs = 0, selectedFiles = 0, selectedDirs = 0;
     for (int row = 0; row < model_->rowCount(); ++row) {
@@ -481,13 +618,14 @@ void FilePanel::updateStatus() {
             }
         }
     }
-    const QLocale locale(QLocale::English, QLocale::UnitedStates);
-    status_->setText(QString("%1 / %2 k in %3 / %4 file(s), %5 / %6 dir(s)")
-                         .arg(locale.toString(bytes / 1024), locale.toString(total / 1024))
-                         .arg(selectedFiles)
-                         .arg(files)
-                         .arg(selectedDirs)
-                         .arg(dirs));
+    const int mode = QSettings().value("format/footerSize", 1).toInt();
+    QString text = QString("%1 / %2 in %3 / %4 file(s)")
+                       .arg(Preferences::sizeText(bytes, mode), Preferences::sizeText(total, mode))
+                       .arg(selectedFiles)
+                       .arg(files);
+    if (QSettings().value("format/directoryCount", true).toBool())
+        text += QString(", %1 / %2 dir(s)").arg(selectedDirs).arg(dirs);
+    status_->setText(text);
     status_->setFixedHeight(19);
 }
 
@@ -509,6 +647,16 @@ bool FilePanel::eventFilter(QObject *watched, QEvent *event) {
             return true;
         }
     }
+    if ((watched == table_ || watched == briefList_) && event->type() == QEvent::ShortcutOverride) {
+        auto *key = static_cast<QKeyEvent *>(event);
+        const int mode = QSettings().value("quick/mode", 2).toInt();
+        const bool matches = (mode == 0 && key->modifiers() == (Qt::ControlModifier | Qt::AltModifier)) ||
+                             (mode == 1 && key->modifiers() == Qt::AltModifier);
+        if (matches && !key->text().isEmpty() && key->text().front().isPrint()) {
+            key->accept();
+            return true;
+        }
+    }
     if ((watched == table_ || watched == briefList_) && event->type() == QEvent::KeyPress) {
         const auto *key = static_cast<QKeyEvent *>(event);
         if (key->key() == Qt::Key_A && key->modifiers() == Qt::ControlModifier) {
@@ -516,6 +664,53 @@ bool FilePanel::eventFilter(QObject *watched, QEvent *event) {
             selectMask("*");
             return true;
         }
+        const int quickMode = QSettings().value("quick/mode", 2).toInt();
+        const bool quickModifiers =
+            (quickMode == 0 && key->modifiers() == (Qt::ControlModifier | Qt::AltModifier)) ||
+            (quickMode == 1 && key->modifiers() == Qt::AltModifier) ||
+            ((quickMode == 2 || quickMode == 3) &&
+             (key->modifiers() == Qt::NoModifier || key->modifiers() == Qt::ShiftModifier));
+        if (quickMode != 4 && quickModifiers && !key->text().isEmpty() && key->text().front().isPrint() &&
+            key->key() != Qt::Key_Space) {
+            if (quickMode == 3) {
+                focusFilter();
+                filter_->setText(filter_->text() + key->text());
+                return true;
+            }
+            const auto now = QDateTime::currentMSecsSinceEpoch();
+            if (now - quickTime_ > 1200)
+                quickText_.clear();
+            quickTime_ = now;
+            quickText_ += key->text();
+            const auto match = [&](const QString &name) {
+                const bool beginning = QSettings().value("quick/beginning", true).toBool();
+                if (QSettings().value("quick/ending").toBool() && quickText_.contains('.')) {
+                    const auto dot = quickText_.indexOf('.');
+                    const auto nameDot = name.lastIndexOf('.');
+                    if (nameDot < 0)
+                        return false;
+                    const auto stem = name.left(nameDot), typed = quickText_.left(dot);
+                    if (!(beginning ? QString::compare(stem, typed, Qt::CaseInsensitive) == 0
+                                    : stem.endsWith(typed, Qt::CaseInsensitive)))
+                        return false;
+                    return name.mid(nameDot + 1).startsWith(quickText_.mid(dot + 1), Qt::CaseInsensitive);
+                }
+                return beginning ? name.startsWith(quickText_, Qt::CaseInsensitive)
+                                 : name.contains(quickText_, Qt::CaseInsensitive);
+            };
+            for (int row = 0; row < model_->rowCount(); ++row)
+                if (!model_->entry(row)->parent && match(model_->entry(row)->name)) {
+                    table_->selectionModel()->setCurrentIndex(model_->index(row, 0),
+                                                              QItemSelectionModel::NoUpdate);
+                    (brief_ ? static_cast<QAbstractItemView *>(briefList_) : table_)
+                        ->scrollTo(model_->index(row, 0));
+                    break;
+                }
+            return true;
+        }
+        if (quickMode == 4 && key->modifiers() == Qt::NoModifier && !key->text().isEmpty() &&
+            key->text().front().isPrint() && key->key() != Qt::Key_Space)
+            return true;
         if (key->modifiers() == Qt::NoModifier) {
             switch (key->key()) {
             case Qt::Key_Tab:
@@ -558,10 +753,16 @@ void FilePanel::filterView(const QString &mask, bool programs, bool selected) {
     refresh();
 }
 void FilePanel::storeHistory() {
-    QVariantList paths;
-    for (const auto &path : history_)
-        paths.append(QByteArray::fromStdString(path.native()));
-    QSettings().setValue("directoryHistoryNative", paths);
+    auto merged = QSettings().value("directoryHistoryNative").toList();
+    for (const auto &path : history_) {
+        const auto value = QByteArray::fromStdString(path.native());
+        merged.removeAll(value);
+        merged.append(value);
+    }
+    const int limit = qBound(1, QSettings().value("history/saveLimit", 100).toInt(), 1000);
+    while (merged.size() > limit)
+        merged.removeFirst();
+    QSettings().setValue("directoryHistoryNative", merged);
 }
 void FilePanel::clearHistory() {
     history_ = {path()};
@@ -610,4 +811,32 @@ void FilePanel::setDisplayMode(const QString &mode) {
         setProperty("displayMode", mode);
         refresh();
     }
+}
+
+void FilePanel::applyPreferences() {
+    QSettings s;
+    const int sizes[]{16, 20, 24, 32, 48}, spaces[]{0, 2, 4, 8, 16};
+    const int size = sizes[qBound(0, s.value("icons/size", 0).toInt(), 4)];
+    const int x = spaces[qBound(0, s.value("icons/extraX", 0).toInt(), 4)],
+              y = spaces[qBound(0, s.value("icons/extraY", 0).toInt(), 4)];
+    table_->setIconSize(QSize(size, size));
+    table_->verticalHeader()->setDefaultSectionSize(qMax(19, size + 3) + y);
+    table_->setStyleSheet(QString("QTableView::item { padding-left: %1px; padding-right: %1px; }").arg(x));
+    table_->horizontalHeader()->setSectionResizeMode(
+        0, s.value("columns/stretch", true).toBool() ? QHeaderView::Stretch : QHeaderView::Interactive);
+    table_->setColumnHidden(1, s.value("format/extension", 1).toInt() == 0);
+    const char *keys[]{"columns/extension", "columns/size", "columns/date", "columns/attributes"};
+    const int widths[]{55, 90, 127, 42};
+    for (int c = 1; c < 5; ++c)
+        table_->setColumnWidth(c, s.value(keys[c - 1], widths[c - 1]).toInt());
+    for (int c = 5; c < model_->columnCount(); ++c)
+        if (model_->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString() == "comment")
+            table_->setColumnWidth(c, s.value("columns/comment", 180).toInt());
+    if (!briefList_->property("thumbnails").toBool()) {
+        briefList_->setIconSize(QSize(size, size));
+        briefList_->setGridSize(
+            QSize(s.value("display/limitBrief").toBool() ? s.value("display/briefWidth", 190).toInt() : 190,
+                  qMax(19, size + 3) + y));
+    }
+    updateStatus();
 }

@@ -40,6 +40,8 @@ class MainWindow : public QMainWindow {
     void registerNetworkCommands();
     RemoteDialog *remoteBrowser();
     void configureRemainingOptions(QDialog *dialog);
+    void configureFunctionalOptions(QDialog *dialog);
+    void applyFunctionalPreferences(bool panels = true);
     void applyUserCommands();
     void applyViewMode(const QVariantMap &mode);
     void setSeparateTrees(int count);

@@ -110,6 +110,7 @@ void MainWindow::rebuildButtonBar(bool vertical) {
             auto *button = new QToolButton(verticalBar_);
             button->setDefaultAction(target);
             button->setIcon(slotIcon(slot));
+            connect(target, &QAction::changed, button, [button, slot] { button->setIcon(slotIcon(slot)); });
             if (slot.contains("tooltip"))
                 button->setToolTip(slot.value("tooltip").toString());
             button->setIconSize(QSize(20, 20));

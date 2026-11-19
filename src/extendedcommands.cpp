@@ -450,7 +450,9 @@ void MainWindow::applyViewMode(const QVariantMap &mode) {
     const auto index = tabs->indexOf(active_);
     if (QColor(mode.value("tabColor").toString()).isValid())
         tabs->tabBar()->setTabTextColor(index, QColor(mode.value("tabColor").toString()));
-    tabs->setTabIcon(index, QIcon(mode.value("icon").toString()));
+    const QIcon modeIcon(mode.value("icon").toString());
+    active_->setProperty("viewModeTabIcon", modeIcon);
+    tabs->setTabIcon(index, QSettings().value("tabs/icons", true).toBool() ? modeIcon : QIcon());
     active_->refresh();
     if (auto *command = commands_.get(mode.value("command").toString()))
         if (command->isEnabled())

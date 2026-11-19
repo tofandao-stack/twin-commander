@@ -12,8 +12,10 @@
 #include <QListView>
 #include <QLocale>
 #include <QMainWindow>
+#include <QMenu>
 #include <QPainter>
 #include <QPainterPath>
+#include <QProxyStyle>
 #include <QResource>
 #include <QSettings>
 #include <QStorageInfo>
@@ -197,11 +199,25 @@ QIcon commanderIcon(const QString &name, int size) {
     cache.insert(key, result);
     return result;
 }
+namespace {
+class CommanderStyle : public QProxyStyle {
+  public:
+    CommanderStyle() : QProxyStyle(QStyleFactory::create("Windows")) {}
+    int pixelMetric(PixelMetric metric, const QStyleOption *option = nullptr,
+                    const QWidget *widget = nullptr) const override {
+        if (metric == QStyle::PM_SmallIconSize && qobject_cast<const QMenu *>(widget)) {
+            const int sizes[]{16, 20, 24, 32};
+            return sizes[qBound(0, QSettings().value("icons/menuSize", 0).toInt(), 3)];
+        }
+        return QProxyStyle::pixelMetric(metric, option, widget);
+    }
+};
+} // namespace
 void applyCommanderAppearance() {
     if (qApp->property("commanderAppearanceInstalled").toBool())
         return;
     qApp->setProperty("commanderAppearanceInstalled", true);
-    qApp->setStyle(QStyleFactory::create("Windows"));
+    qApp->setStyle(new CommanderStyle);
     QPalette palette;
     palette.setColor(QPalette::Window, QColor("#e5e5eb"));
     palette.setColor(QPalette::Button, QColor("#e5e5eb"));

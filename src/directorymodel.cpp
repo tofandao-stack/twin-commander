@@ -3,13 +3,18 @@
 #include "classicui.h"
 #include "extendedtools.h"
 #include "nativesettings.h"
+#include "preferences.h"
 #include <QBuffer>
+#include <QCollator>
 #include <QCryptographicHash>
 #include <QDir>
+#include <QFileIconProvider>
+#include <QFileInfo>
 #include <QImageReader>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLocale>
+#include <QPainter>
 #include <QSaveFile>
 #include <QSettings>
 #include <QStandardPaths>
@@ -46,15 +51,28 @@ constexpr size_t batchSize = 256;
 
 void sortEntries(std::vector<DirectoryEntry> &entries, int column, Qt::SortOrder order,
                  const QStringList &fields = {}, int secondary = 0) {
+    QSettings settings;
+    const bool directoriesByName = settings.value("display/directorySort", 1).toInt() == 0;
+    const int method = settings.value("display/sortMethod", 0).toInt();
+    QCollator collator(QLocale(QLocale::English));
+    collator.setNumericMode(true);
+    collator.setCaseSensitivity(Qt::CaseInsensitive);
+    const auto compareName = [&](const QString &a, const QString &b) {
+        return method == 2 ? collator.compare(a, b)
+                           : QString::compare(a, b, method == 1 ? Qt::CaseInsensitive : Qt::CaseSensitive);
+    };
     std::stable_sort(
         entries.begin(), entries.end(),
-        [column, order, fields, secondary](const auto &left, const auto &right) {
+        [column, order, fields, secondary, directoriesByName, &compareName](const auto &left,
+                                                                            const auto &right) {
             if (left.parent != right.parent)
                 return left.parent;
             if (column == -1)
                 return left.enumerationOrder < right.enumerationOrder;
             if (left.directory != right.directory)
                 return left.directory;
+            if (left.directory && right.directory && directoriesByName)
+                return compareName(left.name, right.name) < 0;
             int comparison = column >= 5 ? QString::compare(left.fields.value(fields.value(column - 5)),
                                                             right.fields.value(fields.value(column - 5)),
                                                             Qt::CaseInsensitive)
@@ -78,7 +96,7 @@ void sortEntries(std::vector<DirectoryEntry> &entries, int column, Qt::SortOrder
                     comparison = left.modified < right.modified ? -1 : left.modified > right.modified ? 1 : 0;
             }
             if (comparison == 0)
-                comparison = QString::compare(left.name, right.name, Qt::CaseSensitive);
+                comparison = compareName(left.name, right.name);
             return order == Qt::AscendingOrder ? comparison < 0 : comparison > 0;
         });
 }
@@ -312,9 +330,40 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
         return {};
     if (role == Qt::DecorationRole && index.column() == 0 && !item->thumbnail.isNull())
         return QIcon(QPixmap::fromImage(item->thumbnail));
-    if (role == Qt::DecorationRole && index.column() == 0)
-        return commanderIcon(item->parent ? "parent" : item->directory ? "folder" : "file", 16);
+    if (role == Qt::DecorationRole && index.column() == 0) {
+        const int mode = QSettings().value("icons/mode", 1).toInt();
+        if (mode == 2)
+            return {};
+        const int sizes[]{16, 20, 24, 32, 48};
+        const int size = sizes[qBound(0, QSettings().value("icons/size", 0).toInt(), 4)];
+        QIcon icon;
+        if (mode == 0 && nativePath(displayPath(item->path)) == item->path) {
+            static QFileIconProvider provider;
+            provider.setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
+            icon = provider.icon(QFileInfo(displayPath(item->path)));
+        }
+        if (icon.isNull())
+            icon = commanderIcon(item->parent ? "parent" : item->directory ? "folder" : "file", size);
+        if ((item->symlink && QSettings().value("icons/overlay", true).toBool()) ||
+            QSettings().value("icons/frame", false).toBool()) {
+            auto pixmap = icon.pixmap(size, size);
+            QPainter painter(&pixmap);
+            if (QSettings().value("icons/frame", false).toBool()) {
+                painter.setPen(Qt::gray);
+                painter.drawRect(0, 0, size - 1, size - 1);
+            }
+            if (item->symlink && QSettings().value("icons/overlay", true).toBool()) {
+                painter.setPen(Qt::blue);
+                painter.drawText(QRect(0, size / 2, size, size / 2), Qt::AlignLeft | Qt::AlignBottom,
+                                 QString::fromUtf8("↗"));
+            }
+            return QIcon(pixmap);
+        }
+        return icon;
+    }
     if (role == Qt::ToolTipRole) {
+        if (!QSettings().value("display/nameTips", true).toBool())
+            return {};
         QString tip = displayPath(item->path) + (item->symlink ? "\nSymbolic link" : "");
         for (const auto &entry : QSettings().value("hintRules").toList()) {
             const auto rule = entry.toMap();
@@ -331,7 +380,8 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
     }
     if (role == Qt::UserRole + 1)
         return item->thumbnailText;
-    if (role == Qt::ForegroundRole || role == Qt::BackgroundRole)
+    if ((role == Qt::ForegroundRole || role == Qt::BackgroundRole) &&
+        QSettings().value("appearance/typeColors", true).toBool())
         for (const auto &entry : QSettings().value("colorRules").toList()) {
             const auto rule = entry.toMap();
             if (QDir::match(rule.value("mask", "*").toString(), displayPath(item->path.filename()))) {
@@ -341,8 +391,21 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
                     return color;
             }
         }
+    const auto displayName = [&] {
+        QString name = item->name;
+        if (item->directory && !item->parent) {
+            if (QSettings().value("display/brackets").toBool())
+                name = "[" + name + "]";
+            if (QSettings().value("display/directorySlash").toBool())
+                name += '/';
+        }
+        return name;
+    };
     if (role == Qt::UserRole)
-        return item->name;
+        return displayName();
+    if (role == Qt::ForegroundRole && !item->parent && displayPath(item->path.filename()).startsWith('.') &&
+        QSettings().value("icons/dimHidden").toBool())
+        return QColor(Qt::gray);
     if (role == Qt::ForegroundRole && item->symlink)
         return QColor(30, 70, 150);
     if (role == Qt::TextAlignmentRole && index.column() == 2)
@@ -351,18 +414,16 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const {
         return {};
     const auto basename = displayPath(item->path.filename());
     const int dot = basename.lastIndexOf('.');
-    const bool split = !item->directory && dot > 0;
+    const bool split = !item->directory && dot > 0 && QSettings().value("format/extension", 1).toInt() == 1;
     switch (index.column()) {
     case 0:
-        return split ? item->name.left(item->name.size() - basename.size() + dot) : item->name;
+        return split ? item->name.left(item->name.size() - basename.size() + dot) : displayName();
     case 1:
         return split ? basename.mid(dot + 1) : QString();
     case 2:
-        return item->directory
-                   ? QVariant("<DIR>")
-                   : QVariant(QLocale(QLocale::English, QLocale::UnitedStates).toString(item->size));
+        return item->directory ? QVariant("<DIR>") : QVariant(Preferences::sizeText(item->size));
     case 3:
-        return item->parent ? QString() : item->modified.toString("yyyy-MM-dd HH:mm");
+        return item->parent ? QString() : Preferences::dateText(item->modified);
     case 4: {
         if (item->parent)
             return QString();
@@ -417,6 +478,10 @@ void DirectoryModel::load(const std::filesystem::path &path) {
         cancellation_->store(true);
     cancellation_ = std::make_shared<std::atomic_bool>(false);
     const auto generation = ++generation_;
+    auto oldOrder = std::make_shared<std::unordered_map<std::filesystem::path, size_t>>();
+    if (path == path_ && QSettings().value("refresh/append").toBool())
+        for (size_t i = 0; i < entries_.size(); ++i)
+            (*oldOrder)[entries_[i].path] = i;
     auto queue = std::make_shared<BatchQueue>();
     auto staged = std::make_shared<std::vector<DirectoryEntry>>();
     struct SortTask {
@@ -429,75 +494,89 @@ void DirectoryModel::load(const std::filesystem::path &path) {
     auto *watcher = new QFutureWatcher<Listing>(this);
     auto *pump = new QTimer(watcher);
     pump->setInterval(1);
-    connect(pump, &QTimer::timeout, this, [this, watcher, pump, queue, staged, sorting, generation, path] {
-        if (generation != generation_) {
-            pump->stop();
-            watcher->deleteLater();
-            return;
-        }
-        std::vector<DirectoryEntry> batch;
-        bool empty = false;
-        {
-            std::lock_guard lock(queue->mutex);
-            if (!queue->batches.empty()) {
-                batch = std::move(queue->batches.front());
-                queue->batches.pop_front();
-            }
-            empty = queue->batches.empty();
-        }
-        queue->available.notify_one();
-        if (!batch.empty()) {
-            const int count = static_cast<int>(batch.size());
-            staged->insert(staged->end(), std::make_move_iterator(batch.begin()),
-                           std::make_move_iterator(batch.end()));
-            emit batchReceived(count, static_cast<int>(staged->size()));
-            // A signal handler may request a different directory.
-            if (generation != generation_)
-                return;
-        }
-        if (!empty || !watcher->isFinished())
-            return;
-        // The worker can publish its final batch between the drain and finishing.
-        {
-            std::lock_guard lock(queue->mutex);
-            if (!queue->batches.empty())
-                return;
-        }
-        auto result = watcher->result();
-        if (!result.error.isEmpty()) {
-            pump->stop();
-            watcher->deleteLater();
-            emit loadFailed(QString("Cannot open %1: %2").arg(displayPath(path), result.error));
-            return;
-        }
-        if (sorting->started && !sorting->future.isFinished())
-            return;
-        if (!sorting->started || sorting->column != sortColumn_ || sorting->order != sortOrder_) {
-            if (!sorting->started && showParent_ && result.path != result.path.parent_path()) {
-                DirectoryEntry parent;
-                parent.path = result.path.parent_path();
-                parent.name = "..";
-                parent.directory = true;
-                parent.parent = true;
-                staged->push_back(std::move(parent));
-            }
-            sorting->started = true;
-            sorting->column = sortColumn_;
-            sorting->order = sortOrder_;
-            sorting->future = QtConcurrent::run(ioPool(), [staged, column = sortColumn_, order = sortOrder_,
-                                                           fields = columns_, secondary = secondarySort_] {
-                sortEntries(*staged, column, order, fields, secondary);
+    connect(pump, &QTimer::timeout, this,
+            [this, watcher, pump, queue, staged, sorting, generation, path, oldOrder] {
+                if (generation != generation_) {
+                    pump->stop();
+                    watcher->deleteLater();
+                    return;
+                }
+                std::vector<DirectoryEntry> batch;
+                bool empty = false;
+                {
+                    std::lock_guard lock(queue->mutex);
+                    if (!queue->batches.empty()) {
+                        batch = std::move(queue->batches.front());
+                        queue->batches.pop_front();
+                    }
+                    empty = queue->batches.empty();
+                }
+                queue->available.notify_one();
+                if (!batch.empty()) {
+                    const int count = static_cast<int>(batch.size());
+                    staged->insert(staged->end(), std::make_move_iterator(batch.begin()),
+                                   std::make_move_iterator(batch.end()));
+                    emit batchReceived(count, static_cast<int>(staged->size()));
+                    // A signal handler may request a different directory.
+                    if (generation != generation_)
+                        return;
+                }
+                if (!empty || !watcher->isFinished())
+                    return;
+                // The worker can publish its final batch between the drain and finishing.
+                {
+                    std::lock_guard lock(queue->mutex);
+                    if (!queue->batches.empty())
+                        return;
+                }
+                auto result = watcher->result();
+                if (!result.error.isEmpty()) {
+                    pump->stop();
+                    watcher->deleteLater();
+                    emit loadFailed(QString("Cannot open %1: %2").arg(displayPath(path), result.error));
+                    return;
+                }
+                if (sorting->started && !sorting->future.isFinished())
+                    return;
+                if (!sorting->started || sorting->column != sortColumn_ || sorting->order != sortOrder_) {
+                    if (!sorting->started && showParent_ &&
+                        (result.path != result.path.parent_path() ||
+                         QSettings().value("display/rootParent").toBool())) {
+                        DirectoryEntry parent;
+                        parent.path = result.path.parent_path();
+                        parent.name = "..";
+                        parent.directory = true;
+                        parent.parent = true;
+                        staged->push_back(std::move(parent));
+                    }
+                    sorting->started = true;
+                    sorting->column = sortColumn_;
+                    sorting->order = sortOrder_;
+                    sorting->future = QtConcurrent::run(ioPool(), [staged, column = sortColumn_,
+                                                                   order = sortOrder_, fields = columns_,
+                                                                   secondary = secondarySort_, oldOrder] {
+                        sortEntries(*staged, column, order, fields, secondary);
+                        if (!oldOrder->empty())
+                            std::stable_sort(
+                                staged->begin(), staged->end(), [oldOrder](const auto &a, const auto &b) {
+                                    if (a.parent != b.parent)
+                                        return a.parent;
+                                    const auto ai = oldOrder->find(a.path), bi = oldOrder->find(b.path);
+                                    const auto ar = ai == oldOrder->end() ? SIZE_MAX : ai->second,
+                                               br = bi == oldOrder->end() ? SIZE_MAX : bi->second;
+                                    return ar < br;
+                                });
+                    });
+                    return;
+                }
+                pump->stop();
+                watcher->deleteLater();
+                beginResetModel();
+                entries_ = std::move(*staged);
+                path_ = std::move(result.path);
+                endResetModel();
+                emit loaded();
             });
-            return;
-        }
-        pump->stop();
-        watcher->deleteLater();
-        beginResetModel();
-        entries_ = std::move(*staged);
-        path_ = std::move(result.path);
-        endResetModel();
-        emit loaded();
-    });
     emit loading();
     auto fields = columns_;
     if (thumbnails_)

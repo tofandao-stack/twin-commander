@@ -4,14 +4,18 @@
 #include "classicui.h"
 #include "extendedtools.h"
 #include "nativesettings.h"
+#include "preferences.h"
 #include "remotetools.h"
 #include "toolwindows.h"
+#include <QFileIconProvider>
 #include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QShortcut>
 #include <QTabBar>
+#include <QUuid>
 
 #include <QApplication>
 #include <QClipboard>
@@ -29,6 +33,7 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPlainTextEdit>
@@ -237,9 +242,20 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
         connect(tabs, &QTabWidget::currentChanged, this, [this, tabs](int index) {
             if (index >= 0) {
                 auto *panel = qobject_cast<FilePanel *>(tabs->widget(index));
-                activate(panel);
-                panel->focusFiles();
+                tabs->setProperty("previousTab", tabs->property("lastTab"));
+                tabs->setProperty("lastTab", panel->property("tabIdentity"));
+                if (QSettings().value("tabs/activate", true).toBool() || tabs->indexOf(active_) >= 0) {
+                    activate(panel);
+                    panel->focusFiles();
+                }
             }
+        });
+        connect(tabs->tabBar(), &QTabBar::tabBarDoubleClicked, this, [tabs](int index) {
+            if (index < 0 || tabs->count() <= 1 || !QSettings().value("tabs/doubleClose").toBool())
+                return;
+            auto *panel = tabs->widget(index);
+            tabs->removeTab(index);
+            panel->deleteLater();
         });
         connect(tabs, &QTabWidget::tabCloseRequested, this, [tabs](int index) {
             if (tabs->count() <= 1)
@@ -255,10 +271,42 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
     active_->focusFiles();
     applyLayoutOptions();
     updateUiState();
+    applyFunctionalPreferences();
+    auto *cycle = new QShortcut(QKeySequence("Ctrl+Tab"), this);
+    connect(cycle, &QShortcut::activated, this, [this] {
+        auto *tabs = left_->indexOf(active_) >= 0 ? left_ : right_;
+        if (QSettings().value("tabs/list").toBool()) {
+            auto *menu = new QMenu(this);
+            menu->setAttribute(Qt::WA_DeleteOnClose);
+            for (int i = 0; i < tabs->count(); ++i) {
+                auto *target = tabs->widget(i);
+                connect(menu->addAction(tabs->tabText(i)), &QAction::triggered, tabs,
+                        [tabs, target] { tabs->setCurrentWidget(target); });
+            }
+            menu->popup(tabs->mapToGlobal(QPoint(0, 20)));
+            return;
+        }
+        int before = -1;
+        for (int i = 0; i < tabs->count(); ++i)
+            if (tabs->widget(i)->property("tabIdentity") == tabs->property("previousTab"))
+                before = i;
+        tabs->setCurrentIndex(QSettings().value("tabs/mru").toBool() && before >= 0
+                                  ? before
+                                  : (tabs->currentIndex() + 1) % tabs->count());
+    });
+    auto *open = new QShortcut(QKeySequence("Ctrl+Up"), this);
+    connect(open, &QShortcut::activated, this, [this] {
+        auto target = active_->path();
+        const auto *entry = active_->model()->entry(active_->table()->currentIndex().row());
+        if (entry && entry->directory)
+            target = entry->path;
+        addTab(left_->indexOf(active_) >= 0 ? left_ : right_, target);
+    });
 }
 
 void MainWindow::addTab(QTabWidget *tabs, const std::filesystem::path &path) {
     auto *panel = new FilePanel(path.empty() ? nativePath(QDir::homePath()) : path, tabs);
+    panel->setProperty("tabIdentity", QUuid::createUuid().toString());
     connect(panel, &FilePanel::activated, this, [this, panel] { activate(panel); });
     connect(panel, &FilePanel::switchPanel, this, &MainWindow::switchPanel);
     connect(panel->table()->selectionModel(), &QItemSelectionModel::currentChanged, this,
@@ -307,45 +355,63 @@ void MainWindow::addTab(QTabWidget *tabs, const std::filesystem::path &path) {
             const auto encoded = QString::fromLatin1(native.toBase64());
             usage[encoded] = usage.value(encoded).toInt() + 1;
             qApp->setProperty("frequentUsage", usage);
-            for (const auto &entry : QSettings().value("autoViewRules").toList()) {
-                const auto rule = entry.toMap();
-                if (!QDir::match(rule.value("path", "*").toString(), displayPath(panel->path())))
-                    continue;
-                bool matches = true;
-                for (const auto &mask : rule.value("masks").toString().split(';', Qt::SkipEmptyParts)) {
-                    bool found = false;
-                    for (int row = 0; row < panel->model()->rowCount(); ++row)
-                        if (!panel->model()->entry(row)->parent &&
-                            QDir::match(mask, displayPath(panel->model()->entry(row)->path.filename())))
-                            found = true;
-                    if (!found)
-                        matches = false;
-                }
-                if (matches) {
-                    const auto mode =
-                        QSettings().value("viewModes").toMap().value(rule.value("mode").toString()).toMap();
-                    if (!mode.isEmpty()) {
-                        if (panel == active_)
-                            applyViewMode(mode);
-                        else
-                            panel->setProperty("pendingViewMode", mode);
+            if (QSettings().value("autoView/enabled", true).toBool())
+                for (const auto &entry : QSettings().value("autoViewRules").toList()) {
+                    const auto rule = entry.toMap();
+                    if (!QDir::match(rule.value("path", "*").toString(), displayPath(panel->path())))
+                        continue;
+                    bool matches = true;
+                    for (const auto &mask : rule.value("masks").toString().split(';', Qt::SkipEmptyParts)) {
+                        bool found = false;
+                        for (int row = 0; row < panel->model()->rowCount(); ++row)
+                            if (!panel->model()->entry(row)->parent &&
+                                QDir::match(mask, displayPath(panel->model()->entry(row)->path.filename())))
+                                found = true;
+                        if (!found)
+                            matches = false;
                     }
-                    break;
+                    if (matches) {
+                        const auto mode = QSettings()
+                                              .value("viewModes")
+                                              .toMap()
+                                              .value(rule.value("mode").toString())
+                                              .toMap();
+                        if (!mode.isEmpty()) {
+                            if (panel == active_)
+                                applyViewMode(mode);
+                            else
+                                panel->setProperty("pendingViewMode", mode);
+                        }
+                        break;
+                    }
                 }
-            }
         }
-        leftHost_->refresh();
-        rightHost_->refresh();
+        if (!panel->property("autoRefreshing").toBool() ||
+            QSettings().value("refresh/header", true).toBool()) {
+            leftHost_->refresh();
+            rightHost_->refresh();
+        }
         updateUiState();
         const int index = tabs->indexOf(panel);
         if (index >= 0) {
             const QString name = QDir(pathText).dirName();
-            tabs->setTabText(index, name.isEmpty() ? pathText : name);
+            QString title = name.isEmpty() ? pathText : name;
+            if (QSettings().value("tabs/limit").toBool())
+                title = title.left(qBound(3, QSettings().value("tabs/titleLength", 20).toInt(), 100));
+            tabs->setTabText(index, title);
             tabs->setTabToolTip(index, pathText);
+            applyFunctionalPreferences(false);
         }
     });
-    tabs->setCurrentIndex(tabs->addTab(panel, "Loading…"));
-    panel->focusFiles();
+    auto *old = tabs->currentWidget();
+    const int position =
+        QSettings().value("tabs/nearCurrent").toBool() ? tabs->currentIndex() + 1 : tabs->count();
+    const int index = tabs->insertTab(position, panel, "Loading…");
+    if (QSettings().value("tabs/foreground", true).toBool() || !old)
+        tabs->setCurrentIndex(index);
+    applyFunctionalPreferences(false);
+    if (QSettings().value("tabs/foreground", true).toBool() || !old)
+        panel->focusFiles();
 }
 
 void MainWindow::activate(FilePanel *panel) {
@@ -405,20 +471,29 @@ void MainWindow::restoreSession(const QStringList &initialPaths) {
     for (int side = 0; side < 2; ++side) {
         auto *tabs = side == 0 ? left_ : right_;
         const QString key = side == 0 ? "leftPaths" : "rightPaths";
-        const auto nativePaths = settings.value(key + "/native").toList();
+        const auto nativePaths = settings.value("session/directories", true).toBool()
+                                     ? settings.value(key + "/native").toList()
+                                     : QVariantList{};
         if (side < initialPaths.size())
             addTab(tabs, nativePath(initialPaths[side]));
         else if (!nativePaths.isEmpty()) {
             for (const auto &value : nativePaths)
                 addTab(tabs, std::filesystem::path(value.toByteArray().toStdString()));
         } else {
-            auto paths = settings.value(key).toStringList();
+            auto paths = settings.value("session/directories", true).toBool()
+                             ? settings.value(key).toStringList()
+                             : QStringList{};
             if (paths.isEmpty())
                 paths = {QDir::homePath()};
             for (const auto &path : paths)
                 addTab(tabs, nativePath(path));
         }
         tabs->setCurrentIndex(qBound(0, settings.value(key + "/current", 0).toInt(), tabs->count() - 1));
+        if (settings.value("session/panels", true).toBool()) {
+            const auto modes = settings.value(key + "/modes").toStringList();
+            for (int i = 0; i < tabs->count() && i < modes.size(); ++i)
+                qobject_cast<FilePanel *>(tabs->widget(i))->setDisplayMode(modes[i]);
+        }
     }
     restoreGeometry(settings.value("geometry").toByteArray());
     splitter_->restoreState(settings.value("classic/splitter").toByteArray());
@@ -453,18 +528,31 @@ void MainWindow::saveSession() {
             }
         }
         const QString key = tabs == left_ ? "leftPaths" : "rightPaths";
+        if (!settings.value("session/directories", true).toBool()) {
+            paths.clear();
+            nativePaths.clear();
+        }
         settings.setValue(key, paths);
         settings.setValue(key + "/native", nativePaths);
         settings.setValue(key + "/current", tabs->currentIndex());
+        QStringList modes;
+        for (int i = 0; i < tabs->count(); ++i)
+            modes << tabs->widget(i)->property("displayMode").toString();
+        settings.setValue(key + "/modes",
+                          settings.value("session/panels", true).toBool() ? modes : QStringList{});
     }
     settings.setValue("geometry", saveGeometry());
     settings.setValue("classic/splitter", splitter_->saveState());
     QStringList history;
     for (int i = 0; i < commandHistory_->count(); ++i)
         history << commandHistory_->itemText(i);
-    settings.setValue("classic/commandHistory", history.mid(0, 50));
+    settings.setValue("classic/commandHistory",
+                      settings.value("session/commands", true).toBool() ? history.mid(0, 50) : QStringList{});
+    if (settings.value("history/saveOnExit").toBool())
+        for (auto *panel : findChildren<FilePanel *>())
+            panel->storeHistory();
     if (settings.value("frequent/saveOnExit").toBool())
-        settings.setValue("frequent/saved", qApp->property("frequentUsage"));
+        Preferences::saveFrequent();
 }
 
 FilePanel *MainWindow::oppositePanel() const {
@@ -688,7 +776,62 @@ void MainWindow::updateBookmarks() {
     else
         bookmarks_->addAction(commands_.get("cm_AddBookmark"));
     auto *configure = bookmarks_->addAction("&Configure...");
-    configure->setEnabled(false);
+    configure->setObjectName("configureBookmarks");
+    connect(configure, &QAction::triggered, this, [this] {
+        auto *dialog = new QDialog(this);
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setObjectName("bookmarkEditor");
+        dialog->setWindowTitle("Directory hotlist");
+        auto *layout = new QVBoxLayout(dialog);
+        auto *list = new QListWidget(dialog);
+        list->setObjectName("bookmarkList");
+        layout->addWidget(list);
+        for (const auto &value : QSettings().value("bookmarksNative").toList()) {
+            auto *item = new QListWidgetItem(
+                displayPath(std::filesystem::path(value.toByteArray().toStdString())), list);
+            item->setData(Qt::UserRole, value);
+        }
+        auto *row = new QHBoxLayout;
+        layout->addLayout(row);
+        auto *add = new QPushButton("Add directory…", dialog), *remove = new QPushButton("Remove", dialog),
+             *up = new QPushButton("Up", dialog), *down = new QPushButton("Down", dialog);
+        for (auto *button : {add, remove, up, down})
+            row->addWidget(button);
+        connect(add, &QPushButton::clicked, dialog, [dialog, list] {
+            const auto path = QFileDialog::getExistingDirectory(dialog, "Add directory");
+            if (path.isEmpty())
+                return;
+            const auto bytes = QFile::encodeName(path);
+            for (int i = 0; i < list->count(); ++i)
+                if (list->item(i)->data(Qt::UserRole).toByteArray() == bytes)
+                    return;
+            auto *item = new QListWidgetItem(path, list);
+            item->setData(Qt::UserRole, bytes);
+            list->setCurrentItem(item);
+        });
+        connect(remove, &QPushButton::clicked, dialog, [list] { delete list->takeItem(list->currentRow()); });
+        for (const auto &pair : {std::pair{up, -1}, std::pair{down, 1}})
+            connect(pair.first, &QPushButton::clicked, dialog, [list, offset = pair.second] {
+                const int row = list->currentRow(), target = row + offset;
+                if (row < 0 || target < 0 || target >= list->count())
+                    return;
+                auto *item = list->takeItem(row);
+                list->insertItem(target, item);
+                list->setCurrentItem(item);
+            });
+        auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, dialog);
+        layout->addWidget(buttons);
+        connect(buttons, &QDialogButtonBox::accepted, dialog, [dialog, list] {
+            QVariantList paths;
+            for (int i = 0; i < list->count(); ++i)
+                paths << list->item(i)->data(Qt::UserRole);
+            QSettings().setValue("bookmarksNative", paths);
+            dialog->accept();
+        });
+        connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+        dialog->resize(520, 340);
+        dialog->show();
+    });
 }
 
 void MainWindow::showProperties() {

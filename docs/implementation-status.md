@@ -2,6 +2,8 @@
 
 ## Current increment
 
+Version 0.7 implements 92 audited configuration inputs and bookmark configuration (93 of 299 disabled controls, 31.1%). All seven CTest suites pass in Debug and ASan/UBSan builds (leak reporting disabled; optional large-directory measurement skipped), and installed 0.7.0 smoke checks pass. See [settings implementation](settings-implementation-0.7.md). The frozen 0.6 audit remains the baseline; unsupported fields are still disabled.
+
 Version 0.6 adds the remaining baseline command/configuration/rename button handlers, native views and extensions, FTP/FTPS and sharing. The button/action inventory is distinct from the many reference settings fields and from Windows binary/proprietary protocol compatibility. See [remaining control implementation](remaining-controls-0.6.md) for actual behavior and limits. A subsequent [runtime disabled-controls audit](disabled-controls-audit.md) found 277 disabled configuration inputs, 20 disabled bar-editor inputs and two other unavailable functions; the earlier button inventory did not cover these.
 
 Version 0.5 implements 62 of 155 disabled button/action instances from the frozen 0.4 runtime inventory (40%). This includes 21 of 53 main commands and functional toolbar, appearance, view-mode, search-result and rename controls. See [button implementation report](button-implementation-0.5.md). This percentage describes the disabled-button baseline, not final-product parity.

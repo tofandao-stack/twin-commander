@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(TwinCommander VERSION 0.6.0 LANGUAGES CXX)
+project(TwinCommander VERSION 0.7.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,6 +20,7 @@ add_library(commander_ui
     resources/commander.qrc
     src/classicui.cpp
     src/classicui.h
+    src/preferences.cpp
     src/remainingoptions.cpp
     src/remotetools.cpp
     src/remotetools.h
@@ -73,6 +74,10 @@ target_link_libraries(twin-commander PRIVATE commander_ui)
 include(CTest)
 if(BUILD_TESTING)
     find_package(Qt6 REQUIRED COMPONENTS Test)
+    add_executable(preferences_tests tests/preferences_tests.cpp)
+    target_link_libraries(preferences_tests PRIVATE commander_ui Qt6::Test)
+    add_test(NAME preferences_tests COMMAND preferences_tests)
+    set_tests_properties(preferences_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 90)
     add_executable(remaining_gui_tests tests/remaining_gui_tests.cpp)
     target_link_libraries(remaining_gui_tests PRIVATE commander_ui Qt6::Test)
     add_test(NAME remaining_gui_tests COMMAND remaining_gui_tests)

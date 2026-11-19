@@ -1,0 +1,660 @@
+{
+  "baselineTotal": 299,
+  "implementedCount": 93,
+  "implementedConfiguration": [
+    {
+      "page": "Display",
+      "id": "IdConfshowhidden",
+      "type": "QCheckBox",
+      "caption": "&Show hidden files",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdShowUpdir",
+      "type": "QCheckBox",
+      "caption": "Show &parent dir [..] also in root of drive",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdDirBrackets",
+      "type": "QCheckBox",
+      "caption": "Show s&quare brackets [ ] around directories",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdBriefViewWidthLimit",
+      "type": "QCheckBox",
+      "caption": "&Limit width of brief view column to:",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "SortMethodCombo",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "BriefViewWidthLimitEdit",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdDirBackslash",
+      "type": "QCheckBox",
+      "caption": "Append \\",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdConfDirsByName",
+      "type": "QRadioButton",
+      "caption": "Always &by name",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdConfDirsLikeFiles",
+      "type": "QRadioButton",
+      "caption": "Like &files (also by time)",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdConf_tooltips",
+      "type": "QCheckBox",
+      "caption": "Show &help texts for buttons (tooltips)",
+      "status": "implemented"
+    },
+    {
+      "page": "Display",
+      "id": "IdConf_NameTips",
+      "type": "QCheckBox",
+      "caption": "Sho&w filename in file list as tooltip if truncated",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "idiconsize",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "idIconExtraX",
+      "type": "QComboBox",
+      "caption": "Extra space: &Horizontal:",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "idIconExtraY",
+      "type": "QComboBox",
+      "caption": "Vert&ical:",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdConfShowAllIcons",
+      "type": "QRadioButton",
+      "caption": "&All associated",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdConfshowStandardIcons",
+      "type": "QRadioButton",
+      "caption": "&Only standard icons",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdConfShowNoIcons",
+      "type": "QRadioButton",
+      "caption": "&No icons",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdShowOverlayIcons",
+      "type": "QCheckBox",
+      "caption": "Show overlay i&cons, e.g. for links",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdDimmedHidden",
+      "type": "QCheckBox",
+      "caption": "&Dimmed hidden files",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdIconsForMenu",
+      "type": "QCheckBox",
+      "caption": "Show icons for commands in the &main menu",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "IdMenuIconSize",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Icons",
+      "id": "Id3dFrame",
+      "type": "QCheckBox",
+      "caption": "Show &3d frame around icon",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_ForeColor",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_BackColor",
+      "type": "QComboBox",
+      "caption": "&Font color:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_MarkColor",
+      "type": "QComboBox",
+      "caption": "Background &2:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_CursorColor",
+      "type": "QComboBox",
+      "caption": "&Mark color:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_CursorFontColor",
+      "type": "QComboBox",
+      "caption": "&Cursor color:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_BackColor2",
+      "type": "QComboBox",
+      "caption": "&Background:",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_CursorInverted",
+      "type": "QCheckBox",
+      "caption": "&Use inverted cursor",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_ColorTypesEnabled",
+      "type": "QCheckBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Color",
+      "id": "id_MarkInverted",
+      "type": "QCheckBox",
+      "caption": "Use inverted &selection",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_confExtAfterName",
+      "type": "QRadioButton",
+      "caption": "di&rectly after filename",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_confExtAligned",
+      "type": "QRadioButton",
+      "caption": "ali&gned (with Tab)",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_tabSize",
+      "type": "QLineEdit",
+      "caption": "&Size:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_TabDate",
+      "type": "QLineEdit",
+      "caption": "&Date/Time:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_TabAttr",
+      "type": "QLineEdit",
+      "caption": "&Attributes:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_tabExt",
+      "type": "QLineEdit",
+      "caption": "&Extension:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_TabComments",
+      "type": "QLineEdit",
+      "caption": "Co&mments (fixed):",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_ShowCentury",
+      "type": "QCheckBox",
+      "caption": "Show &century in date (20xx)",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_UseAMPMFormat",
+      "type": "QCheckBox",
+      "caption": "&Use 12 hour AM/PM format",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_AdjustWidth",
+      "type": "QCheckBox",
+      "caption": "Adjust &Tabs to window width",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_sizeDisplay",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_size_footer",
+      "type": "QComboBox",
+      "caption": "Si&ze display:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_dircountinfooter",
+      "type": "QCheckBox",
+      "caption": "Show director&y count in footer",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_confDateFormat",
+      "type": "QComboBox",
+      "caption": "Date f&ormat:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_confTimeFormat",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_sepDate",
+      "type": "QComboBox",
+      "caption": "Date:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_sepTime",
+      "type": "QComboBox",
+      "caption": "Time:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_sepThousands",
+      "type": "QComboBox",
+      "caption": "Thousands:",
+      "status": "implemented"
+    },
+    {
+      "page": "Tabstops/Data Formats",
+      "id": "id_sepDecimal",
+      "type": "QComboBox",
+      "caption": "Decimal:",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsSameWidth",
+      "type": "QCheckBox",
+      "caption": "&All tabs have same width",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsLimitOption",
+      "type": "QCheckBox",
+      "caption": "&Limit tab title length to:",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "EdtTabsLimitLength",
+      "type": "QLineEdit",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsCloseDoubleClick",
+      "type": "QCheckBox",
+      "caption": "Cl&ose tab on double click",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsOpenForeground",
+      "type": "QCheckBox",
+      "caption": "Ctrl+&Up opens new tab in foreground",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsOpenNearCurrent",
+      "type": "QCheckBox",
+      "caption": "Open &new tabs near current tab",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsAlwaysVisible",
+      "type": "QCheckBox",
+      "caption": "&Show tab header also when there is only one tab",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsActivateTarget",
+      "type": "QCheckBox",
+      "caption": "Activate target &panel when clicking on one of its Tabs",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsIcons",
+      "type": "QCheckBox",
+      "caption": "Show &icons on tabs",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsOpenList",
+      "type": "QCheckBox",
+      "caption": "Ctrl+Ta&b opens as list",
+      "status": "implemented"
+    },
+    {
+      "page": "Folder-Tabs",
+      "id": "ChkTabsLastVisitedFirst",
+      "type": "QCheckBox",
+      "caption": "Ctrl+Tab switches to last &visited",
+      "status": "implemented"
+    },
+    {
+      "page": "Auto Switch Mode",
+      "id": "AutoSwitchModeCheck",
+      "type": "QCheckBox",
+      "caption": "Automatically switch view mode on directory change:",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdConfFilesOnly",
+      "type": "QRadioButton",
+      "caption": "Select &files only",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdConfAlsoDirs",
+      "type": "QRadioButton",
+      "caption": "Also select d&irectories",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdConfsavedirs",
+      "type": "QCheckBox",
+      "caption": "&Directories",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdConfsavepanels",
+      "type": "QCheckBox",
+      "caption": "&Panels (brief/full, etc.)",
+      "status": "implemented"
+    },
+    {
+      "page": "Operation",
+      "id": "IdConfCommandLines",
+      "type": "QCheckBox",
+      "caption": "Old co&mmand lines",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "WatchDirsDetect",
+      "type": "QCheckBox",
+      "caption": "Refresh when files are &created, deleted and renamed",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "WatchDirsSizeDateAttr",
+      "type": "QCheckBox",
+      "caption": "Also when &size, date, or attributes change",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "WatchDirsAtEnd",
+      "type": "QCheckBox",
+      "caption": "&Put added files at the END of the file list (default: sorted)",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "WatchDirsNoBackground",
+      "type": "QCheckBox",
+      "caption": "Don't &react to updates while in the background",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "WatchDirsFooter",
+      "type": "QCheckBox",
+      "caption": "Update &footer (total number of files)",
+      "status": "implemented"
+    },
+    {
+      "page": "Refresh",
+      "id": "WatchDirsHeader",
+      "type": "QCheckBox",
+      "caption": "Update &header (free disk space)",
+      "status": "implemented"
+    },
+    {
+      "page": "Quick Search",
+      "id": "IdConfAltForMenu",
+      "type": "QRadioButton",
+      "caption": "&Ctrl+Alt+Letters",
+      "status": "implemented"
+    },
+    {
+      "page": "Quick Search",
+      "id": "IdConfAltForQuickSearch",
+      "type": "QRadioButton",
+      "caption": "Al&t+Letters",
+      "status": "implemented"
+    },
+    {
+      "page": "Quick Search",
+      "id": "IdConfLetterQuickSearch",
+      "type": "QRadioButton",
+      "caption": "L&etter only",
+      "status": "implemented"
+    },
+    {
+      "page": "Quick Search",
+      "id": "IdConfLetterDlgQuickSearch",
+      "type": "QRadioButton",
+      "caption": "Letters - &with search dialog",
+      "status": "implemented"
+    },
+    {
+      "page": "Quick Search",
+      "id": "IdConfDisabledQuickSearch",
+      "type": "QRadioButton",
+      "caption": "Di&sabled",
+      "status": "implemented"
+    },
+    {
+      "page": "Quick Search",
+      "id": "IdConfExactBeginning",
+      "type": "QCheckBox",
+      "caption": "&Beginning (name must start with first typed character)",
+      "status": "implemented"
+    },
+    {
+      "page": "Quick Search",
+      "id": "IdConfExactEnding",
+      "type": "QCheckBox",
+      "caption": "En&ding (last character before a typed dot . must match)",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "id_historythinning2",
+      "type": "QCheckBox",
+      "caption": "Directory history &thinning",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "ShowHistoryIconsChk",
+      "type": "QCheckBox",
+      "caption": "I&cons",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "HistoryFontCombo",
+      "type": "QComboBox",
+      "caption": "Fo&nt:",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "SaveHistoryOnExitChk",
+      "type": "QCheckBox",
+      "caption": "Save &history on exit",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "HistoryMaxSaveEdit",
+      "type": "QLineEdit",
+      "caption": "&Maximum items to save:",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "HistoryMaxShowEdit",
+      "type": "QLineEdit",
+      "caption": "Maximum items to sh&ow:",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "ShowLastVisitedInMiddleChk",
+      "type": "QCheckBox",
+      "caption": "Show last visited di&rectory closest to the middle of the list",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "FrequentlyUsedMaxSaveEdit",
+      "type": "QLineEdit",
+      "caption": "Maximum &items to save:",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "FrequentlyUsedMaxShowEdit",
+      "type": "QLineEdit",
+      "caption": "Maximum items to sho&w:",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "ShowFreqentlyUsedMaxInMiddleChk",
+      "type": "QCheckBox",
+      "caption": "Show most frequently &used directory closest to the middle of the list",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "ScrollListToCombo",
+      "type": "QComboBox",
+      "caption": "",
+      "status": "implemented"
+    },
+    {
+      "page": "History",
+      "id": "MaxWidthEdit",
+      "type": "QLineEdit",
+      "caption": "Ma&x. width in characters (average):",
+      "status": "implemented"
+    }
+  ],
+  "otherImplemented": [
+    {
+      "id": "configureBookmarks",
+      "caption": "Directory hotlist: Configure",
+      "evidence": "src/mainwindow.cpp; preferences_tests::historyLimitsAndBookmarkEditor"
+    }
+  ],
+  "remainingTotal": 206,
+  "baselineInventory": "disabled-controls-current.json",
+  "remainingInventory": "disabled-controls-0.7.json"
+}

@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication application(argc, argv);
     QCoreApplication::setOrganizationName("TwinCommander");
     QCoreApplication::setApplicationName("TwinCommander");
-    QCoreApplication::setApplicationVersion("0.6.0");
+    QCoreApplication::setApplicationVersion("0.7.0");
     QCommandLineParser parser;
     parser.setApplicationDescription("Native Linux two-panel file manager");
     parser.addHelpOption();

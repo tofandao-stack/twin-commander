@@ -1,6 +1,7 @@
 #include "classicui.h"
 #include "mainwindow.h"
 #include "nativesettings.h"
+#include "preferences.h"
 #include "productivitytools.h"
 #include "toolwindows.h"
 #include <QAbstractButton>
@@ -170,7 +171,7 @@ void MainWindow::configureRemainingOptions(QDialog *dialog) {
                              {"FrequentlyUsedDeleteNowBtn", "delete"}})
         connect(enable(pair.first), &QAbstractButton::clicked, dialog, [action = pair.second] {
             if (action == "save")
-                QSettings().setValue("frequent/saved", qApp->property("frequentUsage"));
+                Preferences::saveFrequent();
             else {
                 qApp->setProperty("frequentUsage", QVariantMap{});
                 QSettings().remove("frequent/saved");

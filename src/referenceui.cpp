@@ -96,7 +96,8 @@ void MainWindow::buildReferenceUi() {
     commandHistory_ = new QComboBox(this);
     commandHistory_->setEditable(true);
     commandHistory_->setLineEdit(commandLine_);
-    commandHistory_->addItems(QSettings().value("classic/commandHistory").toStringList());
+    if (QSettings().value("session/commands", true).toBool())
+        commandHistory_->addItems(QSettings().value("classic/commandHistory").toStringList());
     commandLine_->clear();
     commandLine_->setPlaceholderText({});
     commandLine_->setAccessibleName("Command line");
@@ -606,6 +607,7 @@ void MainWindow::showOptions() {
     list->setCurrentRow(0);
     configureAppearance(dialog);
     configureRemainingOptions(dialog);
+    configureFunctionalOptions(dialog);
     auto apply = [this, dialog, bindings] {
         QSettings settings;
         for (auto it = bindings.begin(); it != bindings.end(); ++it)
@@ -624,11 +626,13 @@ void MainWindow::showOptions() {
                 panel->table()->setColumnWidth(4, 42);
             }
         applySavedAppearance();
+        applyFunctionalPreferences();
         reloadCustomMenu();
         rebuildButtonBar(false);
         rebuildButtonBar(true);
         for (auto *panel : findChildren<FilePanel *>()) {
             panel->setActive(panel == active_);
+            panel->model()->setShowHidden(settings.value("display/hidden").toBool());
             if (panel->property("displayMode") == "thumbnails")
                 panel->setDisplayMode("thumbnails");
             else

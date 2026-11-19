@@ -9,16 +9,19 @@ class QLineEdit;
 class QTableView;
 class QListView;
 class QTreeView;
+class QFileSystemWatcher;
+class QTimer;
 
 class FilePanel : public QWidget {
     Q_OBJECT
 
-public:
+  public:
     explicit FilePanel(const std::filesystem::path &initialPath, QWidget *parent = nullptr);
     void navigate(const std::filesystem::path &path);
     void parentDirectory();
     void back();
     void refresh();
+    void applyPreferences();
     void filterView(const QString &mask = {}, bool programs = false, bool selected = false);
     void storeHistory();
     void clearHistory();
@@ -44,7 +47,7 @@ public:
     QTableView *table() const;
     DirectoryModel *model() const;
 
-signals:
+  signals:
     void activated();
     void switchPanel();
     void pathChanged(const QString &path);
@@ -53,12 +56,19 @@ signals:
     void hotlistRequested();
     void contextMenuRequested(const QPoint &position);
 
-protected:
+  protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
-private:
+  private:
     void openCurrent();
     void updateStatus();
+    QFileSystemWatcher *watcher_;
+    QTimer *refreshTimer_;
+    QString quickText_;
+    qint64 quickTime_ = 0;
+    int refreshCursor_ = 0;
+    bool refreshPending_ = false;
+    bool autoRefreshing_ = false;
     DirectoryModel *model_;
     QTableView *table_;
     QListView *briefList_;

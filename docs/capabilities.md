@@ -1,9 +1,10 @@
-# Capability inventory — internal alpha 0.6
+# Capability inventory — internal alpha 0.7
 
 These are concrete locally implemented capabilities. This list is not the exhaustive final TC inventory, and its row count cannot establish a percentage of final parity. `docs/parity-matrix.csv` retains scenario-level reference status; static GUI structure has been audited against 11.58.1 resources; installed runtime behavior remains unverified.
 
 | Area | Available capabilities |
 | --- | --- |
+| Settings 0.7 | 93 audited control gaps resolved: file display/formatting, icons/colors, tab behavior, session switches, history, quick search, bounded automatic refresh and bookmark editing; [scope and limits](settings-implementation-0.7.md) |
 | Main window | Two independent panels; resizable splitter; active path highlighting; dense sortable columns; project-owned icons and link indication; shared menus/toolbar/function-key actions; right-click actions |
 | Navigation | Editable paths; parent; previous/next directory; home; root; directory Enter/double-click; desktop file opening; opposite-panel matching; swap current panel directories; tabs; per-tab history |
 | Panel state | Hidden files; bounded worker enumeration; loading counts; stale request cancellation; retained listing on failure; refresh selection/cursor restoration; native entry identity |
