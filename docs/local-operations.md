@@ -4,7 +4,7 @@ This is an internal Linux alpha. These behaviors are implementation contracts te
 
 ## Copy
 
-F5 copies selected entries (or the cursor item if nothing is selected) to a directory, defaulting to the opposite panel. The confirmation lists the sources and lets the user edit the destination and choose fail-on-conflict, skip-existing, or replace-regular-files. There is no implicit directory merge. Existing directory or symlink destinations cannot be replaced.
+F5 copies selected entries (or the cursor item if nothing is selected) directly to the opposite panel and opens progress immediately. The direct command defaults to fail-on-conflict; skip-existing and replace-regular-files remain backend policies for callers that explicitly select them. There is no startup destination/confirmation dialog. There is no implicit directory merge. Existing directory or symlink destinations cannot be replaced.
 
 Each top-level entry is copied into a uniquely named `.tc-copy-*` sibling. Regular files use exclusive creation, bounded read/write buffers, source identity/size/mtime/ctime checks and fsync before publication. Directories are staged as complete trees. Symlinks, including dangling and cyclic links, are copied as links. FIFOs, sockets and device nodes are rejected. Traversal is limited to 256 nested levels. Source traversal refuses filesystem-device changes and destination-inside-source paths. Native filename and link-target bytes are retained.
 
@@ -22,9 +22,9 @@ F7 creates one directory, with a single-component name. Shift+F4 creates one new
 
 ## Trash and permanent deletion
 
-F8 or Delete asks for confirmation then uses Qt's desktop trash integration. It reports failures per selected entry. Trash currently requires a losslessly decodable top-level path; there is no fallback to permanent deletion. Trash cancellation takes effect between selected entries. Restoration is performed through the desktop trash interface.
+F8 or Delete starts progress immediately and uses Qt's desktop trash integration by default. It reports failures per selected entry. Trash currently requires a losslessly decodable top-level path; there is no fallback to permanent deletion. Trash cancellation takes effect between selected entries. Restoration is performed through the desktop trash interface.
 
-Shift+Delete requires separate permanent-delete confirmation. Deletion traverses directory descriptors with no-follow opens and unlinks links themselves. It refuses device-boundary traversal and rejects root/dot/dot-dot entry paths. Cancellation stops remaining traversal; already deleted entries cannot be restored. Privilege elevation is not supported. This is not an adversarial filesystem sandbox or a transactional deletion service.
+Shift+Delete starts permanent deletion directly, with no preparatory confirmation. Deletion traverses directory descriptors with no-follow opens and unlinks links themselves. It refuses device-boundary traversal and rejects root/dot/dot-dot entry paths. Cancellation stops remaining traversal; already deleted entries cannot be restored. Privilege elevation is not supported. This is not an adversarial filesystem sandbox or a transactional deletion service.
 
 ## Execution, reports and journals
 

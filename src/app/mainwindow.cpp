@@ -395,10 +395,10 @@ void MainWindow::addTab(QTabWidget *tabs, const std::filesystem::path &path) {
     });
     connect(panel, &FilePanel::filesDropped, this, [this, panel](const auto &paths, bool move) {
         QString summary;
-        if (ApplicationPreferences::flag("IdConf_CountfilesCopy") &&
+        if (move && ApplicationPreferences::flag("IdConf_CountfilesCopy") &&
             !DirectorySizes::confirmPreflight(paths, this, summary))
             return;
-        if (ApplicationPreferences::flag("confirm_mouse") &&
+        if (move && ApplicationPreferences::flag("confirm_mouse") &&
             QMessageBox::question(
                 this, move ? "Move dropped files" : "Copy dropped files",
                 QString("%1 items to %2?\n%3").arg(paths.size()).arg(displayPath(panel->path()), summary),
@@ -696,6 +696,13 @@ void MainWindow::runOperation(LocalFiles::Operation operation) {
     if (operation == Operation::MakeDirectory || operation == Operation::MakeFile)
         request.sources.clear();
     request.destination = oppositePanel()->path();
+    if (operation == Operation::Copy || operation == Operation::Delete || operation == Operation::Trash) {
+        if (request.sources.empty()) return;
+        if (operation != Operation::Copy) request.destination.clear();
+        request.journalDirectory = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/jobs";
+        startOperation(request);
+        return;
+    }
     if (operation == Operation::MakeDirectory || operation == Operation::MakeFile ||
         operation == Operation::Rename) {
         if (operation == Operation::Rename && request.sources.size() != 1) {
@@ -861,10 +868,12 @@ void MainWindow::startOperation(const LocalFiles::Request &request) {
     const auto label =
         verb + (request.destination.empty() ? QString(" · %1 entries").arg(request.sources.size())
                                             : " → " + displayPath(request.destination));
+    const bool usesProgress = request.operation == LocalFiles::Operation::Copy || request.operation == LocalFiles::Operation::Delete ||
+                              request.operation == LocalFiles::Operation::Trash || request.operation == LocalFiles::Operation::Move;
     const auto jobId = queue_->enqueue(
         label, [request](const auto &control) { return LocalFiles::execute(request, control); },
-        [this, source, request](const LocalFiles::Result &result) {
-            if (source && active_ == source && !QApplication::activeModalWidget())
+        [this, source, request, usesProgress](const LocalFiles::Result &result) {
+            if (!usesProgress && source && active_ == source && !QApplication::activeModalWidget())
                 source->focusFiles();
             if (request.operation == LocalFiles::Operation::MakeFile && !result.items.empty() &&
                 result.items.front().error.isEmpty()) {
@@ -903,9 +912,13 @@ void MainWindow::startOperation(const LocalFiles::Request &request) {
                 report->show();
             }
         });
-    if (request.operation == LocalFiles::Operation::Copy || request.operation == LocalFiles::Operation::Delete ||
-        request.operation == LocalFiles::Operation::Trash || request.operation == LocalFiles::Operation::Move)
-        (new OperationProgressDialog(queue_, jobId, this))->show();
+    if (usesProgress) {
+        auto *progress = new OperationProgressDialog(queue_, jobId, this);
+        connect(progress, &QDialog::finished, this, [this, progress] {
+            if (!progress->property("backgroundMode").toBool()) { activateWindow(); active_->focusFiles(); }
+        });
+        progress->show();
+    }
     statusBar()->showMessage("Operation queued · Ctrl+J opens background operations", 10000);
 }
 void MainWindow::updateBookmarks() {
@@ -1480,14 +1493,6 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
             if (paths.empty())
                 return true;
             const bool trash = ApplicationPreferences::flag("IdConf_trashcan");
-            if ((ApplicationPreferences::flag("confirm_mouse_delete") || !trash) &&
-                QMessageBox::question(this, "Dropped deletion",
-                                      QString("%1 %2 selected entries?")
-                                          .arg(trash ? "Trash" : "Permanently delete")
-                                          .arg(paths.size()),
-                                      QMessageBox::Yes | QMessageBox::No,
-                                      QMessageBox::No) != QMessageBox::Yes)
-                return true;
             LocalFiles::Request request;
             request.sources = paths;
             request.operation = trash ? LocalFiles::Operation::Trash : LocalFiles::Operation::Delete;

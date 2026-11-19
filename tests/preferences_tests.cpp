@@ -1,3 +1,5 @@
+#include <QDoubleSpinBox>
+#include <QLabel>
 #include "ui/dialogs/operationprogressdialog.h"
 #include <QProgressBar>
 #include "ui/icons/commandicons.h"
@@ -148,13 +150,65 @@ class PreferencesTests : public QObject {
     }
     void droppedCopyOpensTwoBarsAndCompletes() {
         QTemporaryDir source,target; put(source.filePath("data"),"copy me");
-        QSettings().setValue("final/confirm_mouse",false);
+        QSettings().setValue("final/confirm_mouse",true);
+        QSettings().setValue("final/IdConf_CountfilesCopy",true);
         MainWindow window({target.path(),target.path()});window.show();
         QTRY_VERIFY(!window.activePanel()->path().empty());
         window.activePanel()->filesDropped({nativePath(source.filePath("data"))},false);
         QPointer<OperationProgressDialog> dialog=window.findChild<OperationProgressDialog *>("operationProgressDialog");
         QVERIFY(dialog);QCOMPARE(dialog->findChildren<QProgressBar *>().size(),2);
         QTRY_VERIFY(QFile::exists(target.filePath("data")));QTRY_VERIFY(dialog.isNull());
+    }
+    void directDeleteBypassesAllStartupConfirmations() {
+        QTemporaryDir dir;QDir().mkdir(dir.filePath("tree"));put(dir.filePath("tree/file"),"delete me");
+        QSettings().setValue("final/confirm_dirs",true);QSettings().setValue("final/confirm_readonly",true);
+        QSettings().setValue("final/confirm_hidsys",true);QSettings().setValue("final/IdConf_CountfilesCopy",true);
+        MainWindow window({dir.path(),dir.path()});window.show();auto *panel=window.activePanel();
+        QTRY_COMPARE(panel->model()->rowCount(),2);panel->table()->selectRow(1);
+        window.findChild<QAction *>("cm_DeletePermanently")->trigger();
+        QPointer<OperationProgressDialog> dialog=window.findChild<OperationProgressDialog *>("operationProgressDialog");
+        QVERIFY(dialog);QCOMPARE(dialog->findChildren<QProgressBar *>().size(),2);
+        QVERIFY(!window.findChild<QLineEdit *>("operationDestination"));
+        QTRY_VERIFY(!QDir(dir.filePath("tree")).exists());QTRY_VERIFY(dialog.isNull());
+    }
+    void transferCountersToggleRemainingAndShowPublishedDestination() {
+        auto c=std::make_shared<LocalFiles::Control>();OperationProgressWidget widget;widget.show();
+        c->startProgress();c->setTotals(200,4,true,true);c->beginFile("/tmp/source/file",100,"/tmp/target/file");c->advanceFile(50);
+        widget.updateProgress(c,JobQueue::State::Running);
+        auto *files=widget.findChild<QLabel *>("operationFileCount");auto *bytes=widget.findChild<QLabel *>("operationByteCount");
+        QCOMPARE(files->text(),QString("0 / 4"));QVERIFY(bytes->text().contains("50 B / 200 B"));
+        QTest::mouseClick(files,Qt::LeftButton);QCOMPARE(files->text(),QString("-4"));
+        QTest::mouseClick(bytes,Qt::LeftButton);QCOMPARE(bytes->text(),QString("-150 B"));
+        QCOMPARE(widget.findChild<QLabel *>("currentDestinationName")->text(),QString("/tmp/target/file"));
+        QTest::qWait(80);c->advanceFile(10);widget.updateProgress(c,JobQueue::State::Running);
+        QTest::qWait(80);c->advanceFile(10);widget.updateProgress(c,JobQueue::State::Running);
+        QVERIFY(widget.findChild<QLabel *>("operationTransferRate")->text().contains("/s"));
+        QVERIFY(widget.findChild<QLabel *>("operationProgressSummary")->text().contains("Time left:"));
+    }
+    void progressBackgroundForegroundPauseAndSpeedControlsWork() {
+        JobQueue queue;auto entered=std::make_shared<std::atomic_bool>(false);
+        auto id=queue.enqueue("Controlled copy",[entered](const auto &c){c->startProgress();c->setTotals(1000,1,true,true);c->beginFile("/tmp/source",1000,"/tmp/target");*entered=true;while(!c->cancelled)std::this_thread::sleep_for(std::chrono::milliseconds(2));LocalFiles::Result r;r.cancelled=true;return r;});
+        QPointer<OperationProgressDialog> dialog=new OperationProgressDialog(&queue,id);dialog->show();
+        QTRY_VERIFY(entered->load());QCOMPARE(dialog->windowModality(),Qt::WindowModal);
+        auto *background=dialog->findChild<QPushButton *>("operationBackground");background->click();
+        QCOMPARE(dialog->windowModality(),Qt::NonModal);QVERIFY(dialog->isVisible());QVERIFY(background->text().contains("Foreground"));
+        auto *value=dialog->findChild<QDoubleSpinBox *>("operationSpeedLimit");value->setValue(64);
+        dialog->findChild<QCheckBox *>("operationSpeedLimitEnabled")->setChecked(true);
+        QCOMPARE(queue.jobs().front().control->bytesPerSecond.load(),uint64_t(65536));
+        dialog->findChild<QCheckBox *>("operationSpeedLimitEnabled")->setChecked(false);
+        QCOMPARE(queue.jobs().front().control->bytesPerSecond.load(),uint64_t(0));
+        auto *pause=dialog->findChild<QPushButton *>("operationPause");pause->click();QVERIFY(queue.jobs().front().state==JobQueue::State::Paused);
+        pause->click();QVERIFY(queue.jobs().front().state==JobQueue::State::Running);
+        background->click();QCOMPARE(dialog->windowModality(),Qt::WindowModal);
+        dialog->reject();QTRY_VERIFY(dialog.isNull());QTRY_VERIFY(!queue.busy());QVERIFY(queue.jobs().front().state==JobQueue::State::Cancelled);
+    }
+    void failedProgressReleasesForegroundModality() {
+        JobQueue queue;const auto id=queue.enqueue("Failed copy",[](const auto &)->LocalFiles::Result{throw std::runtime_error("fixture failure");});
+        QPointer<OperationProgressDialog> dialog=new OperationProgressDialog(&queue,id);dialog->show();
+        QTRY_VERIFY(!queue.busy());QVERIFY(dialog);QCOMPARE(dialog->windowModality(),Qt::NonModal);
+        QVERIFY(queue.jobs().front().state==JobQueue::State::Failed);
+        dialog->findChild<QPushButton *>("operationCancel")->click();QTRY_VERIFY(dialog.isNull());
+        QVERIFY(!queue.jobs().front().control->cancelled);
     }
     void baselineReductionAndCancel() {
         QTemporaryDir dir;

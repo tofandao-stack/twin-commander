@@ -323,7 +323,7 @@ void CommandIcons::decorate(QWidget *root) {
     for (auto *button : root->findChildren<QAbstractButton *>())
         if (button->icon().isNull() && !qobject_cast<QCheckBox *>(button) &&
             !qobject_cast<QRadioButton *>(button)) {
-            if (button->objectName().startsWith("qt_") || button->width() < 20)
+            if (button->property("noCommandIcon").toBool() || button->objectName().startsWith("qt_") || button->width() < 20)
                 continue;
             if (auto *tool = qobject_cast<QToolButton *>(button)) {
                 if (tool->arrowType() != Qt::NoArrow ||

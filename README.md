@@ -51,8 +51,8 @@ Ensure `$HOME/.local/bin` is on `PATH` when using this prefix. The launcher uses
 - Tabs, history, editable paths, hidden-file toggle, multi-selection, and directory navigation.
 - Refresh and hidden-file toggles retain surviving selections and the cursor using native file identities. If the current entry disappears, the cursor uses the nearest remaining row.
 - F3 viewer (UTF-8 text, hex and images), F4 editor with staged saving and unsaved-change protection.
-- F5 recursive copy with explicit conflict policy, F6 same-device move, Shift+F6 rename, F7 mkdir and Shift+F4 new text file.
-- F8/Delete desktop trash and separately confirmed Shift+Delete permanent deletion.
+- F5 copies directly to the opposite panel with no-overwrite handling; F6 same-device move, Shift+F6 rename, F7 mkdir and Shift+F4 new text file.
+- F8/Delete starts desktop trash directly; Shift+Delete starts permanent deletion directly.
 - Background operations with separate current-file and overall progress bars, pause/cancellation, per-item reports and diagnostic JSON journals. See [operation progress](docs/operation-progress.md).
 - Recursive glob/content search with reveal-in-panel, SHA-256 checksums and native file properties.
 - Per-panel quick filters, wildcard selection, inverse selection, path clipboard and persistent bookmarks.
@@ -79,11 +79,11 @@ Ensure `$HOME/.local/bin` is on `PATH` when using this prefix. The launcher uses
 | Ctrl+R | Refresh active panel |
 | Ctrl+H | Toggle hidden entries in active panel |
 | F3 / F4 | View / edit the cursor or selected file |
-| F5 / F6 | Copy / move selected entries to a directory (opposite panel by default) |
+| F5 / F6 | Copy directly to the opposite panel / choose a move destination |
 | Shift+F6 | Rename one entry |
 | F7 / Shift+F4 | Create folder / create text file |
-| F8 or Delete | Confirm move to desktop trash |
-| Shift+Delete | Confirm permanent deletion |
+| F8 or Delete | Start moving selected entries to desktop trash |
+| Shift+Delete | Start permanent deletion of selected entries |
 | Alt+F7 | Find files; glob/regex, content, size/date filters and saved profiles |
 | Ctrl+M | Multi-rename preview |
 | Alt+F5 / Alt+F9 | Create / browse archive |

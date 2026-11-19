@@ -1,3 +1,4 @@
+#include "ui/dialogs/operationprogressdialog.h"
 #include "filesystem/pathencoding.h"
 #include "ui/panels/directorymodel.h"
 #include "ui/panels/filepanel.h"
@@ -572,7 +573,7 @@ private slots:
         QTRY_COMPARE(panel.selectedPaths().front().filename(), std::filesystem::path("a.txt"));
     }
 
-    void copyAndMkdirCommandsUseRealDialogs()
+    void copyStartsImmediatelyAndMkdirUsesNameDialog()
     {
         QTemporaryDir left;
         QTemporaryDir right;
@@ -582,16 +583,12 @@ private slots:
         QTRY_COMPARE(window.activePanel()->model()->rowCount(), 2);
         QTest::qWait(20);
         window.activePanel()->table()->setCurrentIndex(window.activePanel()->model()->index(1, 0));
-        QTimer::singleShot(0, &window, [&] {
-            auto *destination = window.findChild<QLineEdit *>("operationDestination");
-            QVERIFY(destination);
-            QCOMPARE(destination->text(), right.path());
-            auto *dialog = qobject_cast<QDialog *>(destination->parentWidget());
-            QVERIFY(dialog);
-            dialog->accept();
-        });
         window.findChild<QAction *>("cm_Copy")->trigger();
+        QVERIFY(!window.findChild<QLineEdit *>("operationDestination"));
+        QPointer<OperationProgressDialog> progress=window.findChild<OperationProgressDialog *>("operationProgressDialog");
+        QVERIFY(progress);
         QTRY_VERIFY(QFile::exists(right.filePath("copy-me")));
+        QTRY_VERIFY(progress.isNull());
         QTRY_VERIFY(!window.findChildren<QProgressDialog *>().size());
         QFile file(right.filePath("copy-me"));
         QVERIFY(file.open(QIODevice::ReadOnly));
@@ -623,12 +620,10 @@ private slots:
         QTRY_COMPARE(panel->model()->rowCount(), 2);
         panel->focusFiles();
         panel->table()->selectRow(1);
-        QTimer::singleShot(0, &window, [&] {
-            auto *destination = window.findChild<QLineEdit *>("operationDestination");
-            QVERIFY(destination);
-            qobject_cast<QDialog *>(destination->parentWidget())->reject();
-        });
         window.findChild<QAction *>("cm_Copy")->trigger();
+        auto *progress=window.findChild<OperationProgressDialog *>("operationProgressDialog");
+        QVERIFY(progress);
+        progress->findChild<QPushButton *>("operationCancel")->click();
         QTRY_VERIFY(panel->table()->hasFocus());
         QCOMPARE(panel->selectedPaths().size(), size_t(1));
         QCOMPARE(panel->selectedPaths().front().filename(), std::filesystem::path("keep"));

@@ -41,7 +41,7 @@ private slots:
         QVERIFY(progress.phase==Progress::Phase::Finished); QVERIFY(progress.totalsKnown); QVERIFY(progress.byteBased);
         QCOMPARE(progress.totalBytes,uint64_t(700004)); QCOMPARE(progress.doneBytes,progress.totalBytes);
         QCOMPARE(progress.totalEntries,uint64_t(2)); QCOMPARE(progress.doneEntries,uint64_t(2));
-        QCOMPARE(progress.currentPath,root/"second"); QCOMPARE(progress.fileTotal,uint64_t(4));
+        QCOMPARE(progress.currentPath,root/"second");QCOMPARE(progress.currentDestination,root/"out"/"second"); QCOMPARE(progress.fileTotal,uint64_t(4));
         QCOMPARE(progress.fileBytes,uint64_t(4)); QVERIFY(progress.fileComplete);
         QCOMPARE(control->completed.load(),uint64_t(2));
     }
@@ -62,6 +62,27 @@ private slots:
         auto result=execute({Operation::Copy,{root/"source"},root/"out"},control);
         QVERIFY(result.cancelled); const auto p=control->progressSnapshot();QCOMPARE(p.doneBytes,uint64_t(0));
         QCOMPARE(p.doneEntries,uint64_t(0));QVERIFY(p.phase==Progress::Phase::Finished);QVERIFY(!fs::exists(root/"out"/"source"));
+    }
+    void speedLimiterWaitsAndCanBeInterrupted() {
+        auto c=std::make_shared<Control>();c->bytesPerSecond=65536;
+        const auto start=std::chrono::steady_clock::now();c->throttle(16384);
+        QVERIFY(std::chrono::steady_clock::now()-start >= std::chrono::milliseconds(200));
+        c->bytesPerSecond=1;
+        auto waiting=std::async(std::launch::async,[c]{try{c->throttle(4096);return false;}catch(const Cancelled &){return true;}});
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));c->cancelled=true;
+        QVERIFY(waiting.wait_for(std::chrono::seconds(2))==std::future_status::ready);QVERIFY(waiting.get());
+        c=std::make_shared<Control>();c->bytesPerSecond=1;
+        auto disabled=std::async(std::launch::async,[c]{c->throttle(4096);});
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));c->bytesPerSecond=0;
+        QVERIFY(disabled.wait_for(std::chrono::seconds(2))==std::future_status::ready);disabled.get();
+    }
+    void nativeCopyHonorsConfiguredSpeedLimit() {
+        QTemporaryDir dir;const auto root=nativePath(dir.path());fs::create_directory(root/"out");put(root/"source",std::string(32768,'x'));
+        auto c=std::make_shared<Control>();c->bytesPerSecond=65536;
+        const auto start=std::chrono::steady_clock::now();const auto result=execute({Operation::Copy,{root/"source"},root/"out"},c);
+        QVERIFY(result.items.front().error.isEmpty());QVERIFY(std::chrono::steady_clock::now()-start>=std::chrono::milliseconds(400));
+        QCOMPARE(get(root/"out"/"source"),std::string(32768,'x'));
+        QCOMPARE(c->progressSnapshot().currentDestination,root/"out"/"source");
     }
     void recursiveCopyPreservesBytesLinksAndPermissions()
     {

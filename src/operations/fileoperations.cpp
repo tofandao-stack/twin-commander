@@ -148,12 +148,12 @@ void removeEntry(int parent, const std::string &name, dev_t device, const std::s
     if (!path.empty()) control->finishFile();
 }
 void copyEntry(int sourceParent, const std::string &source, int targetParent, const std::string &target,
-               dev_t device, const std::shared_ptr<Control> &control, const fs::path &path, unsigned depth = 0) {
+               dev_t device, const std::shared_ptr<Control> &control, const fs::path &path, const fs::path &publishedPath, unsigned depth = 0) {
     cancellation(control);
     if (depth > 256)
         throw Failure("Directory nesting exceeds the 256-level operation limit");
     const auto before = metadata(sourceParent, source);
-    if (!S_ISDIR(before.st_mode)) control->beginFile(path, S_ISREG(before.st_mode) ? uint64_t(before.st_size) : 0);
+    if (!S_ISDIR(before.st_mode)) control->beginFile(path, S_ISREG(before.st_mode) ? uint64_t(before.st_size) : 0, publishedPath);
     if (S_ISLNK(before.st_mode)) {
         std::vector<char> bytes(4096);
         ssize_t size = 0;
@@ -207,7 +207,7 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
                 const std::string child(entry->d_name);
                 if (child == "." || child == "..")
                     continue;
-                copyEntry(input.value, child, output.value, child, device, control, path / child, depth + 1);
+                copyEntry(input.value, child, output.value, child, device, control, path / child, publishedPath / child, depth + 1);
             }
         } catch (...) {
             ::closedir(stream);
@@ -265,9 +265,11 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
         bool accelerated = ApplicationPreferences::flag("id_StandardCopyMethod") && !big && !qt && !compatibility;
         while (true) {
             cancellation(control);
+            const auto limit = control->bytesPerSecond.load();
+            const size_t chunk = limit ? std::min<uint64_t>(buffer.size(), std::max<uint64_t>(4096, limit / 10)) : buffer.size();
             ssize_t size;
             if (accelerated) {
-                size = ::copy_file_range(input.value, nullptr, output.value, nullptr, buffer.size(), 0);
+                size = ::copy_file_range(input.value, nullptr, output.value, nullptr, chunk, 0);
                 if (size < 0 &&
                     (errno == EXDEV || errno == EINVAL || errno == ENOSYS || errno == EOPNOTSUPP)) {
                     accelerated = false;
@@ -280,10 +282,11 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
                     break;
                 control->bytes += size;
                 control->advanceFile(size);
+                control->throttle(size);
                 continue;
             }
-            size = qt ? qtInput.read(buffer.data(), buffer.size())
-                      : ::read(input.value, buffer.data(), buffer.size());
+            size = qt ? qtInput.read(buffer.data(), chunk)
+                      : ::read(input.value, buffer.data(), chunk);
             if (size < 0 && errno == EINTR && !qt)
                 continue;
             check(size < 0 ? -1 : 0);
@@ -300,6 +303,7 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
                 offset += written;
                 control->bytes += written;
                 control->advanceFile(written);
+                control->throttle(written);
             }
             if (big) {
                 const auto offset = ::lseek(input.value, 0, SEEK_CUR);
@@ -351,7 +355,7 @@ void copyEntry(int sourceParent, const std::string &source, int targetParent, co
     check(::fstat(input.value, &after));
     if (!unchanged(before, after) || !unchanged(before, metadata(sourceParent, source)))
         throw Failure("Source changed during copy; destination was not committed");
-    if (S_ISDIR(before.st_mode)) control->beginFile(path, 0);
+    if (S_ISDIR(before.st_mode)) control->beginFile(path, 0, publishedPath);
     control->finishFile();
 }
 void noReplace(int sourceParent, const std::string &source, int targetParent, const std::string &target) {
@@ -488,7 +492,7 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
         (request.operation == Operation::MakeDirectory || request.operation == Operation::MakeFile)
             ? std::vector<fs::path>{request.destination}
             : request.sources;
-    control->startProgress();
+    control->startProgress(request.operation);
     uint64_t totalBytes=0, totalEntries=0;
     bool totalsKnown=true;
     try {
@@ -510,7 +514,7 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
         try {
             cancellation(control);
             if (request.operation != Operation::Copy && request.operation != Operation::Delete)
-                control->beginFile(sourcePath, 1);
+                control->beginFile(sourcePath, 1, request.operation == Operation::Move ? request.destination / sourcePath.filename() : request.destination);
             const auto copiedComment =
                 ApplicationPreferences::flag("IdConf_comments_copy") &&
                         (request.operation == Operation::Copy || request.operation == Operation::Move ||
@@ -598,7 +602,7 @@ Result execute(const Request &request, const std::shared_ptr<Control> &control) 
                         ".tc-copy-" + QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString();
                     try {
                         copyEntry(sourceParent.value, source, targetParent.value, temporary, before.st_dev,
-                                  control, sourcePath);
+                                  control, sourcePath, targetPath);
                         cancellation(control);
                         if (exists) {
                             if (!unchanged(existing, metadata(targetParent.value, target)))
