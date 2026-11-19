@@ -1,3 +1,4 @@
+#include "ui/icons/commandicons.h"
 #include "filesystem/pathencoding.h"
 #include "settings/applicationpreferences.h"
 #include "app/mainwindow.h"
@@ -21,6 +22,8 @@ int main(int argc, char *argv[]) {
     parser.addOption({"search", "Open an independent search window in directory", "directory"});
     parser.addPositionalArgument("paths", "Initial left and right directories", "[left] [right]");
     parser.process(application);
+    CommandIcons::install();
+    application.setDesktopFileName("twin-commander");
     if (parser.positionalArguments().size() > 2)
         parser.showHelp(1);
     if (parser.isSet("search")) {

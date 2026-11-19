@@ -13,6 +13,7 @@ Production code is grouped by responsibility under `src/`. Includes use paths re
 | `search/` | File-search requests and execution |
 | `settings/` | Application, interface and panel preferences |
 | `thumbnails/` | Native thumbnail providers and owned cache maintenance |
+| `ui/icons/` | Command glyphs, UI icon decoration and application icon loading |
 | `ui/dialogs/` | File content/search dialogs and file-operation dialogs |
 | `ui/panels/` | Directory model, file panel, panel layout, folder-tab preferences and native path MIME |
 | `ui/settings/` | Reference form rendering, configuration editors, appearance/toolbars and panel preference bindings |

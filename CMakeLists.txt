@@ -98,6 +98,10 @@ add_library(commander_ui
     # ui
     src/ui/mainwindowui.cpp
 
+    # ui/icons
+    src/ui/icons/commandicons.cpp
+    src/ui/icons/commandicons.h
+
     # ui/panels
     src/ui/panels/directorymodel.cpp
     src/ui/panels/directorymodel.h
@@ -172,3 +176,9 @@ install(TARGETS twin-commander RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES packaging/twin-commander.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 
 install(FILES third_party/libarchive/COPYRIGHT DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/twin-commander RENAME LIBARCHIVE-COPYRIGHT)
+
+foreach(icon_size 16 32 48 64 128 256 512)
+    install(FILES resources/icons/twin-commander-${icon_size}.png
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${icon_size}x${icon_size}/apps
+        RENAME twin-commander.png)
+endforeach()

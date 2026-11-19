@@ -1,3 +1,4 @@
+#include "ui/icons/commandicons.h"
 #include <QSet>
 #include <QVariantMap>
 #include "settings/applicationpreferences.h"
@@ -132,7 +133,7 @@ class WindowPreferenceEventFilter : public QObject {
             }
             auto *tray = window->findChild<QSystemTrayIcon *>("commanderTray");
             if (!tray) {
-                tray = new QSystemTrayIcon(commanderIcon("folder"), window);
+                tray = new QSystemTrayIcon(CommandIcons::applicationIcon(), window);
                 tray->setObjectName("commanderTray");
                 auto *menu = new QMenu(window);
                 const auto restore = [window, tray] {

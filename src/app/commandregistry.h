@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/icons/commandicons.h"
 #include <QAction>
 #include <QHash>
 #include <QKeySequence>
@@ -14,6 +15,7 @@ class CommandRegistry {
                  std::function<void()> callback) {
         auto *action = new QAction(label, owner_);
         action->setObjectName(id);
+        action->setIcon(CommandIcons::icon(id));
         action->setShortcut(shortcut);
         owner_->addAction(action);
         QObject::connect(action, &QAction::triggered, owner_, std::move(callback));

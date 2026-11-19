@@ -1,3 +1,4 @@
+#include "ui/icons/commandicons.h"
 #include "filesystem/pathencoding.h"
 #include "ui/panels/filepanellayout.h"
 #include "settings/applicationpreferences.h"
@@ -338,6 +339,7 @@ void MainWindow::buildMainWindowUi() {
                                parent ? static_cast<QWidget *>(parent) : this);
         menu->setObjectName("referenceMenu_" + description.value("name").toString());
         menu->setSeparatorsCollapsible(false);
+        if (parent) menu->setIcon(commanderIcon(description.value("caption").toString()));
         for (const auto &value : description.value("items").toArray()) {
             const auto item = value.toObject();
             const auto caption = item.value("caption").toString();
@@ -433,6 +435,9 @@ void MainWindow::buildMainWindowUi() {
     for (int i = 0; i < functionActions.size(); ++i) {
         auto *button = new QPushButton(captions[i].toString(), functionBar_);
         button->setObjectName("function_" + functionActions[i]);
+        button->setProperty("iconCommand", functionActions[i]);
+        button->setIcon(commanderIcon(functionActions[i], 16));
+        button->setIconSize(QSize(16, 16));
         button->setFixedHeight(23);
         button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         button->setFlat(true);
@@ -548,10 +553,12 @@ void MainWindow::showOptions() {
                                  "  7-ZIP Packer", "Misc."};
     auto *list = new QListWidget(dialog);
     list->setObjectName("configurationCategories");
+    list->setIconSize(QSize(12, 12));
     list->setGeometry(1, 0, 132, 392);
     for (const auto &category : categories) {
-        auto *item = new QListWidgetItem(category, list);
-        item->setSizeHint(QSize(126, 15));
+        auto *item = new QListWidgetItem(commanderIcon(category, 16), category, list);
+        item->setToolTip(category.trimmed());
+        item->setSizeHint(QSize(158, 15));
     }
     auto *title = new QLabel("Layout", dialog);
     title->setGeometry(136, 1, 417, 20);
@@ -658,6 +665,11 @@ void MainWindow::showOptions() {
         if (i == 3)
             connect(button, &QPushButton::clicked, dialog, apply);
     }
+    // Allow room for category icons without truncating the existing labels.
+    list->setFixedWidth(164);
+    for (auto *child : dialog->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly))
+        if (child != list && child->x() >= 132) child->move(child->x() + 32, child->y());
+    dialog->setFixedSize(588, 420);
     InterfacePreferences::adaptDialog(dialog);
     dialog->show();
 }

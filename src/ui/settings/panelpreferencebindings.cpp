@@ -238,15 +238,10 @@ void MainWindow::applyPanelPreferences(bool panels) {
     const int menuSizes[]{16, 20, 24, 32};
     const int menuSize = menuSizes[qBound(0, s.value("icons/menuSize", 0).toInt(), 3)];
     for (auto *action : findChildren<QAction *>()) {
-        if (!action->property("preferenceOriginalIcon").isValid())
-            action->setProperty("preferenceOriginalIcon", action->icon());
-        // Toolbar proxies have their own presentation; change only menu commands.
+        if (action->isSeparator()) continue;
         if (action->property("tcCommandId").isValid()) {
-            auto icon = qvariant_cast<QIcon>(action->property("preferenceOriginalIcon"));
-            if (icon.isNull())
-                icon = commanderIcon(action->objectName(), menuSize);
-            action->setIcon(s.value("icons/menu", true).toBool() ? QIcon(icon.pixmap(menuSize, menuSize))
-                                                                 : QIcon());
+            action->setIcon(commanderIcon(action->objectName(), menuSize));
+            action->setIconVisibleInMenu(s.value("icons/menu", true).toBool());
         }
     }
     QFileIconProvider icons;

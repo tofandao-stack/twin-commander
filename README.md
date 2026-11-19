@@ -42,7 +42,7 @@ To install the binary and desktop launcher into a local prefix:
 cmake --install build --prefix "$HOME/.local"
 ```
 
-Ensure `$HOME/.local/bin` is on `PATH` when using this prefix. The launcher uses the desktop's standard file-manager icon.
+Ensure `$HOME/.local/bin` is on `PATH` when using this prefix. The launcher uses Twin Commander's bundled dual-panel application icon. See [command and application icons](docs/icons.md) for coverage and customization.
 
 ## Available behavior
 

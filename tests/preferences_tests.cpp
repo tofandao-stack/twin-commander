@@ -1,3 +1,5 @@
+#include "ui/icons/commandicons.h"
+#include "ui/panels/filepanellayout.h"
 #include "filesystem/pathencoding.h"
 #include "app/mainwindow.h"
 #include "settings/panelpreferences.h"
@@ -16,6 +18,9 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMenu>
+#include <QMenuBar>
+#include <QListWidget>
+#include <QImage>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSettings>
@@ -60,6 +65,60 @@ class PreferencesTests : public QObject {
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, settings_.path());
     }
     void init() { QSettings().clear(); }
+    void commandAndApplicationIconsCoverMenusAndOptions() {
+        QTemporaryDir dir;
+        MainWindow window({dir.path(), dir.path()});
+        window.show();
+        QVERIFY(!window.windowIcon().isNull());
+        QVERIFY(!qApp->windowIcon().isNull());
+        for (int size : {16, 32, 48, 64, 128, 256, 512}) {
+            QImage image(QString(":/icons/twin-commander-%1.png").arg(size));
+            QCOMPARE(image.size(), QSize(size, size));
+            QVERIFY(image.hasAlphaChannel());
+        }
+        for (auto *header : window.menuBar()->actions()) {
+            QVERIFY(!header->text().isEmpty());
+            QVERIFY(header->icon().isNull());
+        }
+        int commands = 0;
+        std::function<void(QMenu *)> checkMenu = [&](QMenu *menu) {
+            for (auto *action : menu->actions()) {
+                if (action->isSeparator()) continue;
+                QVERIFY2(!action->icon().isNull(), qPrintable(action->text()));
+                ++commands;
+                if (action->menu()) checkMenu(action->menu());
+            }
+        };
+        for (auto *header : window.menuBar()->actions())
+            if (header->menu()) checkMenu(header->menu());
+        QVERIFY(commands > 90);
+        // Numeric reference commands must resolve to their semantic glyph, rather than one document.
+        QCOMPARE(commanderIcon("tc_501").pixmap(24, 24).toImage(),
+                 commanderIcon("cm_SearchFor").pixmap(24, 24).toImage());
+        QVERIFY(commanderIcon("cm_Copy").pixmap(24, 24).toImage() !=
+                commanderIcon("cm_Delete").pixmap(24, 24).toImage());
+        auto *dialog = options(window);
+        QVERIFY(dialog);
+        auto *categories = dialog->findChild<QListWidget *>("configurationCategories");
+        QCOMPARE(categories->count(), 26);
+        for (int i = 0; i < categories->count(); ++i) QVERIFY(!categories->item(i)->icon().isNull());
+        for (auto *button : dialog->findChildren<QPushButton *>())
+            QVERIFY2(!button->icon().isNull(), qPrintable(button->text()));
+        dialog->reject();
+        QSettings().setValue("icons/menu", false);
+        QMenu dynamic;
+        auto *action = dynamic.addAction("Copy");
+        CommandIcons::decorate(&dynamic);
+        QVERIFY(!action->icon().isNull());
+        QVERIFY(!action->isIconVisibleInMenu());
+        QSettings().setValue("icons/menu", true);
+        CommandIcons::decorate(&dynamic);
+        QVERIFY(action->isIconVisibleInMenu());
+        QImage custom(24, 24, QImage::Format_ARGB32); custom.fill(Qt::magenta);
+        QVERIFY(custom.save(dir.filePath("cm_Copy.png")));
+        QSettings().setValue("appearance/iconDirectory", dir.path());
+        QCOMPARE(commanderIcon("cm_Copy").pixmap(24, 24).toImage().pixelColor(12, 12), QColor(Qt::magenta));
+    }
     void baselineReductionAndCancel() {
         QTemporaryDir dir;
         MainWindow window({dir.path(), dir.path()});

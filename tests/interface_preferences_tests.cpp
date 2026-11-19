@@ -265,6 +265,7 @@ class InterfacePreferencesTests : public QObject {
         window.show();
         QTRY_VERIFY(!window.activePanel()->path().empty());
         auto *dialog = options(window);
+        const int unscaledWidth = dialog->width();
         dialog->findChild<QListWidget *>("ViewModeList")->setCurrentRow(0);
         edit(dialog, "AdditionalSortEdit", "date");
         dialog->findChild<QComboBox *>("id_TabColorBg")->setCurrentText("#123456");
@@ -282,7 +283,7 @@ class InterfacePreferencesTests : public QObject {
         QVERIFY(qApp->palette().color(QPalette::Base).lightness() < 80);
         QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
         dialog = options(window);
-        QCOMPARE(dialog->width(), 834);
+        QCOMPARE(dialog->width(), qRound(unscaledWidth * 1.5));
         dialog->reject();
         window.activePanel()->navigate(nativePath(dir.filePath("child")));
         QTRY_COMPARE(window.activePanel()->path(), nativePath(dir.filePath("child")));

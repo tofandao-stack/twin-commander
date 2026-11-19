@@ -1,3 +1,4 @@
+#include "ui/icons/commandicons.h"
 #include "filesystem/pathencoding.h"
 #include "filesystem/directorysizes.h"
 #include "ui/panels/foldertabpreferences.h"
@@ -74,6 +75,8 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
     : QMainWindow(parent), left_(new QTabWidget(this)), right_(new QTabWidget(this)),
       splitter_(new QSplitter(this)), commandLine_(new QLineEdit(this)), commands_(this) {
     applyCommanderAppearance();
+    CommandIcons::install();
+    setWindowIcon(CommandIcons::applicationIcon());
     setProperty("nativeCommanderWindow", true);
     queue_ = new JobQueue(this);
     queue_->setJournalDirectory(journalDirectory());
@@ -335,6 +338,7 @@ MainWindow::MainWindow(const QStringList &initialPaths, QWidget *parent)
     applyLayoutOptions();
     updateUiState();
     applyPanelPreferences();
+    CommandIcons::decorate(this);
     ApplicationPreferences::apply();
     for (auto *button : functionBar_->findChildren<QPushButton *>())
         if (button->objectName() == "function_cm_Delete") {
